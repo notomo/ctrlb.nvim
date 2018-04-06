@@ -20,3 +20,6 @@ class Kind(Base):
 
     def action_preview(self, context):
         self.action_activate(context)
+
+    def action_open(self, context):
+        self.action_activate(context)
