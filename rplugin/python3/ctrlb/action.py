@@ -31,7 +31,8 @@ class ActionInfo(object):
                 kind_name = names.pop(0)
                 action_name = names.pop(0)
             elif len(key_value) > 1:
-                args[key[1:]] = int(key_value[1])
+                value = key_value[1]
+                args[key[1:]] = int(value) if value.isdigit() else str(value)
 
         return cls(kind_name, action_name, args)
 
