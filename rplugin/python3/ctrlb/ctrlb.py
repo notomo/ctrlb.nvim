@@ -23,6 +23,19 @@ class Ctrlb(Echoable):
     def custom(self, name: str, value):
         self._custom.set(name, value)
 
+    def open(self, arg_string: str):
+        self._vim.command('tabnew ctrlb')
+        buf = self._vim.current.buffer
+        options = buf.options
+        options['buftype'] = 'nofile'
+        options['swapfile'] = False
+        options['buflisted'] = False
+        options['filetype'] = 'ctrlb'
+        options['modifiable'] = False
+        self._vim.command('silent doautocmd WinEnter')
+        self._vim.command('silent doautocmd BufWinEnter')
+        self._vim.command('silent doautocmd FileType ctrlb')
+
     def _send(self, action_info: ActionInfo):
         host = self._custom.host
         port = self._custom.port

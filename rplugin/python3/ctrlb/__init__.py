@@ -17,3 +17,7 @@ class CtrlbHandler(object):
     @neovim.function('_ctrlb_custom', sync=True)
     def custom(self, args):
         self._ctrlb.custom(args[0], args[1])
+
+    @neovim.function('_ctrlb_open', sync=True)
+    def open(self, args):
+        self._ctrlb.open(args[0])
