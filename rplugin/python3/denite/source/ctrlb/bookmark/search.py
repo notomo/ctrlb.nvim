@@ -31,6 +31,7 @@ class Source(Base):
                 'word': '{} {}'.format(url, b['title']),
                 'action__bookmark_id': b['id'],
                 'action__url': url,
+                'action__title': b['title'],
             }
 
         return [create(b) for b in bookmarks['body']]
