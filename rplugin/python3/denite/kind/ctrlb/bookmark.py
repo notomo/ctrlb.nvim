@@ -13,8 +13,8 @@ class Kind(Base):
         self.name = 'ctrlb/bookmark'
         self.default_action = 'open'
 
-        self.redraw_actions += ['rename']
-        self.persist_actions += ['rename']
+        self.redraw_actions += ['rename', 'delete']
+        self.persist_actions += ['rename', 'delete']
 
     def action_tabopen(self, context):
         ctrlb = Ctrlb(self.vim)
@@ -30,6 +30,12 @@ class Kind(Base):
 
     def action_preview(self, context):
         self.action_open(context)
+
+    def action_delete(self, context):
+        ctrlb = Ctrlb(self.vim)
+        for target in context['targets']:
+            bookmark_id = target['action__bookmark_id']
+            ctrlb.execute('bookmark', 'remove', {'id': bookmark_id})
 
     def action_rename(self, context):
         ctrlb = Ctrlb(self.vim)

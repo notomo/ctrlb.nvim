@@ -19,5 +19,7 @@ class Source(Base):
             {
                 'word': t['url'],
                 'action__tab_id': t['id'],
+                'action__url': t['url'],
+                'action__title': t['title'],
             } for t in tabs['body']
         ]

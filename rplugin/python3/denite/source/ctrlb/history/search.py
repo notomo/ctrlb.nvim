@@ -31,6 +31,7 @@ class Source(Base):
                 'word': '{} {}'.format(url, h['title']),
                 'action__history_id': h['id'],
                 'action__url': url,
+                'action__title': h['title'],
             }
 
         return [create(h) for h in histories['body']]

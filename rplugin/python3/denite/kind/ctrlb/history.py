@@ -26,3 +26,11 @@ class Kind(Base):
 
     def action_preview(self, context):
         self.action_open(context)
+
+    def action_bookmark(self, context):
+        ctrlb = Ctrlb(self.vim)
+        for target in context['targets']:
+            ctrlb.execute('bookmark', 'create', {
+                'url': target['action__url'],
+                'title': target['action__title'],
+            })
