@@ -20,13 +20,13 @@ class Kind(Base):
         ctrlb = Ctrlb(self.vim)
         target = context['targets'][0]
         bookmark_id = target['action__bookmark_id']
-        ctrlb.execute('bookmark:tabOpen -id={}'.format(bookmark_id))
+        ctrlb.execute('bookmark', 'tabOpen', {'id': bookmark_id})
 
     def action_open(self, context):
         ctrlb = Ctrlb(self.vim)
         target = context['targets'][0]
         bookmark_id = target['action__bookmark_id']
-        ctrlb.execute('bookmark:open -id={}'.format(bookmark_id))
+        ctrlb.execute('bookmark', 'open', {'id': bookmark_id})
 
     def action_preview(self, context):
         self.action_open(context)
@@ -42,8 +42,7 @@ class Kind(Base):
             target['action__title']
         )
 
-        ctrlb.execute(
-            'bookmark:update -id={} -title={}'.format(
-                target['action__bookmark_id'], title
-            )
-        )
+        ctrlb.execute('bookmark', 'update', {
+            'id': target['action__bookmark_id'],
+            'title': title
+        })

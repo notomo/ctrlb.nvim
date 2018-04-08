@@ -21,9 +21,9 @@ class Source(Base):
             return []
 
         ctrlb = Ctrlb(self.vim)
-        histories = ctrlb.execute(
-            'history:search -input="{}"'.format(input_text)
-        )
+        histories = ctrlb.execute('history', 'search', {
+            'input': input_text
+        })
 
         def create(h):
             url = h['url'] if 'url' in h else ''

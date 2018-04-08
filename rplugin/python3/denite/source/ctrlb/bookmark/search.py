@@ -21,9 +21,9 @@ class Source(Base):
             return []
 
         ctrlb = Ctrlb(self.vim)
-        bookmarks = ctrlb.execute(
-            'bookmark:search -input="{}"'.format(input_text)
-        )
+        bookmarks = ctrlb.execute('bookmark', 'search', {
+            'input': input_text
+        })
 
         def create(b):
             url = b['url'] if 'url' in b else ''

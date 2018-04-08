@@ -16,7 +16,7 @@ class Kind(Base):
         ctrlb = Ctrlb(self.vim)
         target = context['targets'][0]
         tab_id = target['action__tab_id']
-        ctrlb.execute('tab:activate -id={}'.format(tab_id))
+        ctrlb.execute('tab', 'activate', {'id': tab_id})
 
     def action_preview(self, context):
         self.action_activate(context)

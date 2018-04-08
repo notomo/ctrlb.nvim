@@ -13,12 +13,10 @@ class Source(Base):
 
     def gather_candidates(self, context):
         ctrlb = Ctrlb(self.vim)
-        limit = (
-            ' -limit={}'.format(context['args'][0])
-            if len(context['args']) > 0
-            else ''
-        )
-        bookmarks = ctrlb.execute('bookmark:list{}'.format(limit))
+        args = {}
+        if len(context['args']) > 0:
+            args['limit'] = context['args'][0]
+        bookmarks = ctrlb.execute('bookmark', 'list', args)
 
         def create(b):
             url = b['url'] if 'url' in b else ''

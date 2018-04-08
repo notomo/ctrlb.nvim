@@ -12,7 +12,7 @@ class CtrlbHandler(object):
 
     @neovim.function('_ctrlb_execute', sync=True)
     def execute(self, args):
-        return self._ctrlb.execute(args[0])
+        return self._ctrlb.execute_by_string(args[0])
 
     @neovim.function('_ctrlb_custom', sync=True)
     def custom(self, args):

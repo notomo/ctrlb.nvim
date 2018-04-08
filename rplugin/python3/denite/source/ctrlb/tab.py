@@ -14,7 +14,7 @@ class Source(Base):
 
     def gather_candidates(self, context):
         ctrlb = Ctrlb(self.vim)
-        tabs = ctrlb.execute('tab:list')
+        tabs = ctrlb.execute('tab', 'list')
         return [
             {
                 'word': t['url'],

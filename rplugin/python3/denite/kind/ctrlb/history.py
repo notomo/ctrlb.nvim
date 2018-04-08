@@ -16,13 +16,13 @@ class Kind(Base):
         ctrlb = Ctrlb(self.vim)
         target = context['targets'][0]
         url = target['action__url']
-        ctrlb.execute('tab:tabOpen -url={}'.format(url))
+        ctrlb.execute('tab', 'tabOpen', {'url': url})
 
     def action_open(self, context):
         ctrlb = Ctrlb(self.vim)
         target = context['targets'][0]
         url = target['action__url']
-        ctrlb.execute('tab:open -url={}'.format(url))
+        ctrlb.execute('tab', 'open', {'url': url})
 
     def action_preview(self, context):
         self.action_open(context)
