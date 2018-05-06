@@ -1,21 +1,24 @@
 
 import json
+from functools import partial
+from queue import Queue
+from typing import Any, Dict  # noqa
 
 from neovim import Nvim
-from websocket import create_connection, setdefaulttimeout
 
 from .action import ActionInfo
 from .custom import Custom
 from .echoable import Echoable
+# from .receiver import Receiver
+from .sender import Sender
 
 
 class Ctrlb(Echoable):
 
     def __init__(self, vim: Nvim) -> None:
         self._vim = vim
-        self._custom = Custom()
-        # TODO: config
-        setdefaulttimeout(1)
+        self._custom = Custom(vim)
+        self._task_results = Queue()  # type: Queue[Dict[str, Any]]
 
     def execute_by_string(self, arg_string: str):
         return self._send(ActionInfo.from_arg_string(arg_string))
@@ -35,20 +38,29 @@ class Ctrlb(Echoable):
         options['swapfile'] = False
         options['buflisted'] = False
         options['filetype'] = 'ctrlb'
-        options['modifiable'] = False
         self._vim.command('silent doautocmd WinEnter')
         self._vim.command('silent doautocmd BufWinEnter')
         self._vim.command('silent doautocmd FileType ctrlb')
+        # process = self._vim.loop.subprocess_exec(
+        #     partial(Receiver, self, self._vim),
+        #     self._custom.executable_path,
+        #     'receive'
+        # )
+        # self._vim.loop.create_task(process)
 
     def _send(self, action_info: ActionInfo):
-        host = self._custom.host
-        port = self._custom.port
-        # TODO: error handling
-        connection = create_connection('ws://{}:{}'.format(host, port))
+        data = json.dumps(action_info.to_dict())
+        process = self._vim.loop.subprocess_exec(
+            partial(Sender, self),
+            self._custom.executable_path,
+            'send',
+            '--json',
+            data
+        )
+        return self._vim.loop.create_task(process)
 
-        data = json.dumps({**action_info.to_dict(), **{'client': 'vim'}})
-        connection.send(data)
+    def _put(self, json_array):
+        self._task_results.put(json_array)
 
-        result = json.loads(connection.recv())
-        connection.close()
-        return result
+    def get_result(self, timeout):
+        return self._task_results.get(timeout=timeout)

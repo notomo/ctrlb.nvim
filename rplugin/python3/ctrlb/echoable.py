@@ -1,4 +1,6 @@
 
+import traceback
+
 
 class Echoable(object):
 
@@ -8,3 +10,7 @@ class Echoable(object):
                 self._vim.call('escape', str(message), '\\"')
             )
         )
+
+    def echo_error(self):
+        lines = traceback.format_exc().splitlines()
+        self._vim.err_write('[ctrlb] {}\n'.format('\n'.join(lines)))

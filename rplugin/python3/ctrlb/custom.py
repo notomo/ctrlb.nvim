@@ -1,16 +1,19 @@
 
-from .exception import InvalidArgumentException
+
+from neovim import Nvim
+
+from .exception import InvalidArgumentException, InvalidSettingException
 
 
 class Custom(object):
 
     DEFAULT = {
-        'host': '127.0.0.1',
-        'port': 8888,
+        'executable_path': 'wsxhub',
     }
 
-    def __init__(self) -> None:
+    def __init__(self, vim: Nvim) -> None:
         self._attributes = self.DEFAULT
+        self._vim = vim
 
     def set(self, name: str, value):
         if name not in self._attributes:
@@ -20,9 +23,10 @@ class Custom(object):
         self._attributes[name] = value
 
     @property
-    def port(self):
-        return self._attributes['port']
-
-    @property
-    def host(self):
-        return self._attributes['host']
+    def executable_path(self) -> str:
+        path = self._attributes['executable_path']
+        if not self._vim.call('executable', path):
+            raise InvalidSettingException(
+                'Invalid executable path: {}'.format(path)
+            )
+        return path
