@@ -1,4 +1,6 @@
 
+from queue import Empty
+
 from ctrlb.ctrlb import Ctrlb
 from denite.source.base import Base
 
@@ -11,19 +13,34 @@ class Source(Base):
         self.name = 'ctrlb/history/search'
         self.kind = 'ctrlb/history'
 
-    def gather_candidates(self, context):
+        self.matchers = []
+
+    def on_init(self, context):
+        context['__ctrlb'] = None
         context['is_interactive'] = True
 
+    def gather_candidates(self, context):
+        if (
+            context['event'] != 'interactive'and
+            context['__ctrlb'] is not None
+        ):
+            return self._async_gather_candidates(context, context['__ctrlb'])
+
         input_text = ' '.join([*context['args'], context['input']])
-
-        # TODO
-        if len(input_text.rstrip()) < 3:
-            return []
-
-        ctrlb = Ctrlb(self.vim)
-        histories = ctrlb.execute('history', 'search', {
+        context['__ctrlb'] = Ctrlb(self.vim)
+        context['__ctrlb'].execute('history', 'search', {
             'input': input_text
         })
+        return self._async_gather_candidates(context, context['__ctrlb'])
+
+    def _async_gather_candidates(self, context, ctrlb):
+        try:
+            histories = ctrlb.get_result(0.1)
+        except Empty:
+            context['is_async'] = True
+            return []
+        context['is_async'] = False
+        context['__ctrlb'] = None
 
         def create(h):
             url = h['url'] if 'url' in h else ''

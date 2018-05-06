@@ -1,4 +1,6 @@
 
+from queue import Empty
+
 from ctrlb.ctrlb import Ctrlb
 from denite.source.base import Base
 
@@ -11,19 +13,35 @@ class Source(Base):
         self.name = 'ctrlb/bookmark/search'
         self.kind = 'ctrlb/bookmark'
 
-    def gather_candidates(self, context):
+    def on_init(self, context):
+        context['__ctrlb'] = None
         context['is_interactive'] = True
 
-        input_text = ' '.join([*context['args'], context['input']])
+    def gather_candidates(self, context):
+        if (
+            context['event'] != 'interactive'and
+            context['__ctrlb'] is not None
+        ):
+            return self._async_gather_candidates(context, context['__ctrlb'])
 
-        # TODO
-        if len(input_text.rstrip()) < 3:
+        input_text = ' '.join([*context['args'], context['input']])
+        if len(input_text.rstrip()) < 2:
             return []
 
-        ctrlb = Ctrlb(self.vim)
-        bookmarks = ctrlb.execute('bookmark', 'search', {
+        context['__ctrlb'] = Ctrlb(self.vim)
+        context['__ctrlb'].execute('bookmark', 'search', {
             'input': input_text
         })
+        return self._async_gather_candidates(context, context['__ctrlb'])
+
+    def _async_gather_candidates(self, context, ctrlb):
+        try:
+            bookmarks = ctrlb.get_result(0.1)
+        except Empty:
+            context['is_async'] = True
+            return []
+        context['is_async'] = False
+        context['__ctrlb'] = None
 
         def create(b):
             url = b['url'] if 'url' in b else ''

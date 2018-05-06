@@ -1,4 +1,6 @@
 
+from queue import Empty
+
 from ctrlb.ctrlb import Ctrlb
 from denite.source.base import Base
 
@@ -11,12 +13,27 @@ class Source(Base):
         self.name = 'ctrlb/bookmark/recent'
         self.kind = 'ctrlb/bookmark'
 
+    def on_init(self, context):
+        self._ctrlb = Ctrlb(self.vim)
+        context['__task'] = None
+
     def gather_candidates(self, context):
-        ctrlb = Ctrlb(self.vim)
+        if context['__task'] is not None:
+            return self._async_gather_candidates(context, context['__task'])
+
         args = {}
         if len(context['args']) > 0:
             args['limit'] = context['args'][0]
-        bookmarks = ctrlb.execute('bookmark', 'list', args)
+        context['__task'] = self._ctrlb.execute('bookmark', 'list', args)
+        return self._async_gather_candidates(context, context['__task'])
+
+    def _async_gather_candidates(self, context, task):
+        try:
+            bookmarks = self._ctrlb.get_result(0.01)
+        except Empty:
+            context['is_async'] = True
+            return []
+        context['is_async'] = False
 
         def create(b):
             url = b['url'] if 'url' in b else ''
