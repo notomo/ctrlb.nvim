@@ -16,31 +16,31 @@ class Source(Base):
         self.matchers = []
 
     def on_init(self, context):
-        context['__ctrlb'] = None
+        context['__task'] = None
         context['is_interactive'] = True
 
     def gather_candidates(self, context):
         if (
             context['event'] != 'interactive'and
-            context['__ctrlb'] is not None
+            context['__task'] is not None
         ):
-            return self._async_gather_candidates(context, context['__ctrlb'])
+            return self._async_gather_candidates(context)
 
         input_text = ' '.join([*context['args'], context['input']])
-        context['__ctrlb'] = Ctrlb(self.vim)
-        context['__ctrlb'].execute('history', 'search', {
+        ctrlb = Ctrlb(self.vim)
+        context['__task'] = ctrlb.execute('history', 'search', {
             'input': input_text
         })
-        return self._async_gather_candidates(context, context['__ctrlb'])
+        return self._async_gather_candidates(context)
 
-    def _async_gather_candidates(self, context, ctrlb):
+    def _async_gather_candidates(self, context):
         try:
-            histories = ctrlb.get_result(0.1)
+            histories = context['__task'].get_result(0.1)
         except Empty:
             context['is_async'] = True
             return []
         context['is_async'] = False
-        context['__ctrlb'] = None
+        context['__task'] = None
 
         def create(h):
             url = h['url'] if 'url' in h else ''

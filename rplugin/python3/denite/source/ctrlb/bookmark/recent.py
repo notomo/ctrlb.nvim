@@ -14,26 +14,27 @@ class Source(Base):
         self.kind = 'ctrlb/bookmark'
 
     def on_init(self, context):
-        self._ctrlb = Ctrlb(self.vim)
         context['__task'] = None
 
     def gather_candidates(self, context):
         if context['__task'] is not None:
-            return self._async_gather_candidates(context, context['__task'])
+            return self._async_gather_candidates(context)
 
         args = {}
         if len(context['args']) > 0:
             args['limit'] = context['args'][0]
-        context['__task'] = self._ctrlb.execute('bookmark', 'list', args)
-        return self._async_gather_candidates(context, context['__task'])
+        ctrlb = Ctrlb(self.vim)
+        context['__task'] = ctrlb.execute('bookmark', 'list', args)
+        return self._async_gather_candidates(context)
 
-    def _async_gather_candidates(self, context, task):
+    def _async_gather_candidates(self, context):
         try:
-            bookmarks = self._ctrlb.get_result(0.01)
+            bookmarks = context['__task'].get_result(0.01)
         except Empty:
             context['is_async'] = True
             return []
         context['is_async'] = False
+        context['__task'] = None
 
         def create(b):
             url = b['url'] if 'url' in b else ''

@@ -1,8 +1,5 @@
 
 import json
-from functools import partial
-from queue import Queue
-from typing import Any, Dict  # noqa
 
 from neovim import Nvim
 
@@ -10,7 +7,7 @@ from .action import ActionInfo
 from .custom import Custom
 from .echoable import Echoable
 # from .receiver import Receiver
-from .sender import Sender
+from .sender import SenderHub
 
 
 class Ctrlb(Echoable):
@@ -18,7 +15,6 @@ class Ctrlb(Echoable):
     def __init__(self, vim: Nvim) -> None:
         self._vim = vim
         self._custom = Custom(vim)
-        self._task_results = Queue()  # type: Queue[Dict[str, Any]]
 
     def execute_by_string(self, arg_string: str):
         return self._send(ActionInfo.from_arg_string(arg_string))
@@ -50,17 +46,8 @@ class Ctrlb(Echoable):
 
     def _send(self, action_info: ActionInfo):
         data = json.dumps(action_info.to_dict())
-        process = self._vim.loop.subprocess_exec(
-            partial(Sender, self),
+        return SenderHub(
+            self._vim,
             self._custom.executable_path,
-            'send',
-            '--json',
             data
         )
-        return self._vim.loop.create_task(process)
-
-    def _put(self, json_array):
-        self._task_results.put(json_array)
-
-    def get_result(self, timeout):
-        return self._task_results.get(timeout=timeout)

@@ -15,22 +15,23 @@ class Source(Base):
         self.kind = 'ctrlb/tab'
 
     def on_init(self, context):
-        self.ctrlb = Ctrlb(self.vim)
         context['__task'] = None
 
     def gather_candidates(self, context):
         if context['__task'] is not None:
-            return self._async_gather_candidates(context, context['__task'])
-        context['__task'] = self.ctrlb.execute('tab', 'list')
-        return self._async_gather_candidates(context, context['__task'])
+            return self._async_gather_candidates(context)
+        ctrlb = Ctrlb(self.vim)
+        context['__task'] = ctrlb.execute('tab', 'list')
+        return self._async_gather_candidates(context)
 
-    def _async_gather_candidates(self, context, task):
+    def _async_gather_candidates(self, context):
         try:
-            tabs = self.ctrlb.get_result(0.01)
+            tabs = context['__task'].get_result(0.01)
         except Empty:
             context['is_async'] = True
             return []
         context['is_async'] = False
+        context['__task'] = None
         return [
             {
                 'word': t['url'],

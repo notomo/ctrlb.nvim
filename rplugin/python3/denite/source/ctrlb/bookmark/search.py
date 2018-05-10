@@ -14,34 +14,34 @@ class Source(Base):
         self.kind = 'ctrlb/bookmark'
 
     def on_init(self, context):
-        context['__ctrlb'] = None
+        context['__task'] = None
         context['is_interactive'] = True
 
     def gather_candidates(self, context):
         if (
             context['event'] != 'interactive'and
-            context['__ctrlb'] is not None
+            context['__task'] is not None
         ):
-            return self._async_gather_candidates(context, context['__ctrlb'])
+            return self._async_gather_candidates(context)
 
         input_text = ' '.join([*context['args'], context['input']])
         if len(input_text.rstrip()) < 2:
             return []
 
-        context['__ctrlb'] = Ctrlb(self.vim)
-        context['__ctrlb'].execute('bookmark', 'search', {
+        ctrlb = Ctrlb(self.vim)
+        context['__task'] = ctrlb.execute('bookmark', 'search', {
             'input': input_text
         })
-        return self._async_gather_candidates(context, context['__ctrlb'])
+        return self._async_gather_candidates(context)
 
-    def _async_gather_candidates(self, context, ctrlb):
+    def _async_gather_candidates(self, context):
         try:
-            bookmarks = ctrlb.get_result(0.1)
+            bookmarks = context['__task'].get_result(0.1)
         except Empty:
             context['is_async'] = True
             return []
         context['is_async'] = False
-        context['__ctrlb'] = None
+        context['__task'] = None
 
         def create(b):
             url = b['url'] if 'url' in b else ''
