@@ -20,7 +20,7 @@ class SenderHub(Echoable):
     ) -> None:
         self._vim = vim
         self._results = Queue()  # type: Queue[Dict[str, Any]]
-        self._task = self._execute(executable_path, data)
+        self._task, self._process = self._execute(executable_path, data)
 
     def _execute(self, executable_path: str, data: str):
         process = self._vim.loop.subprocess_exec(
@@ -34,10 +34,16 @@ class SenderHub(Echoable):
             '--json',
             data
         )
-        return self._vim.loop.create_task(process)
+        return self._vim.loop.create_task(process), process
 
     def _put(self, json_array):
         self._results.put(json_array)
+
+    def _cancel(self):
+        self._process.kill()
+        self._process = None
+        self._task.cancel()
+        self._task = None
 
     def get_result(self, timeout):
         return self._results.get(timeout=timeout)
@@ -50,7 +56,7 @@ class SenderProtocol(asyncio.SubprocessProtocol):
         self._vim = vim
 
     def connection_made(self, transport):
-        pass
+        self._transport = transport
 
     def pipe_data_received(self, fd, data):
         try:
@@ -58,6 +64,11 @@ class SenderProtocol(asyncio.SubprocessProtocol):
             self._hub._put(json_array)
         except Exception as e:
             self._hub.echo_error()
+        finally:
+            # TODO kill all zombie processes
+            self._transport.kill()
+            self._transport = None
+            self._hub._cancel()
 
     def process_exited(self):
         pass
