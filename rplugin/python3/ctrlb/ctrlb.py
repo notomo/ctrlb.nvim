@@ -1,13 +1,10 @@
 
-import json
-
 from neovim import Nvim
 
 from .action import ActionInfo
 from .buffer import Facade
 from .custom import Custom
 from .echoable import Echoable
-# from .receiver import Receiver
 from .sender import SenderHub
 
 
@@ -32,9 +29,8 @@ class Ctrlb(Echoable):
         self._buffer_facade.open(arg_string)
 
     def _send(self, action_info: ActionInfo):
-        data = json.dumps(action_info.to_dict())
         return SenderHub(
             self._vim,
             self._custom.executable_path,
-            data
+            action_info.to_dict()
         )

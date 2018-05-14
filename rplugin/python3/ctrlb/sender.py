@@ -3,7 +3,7 @@ import asyncio
 import json
 from functools import partial
 from queue import Queue
-from typing import Any, Dict, List  # noqa
+from typing import Any, Dict
 
 from neovim import Nvim
 
@@ -16,13 +16,13 @@ class SenderHub(Echoable):
         self,
         vim: Nvim,
         executable_path: str,
-        data: str
+        data: Dict[str, Any]
     ) -> None:
         self._vim = vim
         self._results = Queue()  # type: Queue[Dict[str, Any]]
         self._task, self._process = self._execute(executable_path, data)
 
-    def _execute(self, executable_path: str, data: str):
+    def _execute(self, executable_path: str, data: Dict[str, Any]):
         process = self._vim.loop.subprocess_exec(
             partial(
                 SenderProtocol,
@@ -32,7 +32,7 @@ class SenderHub(Echoable):
             executable_path,
             'send',
             '--json',
-            data
+            json.dumps(data)
         )
         return self._vim.loop.create_task(process), process
 
