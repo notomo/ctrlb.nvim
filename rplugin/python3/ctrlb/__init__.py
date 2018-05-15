@@ -21,3 +21,12 @@ class CtrlbHandler(object):
     @neovim.function('_ctrlb_open', sync=True)
     def open(self, args):
         self._ctrlb.open(args[0])
+
+    @neovim.autocmd(
+        'User',
+        'Ctrlb:*',
+        sync=True,
+        eval='expand("<amatch>")'
+    )
+    def action_event(self, event_name: str):
+        self._ctrlb.execute_buffer_action(event_name)

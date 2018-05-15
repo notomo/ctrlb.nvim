@@ -4,6 +4,7 @@ from typing import Any, Dict, List
 
 from neovim import Nvim
 
+from ctrlb.echoable import Echoable
 from ctrlb.receiver import ReceiverHub
 
 
@@ -32,7 +33,24 @@ class ReceiverHubArg(object):
         return self._callback
 
 
-class Base(metaclass=ABCMeta):
+class Keymap(object):
+
+    def __init__(
+        self, command: str, action_name: str
+    ) -> None:
+        self._command = command
+        self._action_name = action_name
+
+    @property
+    def command(self) -> str:
+        return self._command
+
+    @property
+    def action_name(self) -> str:
+        return self._action_name
+
+
+class Base(Echoable, metaclass=ABCMeta):
 
     buffer_options = {
         'buftype': 'nofile',
@@ -52,7 +70,9 @@ class Base(metaclass=ABCMeta):
         options['filetype'] = file_type
         self._vim.command('silent doautocmd WinEnter')
         self._vim.command('silent doautocmd BufWinEnter')
-        self._vim.command('silent doautocmd FileType {}'.format(file_type))
+        for keymap in self.keymaps:
+            self._map(keymap.command, keymap.action_name)
+        self._vim.command('doautocmd FileType {}'.format(file_type))
         self._tasks = self._execute(executable_path)
 
     def open(self) -> 'Base':
@@ -73,7 +93,19 @@ class Base(metaclass=ABCMeta):
 
     @property
     @abstractmethod
+    def name(self) -> str:
+        pass
+
+    @property
     def file_type(self) -> str:
+        return 'ctrlb-{}'.format(self.name)
+
+    @property
+    @abstractmethod
+    def keymaps(self) -> List[Keymap]:
+        pass
+
+    def execute_action(self, action_name: str):
         pass
 
     def _execute(self, executable_path: str):
@@ -87,3 +119,11 @@ class Base(metaclass=ABCMeta):
             )
             for arg in self.receiver_hub_args
         ]
+
+    def _map(self, map_command: str, action_name: str):
+        self._vim.command(
+            '{} <buffer> <Plug>(ctrlb-{}-{}) '
+            ':<C-u>doautocmd User Ctrlb:{}:{}<CR>'.format(
+                map_command, self.name, action_name, self.name, action_name
+            )
+        )

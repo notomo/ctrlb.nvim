@@ -1,7 +1,7 @@
 
 from typing import List
 
-from .base import Base, ReceiverHubArg
+from .base import Base, Keymap, ReceiverHubArg
 
 
 class History(Base):
@@ -17,10 +17,25 @@ class History(Base):
         ]
 
     @property
-    def file_type(self) -> str:
-        return 'ctrlb-history'
+    def name(self) -> str:
+        return 'history'
+
+    @property
+    def keymaps(self) -> List[Keymap]:
+        return [
+            Keymap('nnoremap', 'open')
+        ]
 
     def _on_received(self, json_array):
         body = json_array['body']
         line = '{}\t{}'.format(body['title'], body['url'])
         self._buffer.append(line)
+
+    def execute_action(self, action_name: str):
+        {
+            'open': self._open,
+        }[action_name]()
+
+    def _open(self):
+        # TODO
+        pass

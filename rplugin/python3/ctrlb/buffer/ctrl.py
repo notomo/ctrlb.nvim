@@ -1,7 +1,7 @@
 
 from typing import List
 
-from .base import Base, ReceiverHubArg
+from .base import Base, Keymap, ReceiverHubArg
 
 
 class Ctrl(Base):
@@ -11,5 +11,9 @@ class Ctrl(Base):
         return []
 
     @property
-    def file_type(self) -> str:
-        return 'ctrlb-ctrl'
+    def name(self) -> str:
+        return 'ctrl'
+
+    @property
+    def keymaps(self) -> List[Keymap]:
+        return []
