@@ -1,7 +1,7 @@
 
 from queue import Empty
 
-from ctrlb.ctrlb import Ctrlb
+from ctrlb.client import Client
 from denite.source.base import Base
 
 
@@ -28,8 +28,8 @@ class Source(Base):
         if len(input_text.rstrip()) < 2:
             return []
 
-        ctrlb = Ctrlb(self.vim)
-        context['__task'] = ctrlb.execute('bookmark', 'search', {
+        client = Client(self.vim)
+        context['__task'] = client.execute('bookmark', 'search', {
             'input': input_text
         })
         return self._async_gather_candidates(context)

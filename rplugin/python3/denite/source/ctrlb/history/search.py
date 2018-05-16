@@ -1,7 +1,7 @@
 
 from queue import Empty
 
-from ctrlb.ctrlb import Ctrlb
+from ctrlb.client import Client
 from denite.source.base import Base
 
 
@@ -27,8 +27,8 @@ class Source(Base):
             return self._async_gather_candidates(context)
 
         input_text = ' '.join([*context['args'], context['input']])
-        ctrlb = Ctrlb(self.vim)
-        context['__task'] = ctrlb.execute('history', 'search', {
+        client = Client(self.vim)
+        context['__task'] = client.execute('history', 'search', {
             'input': input_text
         })
         return self._async_gather_candidates(context)

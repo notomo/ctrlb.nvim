@@ -2,7 +2,7 @@
 
 from queue import Empty
 
-from ctrlb.ctrlb import Ctrlb
+from ctrlb.client import Client
 from denite.source.base import Base
 
 
@@ -20,8 +20,8 @@ class Source(Base):
     def gather_candidates(self, context):
         if context['__task'] is not None:
             return self._async_gather_candidates(context)
-        ctrlb = Ctrlb(self.vim)
-        context['__task'] = ctrlb.execute('tab', 'list')
+        client = Client(self.vim)
+        context['__task'] = client.execute('tab', 'list')
         return self._async_gather_candidates(context)
 
     def _async_gather_candidates(self, context):

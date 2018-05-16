@@ -1,6 +1,6 @@
 
 
-from ctrlb.ctrlb import Ctrlb
+from ctrlb.client import Client
 from denite import util
 from denite.kind.base import Base
 
@@ -17,28 +17,28 @@ class Kind(Base):
         self.persist_actions += ['rename', 'delete']
 
     def action_tabopen(self, context):
-        ctrlb = Ctrlb(self.vim)
+        client = Client(self.vim)
         target = context['targets'][0]
         bookmark_id = target['action__bookmark_id']
-        ctrlb.execute('bookmark', 'tabOpen', {'id': bookmark_id})
+        client.execute('bookmark', 'tabOpen', {'id': bookmark_id})
 
     def action_open(self, context):
-        ctrlb = Ctrlb(self.vim)
+        client = Client(self.vim)
         target = context['targets'][0]
         bookmark_id = target['action__bookmark_id']
-        ctrlb.execute('bookmark', 'open', {'id': bookmark_id})
+        client.execute('bookmark', 'open', {'id': bookmark_id})
 
     def action_preview(self, context):
         self.action_open(context)
 
     def action_delete(self, context):
-        ctrlb = Ctrlb(self.vim)
+        client = Client(self.vim)
         for target in context['targets']:
             bookmark_id = target['action__bookmark_id']
-            ctrlb.execute('bookmark', 'remove', {'id': bookmark_id})
+            client.execute('bookmark', 'remove', {'id': bookmark_id})
 
     def action_rename(self, context):
-        ctrlb = Ctrlb(self.vim)
+        client = Client(self.vim)
         target = context['targets'][0]
 
         title = util.input(
@@ -48,7 +48,7 @@ class Kind(Base):
             target['action__title']
         )
 
-        ctrlb.execute('bookmark', 'update', {
+        client.execute('bookmark', 'update', {
             'id': target['action__bookmark_id'],
             'title': title
         })

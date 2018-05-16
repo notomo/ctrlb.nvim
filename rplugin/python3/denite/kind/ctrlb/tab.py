@@ -1,6 +1,6 @@
 
 
-from ctrlb.ctrlb import Ctrlb
+from ctrlb.client import Client
 from denite.kind.base import Base
 
 
@@ -13,17 +13,17 @@ class Kind(Base):
         self.default_action = 'activate'
 
     def action_activate(self, context):
-        ctrlb = Ctrlb(self.vim)
+        client = Client(self.vim)
         target = context['targets'][0]
         tab_id = target['action__tab_id']
-        ctrlb.execute('tab', 'activate', {'id': tab_id})
+        client.execute('tab', 'activate', {'id': tab_id})
 
     def action_close(self, context):
-        ctrlb = Ctrlb(self.vim)
+        client = Client(self.vim)
         target = context['targets']
         for target in context['targets']:
             tab_id = target['action__tab_id']
-            ctrlb.execute('tab', 'close', {'id': tab_id})
+            client.execute('tab', 'close', {'id': tab_id})
 
     def action_preview(self, context):
         self.action_activate(context)
@@ -32,9 +32,9 @@ class Kind(Base):
         self.action_activate(context)
 
     def action_bookmark(self, context):
-        ctrlb = Ctrlb(self.vim)
+        client = Client(self.vim)
         for target in context['targets']:
-            ctrlb.execute('bookmark', 'create', {
+            client.execute('bookmark', 'create', {
                 'url': target['action__url'],
                 'title': target['action__title'],
             })

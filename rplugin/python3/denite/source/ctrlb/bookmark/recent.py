@@ -1,7 +1,7 @@
 
 from queue import Empty
 
-from ctrlb.ctrlb import Ctrlb
+from ctrlb.client import Client
 from denite.source.base import Base
 
 
@@ -23,8 +23,8 @@ class Source(Base):
         args = {}
         if len(context['args']) > 0:
             args['limit'] = context['args'][0]
-        ctrlb = Ctrlb(self.vim)
-        context['__task'] = ctrlb.execute('bookmark', 'list', args)
+        client = Client(self.vim)
+        context['__task'] = client.execute('bookmark', 'list', args)
         return self._async_gather_candidates(context)
 
     def _async_gather_candidates(self, context):
