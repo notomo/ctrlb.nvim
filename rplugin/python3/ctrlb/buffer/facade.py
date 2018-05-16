@@ -4,14 +4,14 @@ from typing import Dict, Type  # noqa
 
 from neovim import Nvim
 
-from ctrlb.custom import Custom
+from ctrlb.customizable import Customizable
 
 from .base import Base  # noqa
 from .ctrl import Ctrl
 from .history import History
 
 
-class Facade(object):
+class Facade(Customizable):
 
     BUFFER_CLASSES = {
         'ctrl': Ctrl,
@@ -21,16 +21,15 @@ class Facade(object):
     EVENT_NAME_PATTERN = 'Ctrlb:([^:]*):(.*)$'
 
     def __init__(
-        self, vim: Nvim, custom: Custom
+        self, vim: Nvim
     ) -> None:
         self._vim = vim
-        self._custom = custom
         self._buffers = {}  # type: Dict[str, Base]
         self._event_name_pattern = re.compile(self.EVENT_NAME_PATTERN)
 
     def open(self, arg_string: str):
         names = arg_string.split()
-        executable_path = self._custom.executable_path
+        executable_path = self.executable_path
         buffers = {
             name: self._buffers[name].open()
             if name in self._buffers and self._buffers[name].valid()

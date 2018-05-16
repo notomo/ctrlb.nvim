@@ -1,6 +1,7 @@
 
 import neovim
 
+from .client import Client
 from .ctrlb import Ctrlb
 
 
@@ -9,14 +10,11 @@ class CtrlbHandler(object):
 
     def __init__(self, vim):
         self._ctrlb = Ctrlb(vim)
+        self._vim = vim
 
     @neovim.function('_ctrlb_execute', sync=True)
     def execute(self, args):
-        self._ctrlb.execute_by_string(args[0])
-
-    @neovim.function('_ctrlb_custom', sync=True)
-    def custom(self, args):
-        self._ctrlb.custom(args[0], args[1])
+        Client(self._vim).execute_by_string(args[0])
 
     @neovim.function('_ctrlb_open', sync=True)
     def open(self, args):

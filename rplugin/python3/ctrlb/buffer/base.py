@@ -4,6 +4,7 @@ from typing import Any, Dict, List
 
 from neovim import Nvim
 
+from ctrlb.client import Client
 from ctrlb.echoable import Echoable
 from ctrlb.receiver import ReceiverHub
 
@@ -74,6 +75,7 @@ class Base(Echoable, metaclass=ABCMeta):
             self._map(keymap.command, keymap.action_name)
         self._vim.command('doautocmd FileType {}'.format(file_type))
         self._tasks = self._execute(executable_path)
+        self._client = Client(self._vim)
 
     def open(self) -> 'Base':
         self._vim.command('tabnew')

@@ -23,7 +23,8 @@ class History(Base):
     @property
     def keymaps(self) -> List[Keymap]:
         return [
-            Keymap('nnoremap', 'open')
+            Keymap('nnoremap', 'open'),
+            Keymap('nnoremap', 'tab-open'),
         ]
 
     def _on_received(self, json_array):
@@ -34,8 +35,20 @@ class History(Base):
     def execute_action(self, action_name: str):
         {
             'open': self._open,
+            'tab-open': self._tab_open,
         }[action_name]()
 
     def _open(self):
-        # TODO
-        pass
+        url = self._get_url()
+        self._client.execute('tab', 'open', {
+            'url': url
+        })
+
+    def _tab_open(self):
+        url = self._get_url()
+        self._client.execute('tab', 'tabOpen', {
+            'url': url
+        })
+
+    def _get_url(self):
+        return self._vim.current.line.split('\t')[-1]

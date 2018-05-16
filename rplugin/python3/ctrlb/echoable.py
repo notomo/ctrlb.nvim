@@ -1,8 +1,13 @@
 
 import traceback
 
+from neovim import Nvim
+
 
 class Echoable(object):
+
+    def __init__(self, vim: Nvim) -> None:
+        self._vim = vim
 
     def echo_message(self, message):
         self._vim.command(
