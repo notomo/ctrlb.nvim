@@ -30,6 +30,8 @@ class SenderHub(Echoable):
                 self._vim
             ),
             executable_path,
+            '--timeout',
+            '3',
             'send',
             '--json',
             json.dumps(data)
