@@ -43,9 +43,9 @@ class ReceiverHub(Echoable):
             executable_path,
             '--key',
             json.dumps(key_filter_dict),
-            'receive',
             '--filter',
-            json.dumps(filter_dict)
+            json.dumps(filter_dict),
+            'receive'
         )
         return self._vim.loop.create_task(process)
 
