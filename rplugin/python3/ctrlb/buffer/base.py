@@ -60,7 +60,7 @@ class Base(Echoable, metaclass=ABCMeta):
         'modifiable': True,
     }
 
-    def __init__(self, vim: Nvim, executable_path: str) -> None:
+    def __init__(self, vim: Nvim) -> None:
         self._vim = vim
         file_type = self.file_type
         self._vim.command('tabnew {}'.format(file_type))
@@ -74,7 +74,7 @@ class Base(Echoable, metaclass=ABCMeta):
         for keymap in self.keymaps:
             self._map(keymap.command, keymap.action_name)
         self._vim.command('doautocmd FileType {}'.format(file_type))
-        self._tasks = self._execute(executable_path)
+        self._tasks = self._execute()
         self._client = Client(self._vim)
 
     def open(self) -> 'Base':
@@ -110,11 +110,10 @@ class Base(Echoable, metaclass=ABCMeta):
     def execute_action(self, action_name: str):
         pass
 
-    def _execute(self, executable_path: str):
+    def _execute(self):
         return [
             ReceiverHub(
                 self._vim,
-                executable_path,
                 arg.filter_dict,
                 arg.key_filter_dict,
                 arg.callback

@@ -7,15 +7,15 @@ from typing import Any, Dict
 
 from neovim import Nvim
 
+from .customizable import Customizable
 from .echoable import Echoable
 
 
-class ReceiverHub(Echoable):
+class ReceiverHub(Echoable, Customizable):
 
     def __init__(
         self,
         vim: Nvim,
-        executable_path: str,
         filter_dict: Dict[str, Any],
         key_filter_dict: Dict[str, Any],
         callback
@@ -23,12 +23,11 @@ class ReceiverHub(Echoable):
         self._vim = vim
         self._results = Queue()  # type: Queue[Any]
         self._task = self._execute(
-            executable_path, filter_dict, key_filter_dict, callback
+            filter_dict, key_filter_dict, callback
         )
 
     def _execute(
         self,
-        executable_path: str,
         filter_dict: Dict[str, Any],
         key_filter_dict: Dict[str, Any],
         callback
@@ -40,7 +39,7 @@ class ReceiverHub(Echoable):
                 self._vim,
                 callback
             ),
-            executable_path,
+            self.executable_path,
             '--key',
             json.dumps(key_filter_dict),
             '--filter',

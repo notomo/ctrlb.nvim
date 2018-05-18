@@ -7,29 +7,30 @@ from typing import Any, Dict
 
 from neovim import Nvim
 
+from .customizable import Customizable
+
 from .echoable import Echoable
 
 
-class SenderHub(Echoable):
+class SenderHub(Echoable, Customizable):
 
     def __init__(
         self,
         vim: Nvim,
-        executable_path: str,
         data: Dict[str, Any]
     ) -> None:
         self._vim = vim
         self._results = Queue()  # type: Queue[Dict[str, Any]]
-        self._task, self._process = self._execute(executable_path, data)
+        self._task, self._process = self._execute(data)
 
-    def _execute(self, executable_path: str, data: Dict[str, Any]):
+    def _execute(self, data: Dict[str, Any]):
         process = self._vim.loop.subprocess_exec(
             partial(
                 SenderProtocol,
                 self,
                 self._vim
             ),
-            executable_path,
+            self.executable_path,
             '--timeout',
             '3',
             'send',

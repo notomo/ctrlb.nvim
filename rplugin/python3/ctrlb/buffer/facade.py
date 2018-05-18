@@ -4,14 +4,12 @@ from typing import Dict, Type  # noqa
 
 from neovim import Nvim
 
-from ctrlb.customizable import Customizable
-
 from .base import Base  # noqa
 from .ctrl import Ctrl
 from .history import History
 
 
-class Facade(Customizable):
+class Facade(object):
 
     BUFFER_CLASSES = {
         'ctrl': Ctrl,
@@ -29,13 +27,11 @@ class Facade(Customizable):
 
     def open(self, arg_string: str):
         names = arg_string.split()
-        executable_path = self.executable_path
         buffers = {
             name: self._buffers[name].open()
             if name in self._buffers and self._buffers[name].valid()
             else self.BUFFER_CLASSES[name](
                 self._vim,
-                executable_path
             )
             for name in names
         }
