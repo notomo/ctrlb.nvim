@@ -1,5 +1,5 @@
 
-from typing import Dict
+from typing import Any, Dict
 
 from .exception import InvalidArgumentException
 
@@ -16,7 +16,7 @@ class ActionInfo(object):
         self._args = args
 
     @classmethod
-    def from_arg_string(cls, arg_string: str):
+    def from_arg_string(cls, arg_string: str) -> 'ActionInfo':
         kind_name = ''
         action_name = ''
         args = {}
@@ -36,7 +36,7 @@ class ActionInfo(object):
 
         return cls(kind_name, action_name, args)
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, Any]:
         return {
             'actionName': self._action_name,
             'kindName': self._kind_name,
