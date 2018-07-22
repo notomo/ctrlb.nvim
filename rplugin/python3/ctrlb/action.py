@@ -1,5 +1,5 @@
 
-from typing import Any, Dict
+from typing import Any, Dict, Union
 
 from .exception import InvalidArgumentException
 
@@ -13,13 +13,17 @@ class ActionInfo(object):
             )
         self._kind_name = kind_name
         self._action_name = action_name
-        self._args = args
+        self._args = {
+            key: ActionInfo._convert_value(value)
+            for key, value
+            in args.items()
+        }
 
     @classmethod
     def from_arg_string(cls, arg_string: str) -> 'ActionInfo':
         kind_name = ''
         action_name = ''
-        args = {}
+        args = {}  # type: Dict[str, Union[str,int,float]]
 
         for arg in arg_string.split(' '):
             key_value = arg.split('=')
@@ -32,13 +36,21 @@ class ActionInfo(object):
                 action_name = names.pop(0)
             elif len(key_value) > 1:
                 value = key_value[1]
-                args[key[1:]] = int(value) if value.isdigit() else str(value)
+                args[key[1:]] = ActionInfo._convert_value(value)
 
         return cls(kind_name, action_name, args)
 
     def to_dict(self) -> Dict[str, Any]:
         return {
             'actionName': self._action_name,
-            'kindName': self._kind_name,
+            'actionGroupName': self._kind_name,
             'args': self._args,
         }
+
+    @staticmethod
+    def _convert_value(value: str) -> Union[str, int, float]:
+        if value.isdigit():
+            return int(value)
+        elif value.replace('.', '', 1).isdigit():
+            return float(value)
+        return str(value)
