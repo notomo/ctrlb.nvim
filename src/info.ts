@@ -4,6 +4,11 @@ export interface ActionInfo {
   args?: ActionArgs;
 }
 
+export interface BufferOpenInfo {
+  name: string;
+  direction: Direction;
+}
+
 export class ArgParser {
   public parse(arg: string): ActionInfo {
     let actionGroupName = "";
@@ -66,8 +71,49 @@ export class ArgParser {
   protected isFloat(value: string): boolean {
     return this.isNumber(value.replace(".", "1"));
   }
+
+  public parseBufferOpenArg(arg: string): BufferOpenInfo[] {
+    let direction: Direction = Direction.VERTICAL;
+    const infos: BufferOpenInfo[] = [];
+    for (const value of arg.split(" ")) {
+      if (!value.startsWith("-")) {
+        infos.push({
+          name: value,
+          direction: direction,
+        });
+        continue;
+      }
+
+      const optionValue = value.slice(1);
+      const directionValue = this.toDirectionTransform(optionValue);
+      if (this.isDirection(directionValue)) {
+        direction = directionValue;
+        continue;
+      }
+    }
+
+    if (infos.length >= 2) {
+      infos.slice(-1)[0].direction = Direction.NOTHING;
+    }
+
+    return infos;
+  }
+
+  protected toDirectionTransform(value: string): string {
+    return value.toUpperCase();
+  }
+
+  protected isDirection(value: string): value is Direction {
+    return value in Direction;
+  }
 }
 
 type ActionArgs = {
   [index: string]: string | number | boolean | null;
 };
+
+export enum Direction {
+  VERTICAL = "VERTICAL",
+  HORIZONTAL = "HORIZONTAL",
+  NOTHING = "NOTHING",
+}

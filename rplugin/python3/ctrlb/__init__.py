@@ -12,7 +12,7 @@ class CtrlbHandler(object):
         self._ctrlb = Ctrlb(vim)
         self._vim = vim
 
-    @neovim.function('_ctrlb_execute', sync=True)
+    @neovim.function('_ctrlb_execute_test', sync=True)
     def execute(self, args):
         Client(self._vim).execute_by_string(args[0])
 

@@ -1,4 +1,4 @@
-import { ArgParser } from "./info";
+import { ArgParser, Direction } from "./info";
 
 describe("ArgParser", () => {
   [
@@ -58,6 +58,31 @@ describe("ArgParser", () => {
     it(`throw error if arg is "${arg}"`, () => {
       const parser = new ArgParser();
       expect(() => parser.parse(arg)).toThrowError(expected);
+    });
+  });
+
+  [
+    {
+      arg: "ctrl history",
+      expected: {
+        direction: Direction.HORIZONTAL,
+        items: [{ name: "ctrl" }, { name: "history" }],
+      },
+    },
+    {
+      arg: "tab url history -split=horizontal",
+      expected: {
+        direction: Direction.VERTICAL,
+        items: [{ name: "tab" }, { name: "url" }, { name: "history" }],
+      },
+    },
+  ].forEach(data => {
+    let arg = data.arg;
+    let expected = data.expected;
+    it(`parseBufferOpenArg "${data.arg}"`, () => {
+      const parser = new ArgParser();
+      const result = parser.parseBufferOpenArg(arg);
+      expect(result).toEqual(expected);
     });
   });
 });

@@ -2,6 +2,7 @@ import { Plugin, Function, Neovim, NvimPlugin } from "neovim";
 import { Ctrlb } from "./ctrlb";
 import { ArgParser } from "./info";
 import { Requester } from "./requester";
+import { BufferOpener } from "./buffer";
 
 @Plugin({ dev: true })
 export default class TestPlugin {
@@ -13,11 +14,17 @@ export default class TestPlugin {
   ) {
     const parser = new ArgParser();
     const requester = new Requester();
-    this.ctrlb = new Ctrlb(requester, parser);
+    const opener = new BufferOpener(nvim);
+    this.ctrlb = new Ctrlb(requester, parser, opener);
   }
 
   @Function("_ctrlb_execute", { sync: true })
   public executeAsync(args: any[]): void {
     this.ctrlb.requestAsync(args[0]);
+  }
+
+  @Function("_ctrlb_open_test", { sync: true })
+  public open(args: any[]): void {
+    this.ctrlb.open(args[0]);
   }
 }
