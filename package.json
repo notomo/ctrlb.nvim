@@ -5,6 +5,7 @@
     "description": "ctrlb client for neovim",
     "main": "lib/index.js",
     "dependencies": {
+        "log4js": "^3.0.5",
         "neovim": "^4.2.1",
         "tslib": "^1.9.3"
     },
