@@ -1,10 +1,10 @@
-import os = require("os");
-import path = require("path");
+import { homedir } from "os";
+import { join } from "path";
 import * as log4js from "log4js";
 
 const BACKUP_FILE_COUNT = 3;
 const LOG_FILE_PATH =
-  process.env.NVIM_CTRLB_LOG_FILE || path.join(os.homedir(), "ctrlb.log");
+  process.env.NVIM_CTRLB_LOG_FILE || join(homedir(), "ctrlb.log");
 
 const level = process.env.NVIM_CTRLB_LOG_LEVEL || "info";
 
