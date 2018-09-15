@@ -1,15 +1,32 @@
+import { readFileSync } from "fs";
+
 export interface ActionInfo {
   actionGroupName: string;
   actionName: string;
   args?: ActionArgs;
 }
 
-export interface BufferOpenInfo {
-  name: string;
-  direction: Direction;
+enum BufferOpenOption {
+  jsonFile = "json-file",
+  json = "json",
 }
 
 export class ArgParser {
+  protected readonly bufferOpenOptionHandlers: BufferOpenOptionHandler;
+  constructor() {
+    this.bufferOpenOptionHandlers = {
+      [BufferOpenOption.jsonFile]: (filePath: string) => {
+        const content = readFileSync(filePath);
+        const json = JSON.parse(content.toString());
+        return json;
+      },
+      [BufferOpenOption.json]: (jsonString: string) => {
+        const json = JSON.parse(jsonString);
+        return json;
+      },
+    };
+  }
+
   public parse(arg: string): ActionInfo {
     let actionGroupName = "";
     let actionName = "";
@@ -72,48 +89,27 @@ export class ArgParser {
     return this.isNumber(value.replace(".", "1"));
   }
 
-  public parseBufferOpenArg(arg: string): BufferOpenInfo[] {
-    let direction: Direction = Direction.VERTICAL;
-    const infos: BufferOpenInfo[] = [];
+  public parseBufferOpenArg(arg: string): {} {
     for (const value of arg.split(" ")) {
       if (!value.startsWith("-")) {
-        infos.push({
-          name: value,
-          direction: direction,
-        });
         continue;
       }
 
-      const optionValue = value.slice(1);
-      const directionValue = this.toDirectionTransform(optionValue);
-      if (this.isDirection(directionValue)) {
-        direction = directionValue;
-        continue;
-      }
+      const optionKeyValue = value.split("=");
+      const optionKey = this.parseArgKey(optionKeyValue[0]);
+      return this.bufferOpenOptionHandlers[optionKey](optionKeyValue[1]);
     }
 
-    if (infos.length >= 2) {
-      infos.slice(-1)[0].direction = Direction.NOTHING;
-    }
-
-    return infos;
-  }
-
-  protected toDirectionTransform(value: string): string {
-    return value.toUpperCase();
-  }
-
-  protected isDirection(value: string): value is Direction {
-    return value in Direction;
+    return {};
   }
 }
+
+type BufferOpenOptionHandler = {
+  [P in BufferOpenOption]: (value: string) => any
+} & {
+  [index: string]: (value: string) => any;
+};
 
 type ActionArgs = {
   [index: string]: string | number | boolean | null;
 };
-
-export enum Direction {
-  VERTICAL = "VERTICAL",
-  HORIZONTAL = "HORIZONTAL",
-  NOTHING = "NOTHING",
-}

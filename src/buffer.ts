@@ -1,36 +1,17 @@
 import { Neovim } from "neovim";
-import { BufferOpenInfo } from "./info";
-import { Ctrl } from "./buffers/ctrl";
-import { Direction } from "./info";
-
-interface CtrlbBuffer {
-  open(direction: Direction): void;
-}
-
-interface Buffers {
-  ctrl: CtrlbBuffer;
-  [index: string]: CtrlbBuffer;
-}
+import { LayoutParser } from "./layout";
+import { getLogger, Logger } from "./logger";
 
 export class BufferOpener {
-  protected readonly buffers: Buffers;
-
+  protected readonly logger: Logger;
   constructor(protected readonly vim: Neovim) {
-    this.buffers = {
-      ctrl: new Ctrl(vim),
-    };
+    this.logger = getLogger("buffer");
   }
 
-  public async open(infos: BufferOpenInfo[]): Promise<void> {
-    // const switchbuf = await this.vim.buffer.getOption("switchbuf");
-    await this.vim.buffer.setOption("switchbuf", "");
+  public async open(info: unknown): Promise<void> {
+    const parser = new LayoutParser(this.vim);
+    const layoutItem = parser.parse(info);
     await this.vim.command("tabnew");
-    for (const info of infos) {
-      await this.buffers[info.name].open(info.direction);
-      await this.vim.command("wincmd w");
-    }
-    // if (switchbuf !== undefined) {
-    //   this.vim.buffer.setOption("switchbuf", switchbuf);
-    // }
+    await layoutItem.open();
   }
 }

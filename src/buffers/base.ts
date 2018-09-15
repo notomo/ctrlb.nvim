@@ -1,16 +1,19 @@
 import { Neovim, Buffer } from "neovim";
-import { Direction } from "./../info";
+import { Direction } from "../layout";
+import { Logger, getLogger } from "../logger";
 
 export abstract class BaseBuffer {
   abstract readonly type: string;
+  protected readonly logger: Logger;
   protected buffer: Buffer | null;
 
   constructor(protected readonly vim: Neovim) {
     this.buffer = null;
+    this.logger = getLogger("buffer.base");
   }
 
   protected async create(): Promise<Buffer> {
-    if (this.buffer !== null) {
+    if (this.isInitialized(this.buffer)) {
       return this.buffer;
     }
     const bufferName = this.fileType;
@@ -26,14 +29,26 @@ export abstract class BaseBuffer {
     throw new Error("buffer not found: " + bufferNumber);
   }
 
+  protected isInitialized(buffer: Buffer | null): buffer is Buffer {
+    return buffer !== null;
+  }
+
   public async open(direction: Direction): Promise<void> {
+    const isInitialized = this.isInitialized(this.buffer);
     const buffer = await this.create();
     if (direction === Direction.VERTICAL) {
-      await this.vim.command("vertical sbuffer " + buffer.id);
+      await this.vim.command("rightbelow split #" + buffer.id);
     } else if (direction === Direction.NOTHING) {
       await this.vim.command("buffer " + buffer.id);
     } else {
-      await this.vim.command("sbuffer " + buffer.id);
+      await this.vim.command("rightbelow vsplit #" + buffer.id);
+    }
+    await this.vim.command("silent doautocmd WinEnter");
+    await this.vim.command("silent doautocmd BufWinEnter");
+    if (!isInitialized) {
+      const fileType = this.fileType;
+      await buffer.setOption("filetype", fileType);
+      await this.vim.command("silent doautocmd FileType " + fileType);
     }
   }
 

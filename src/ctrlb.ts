@@ -14,8 +14,8 @@ export class Ctrlb {
     return this.requester.executeAsync(actionInfo);
   }
 
-  public open(arg: string): Promise<void> {
+  public async open(arg: string): Promise<void> {
     const bufferOpenInfos = this.argParser.parseBufferOpenArg(arg);
-    return this.opener.open(bufferOpenInfos);
+    return await this.opener.open(bufferOpenInfos);
   }
 }
