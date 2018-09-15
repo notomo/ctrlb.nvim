@@ -21,7 +21,7 @@ export class BufferOpener {
     };
   }
 
-  public async open(infos: BufferOpenInfo[]) {
+  public async open(infos: BufferOpenInfo[]): Promise<void> {
     // const switchbuf = await this.vim.buffer.getOption("switchbuf");
     await this.vim.buffer.setOption("switchbuf", "");
     await this.vim.command("tabnew");

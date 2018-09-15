@@ -9,13 +9,13 @@ export class Ctrlb {
     protected readonly opener: BufferOpener
   ) {}
 
-  public requestAsync(arg: string): void {
+  public requestAsync(arg: string): Promise<void> {
     const actionInfo = this.argParser.parse(arg);
-    this.requester.executeAsync(actionInfo);
+    return this.requester.executeAsync(actionInfo);
   }
 
-  public open(arg: string): void {
+  public open(arg: string): Promise<void> {
     const bufferOpenInfos = this.argParser.parseBufferOpenArg(arg);
-    this.opener.open(bufferOpenInfos);
+    return this.opener.open(bufferOpenInfos);
   }
 }
