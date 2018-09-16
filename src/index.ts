@@ -37,9 +37,7 @@ export default class TestPlugin {
     logger.error(error);
 
     const message = error.stack !== undefined ? error.stack : error.message;
-    await this.nvim
-      .errWrite(message.replace(/'/g, "''"))
-      .catch(e => logger.error(e));
+    await this.nvim.errWrite(message).catch(e => logger.error(e));
   }
 
   protected isError(e: any): e is Error {
