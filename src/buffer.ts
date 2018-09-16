@@ -4,13 +4,14 @@ import { getLogger, Logger } from "./logger";
 
 export class BufferOpener {
   protected readonly logger: Logger;
+  protected readonly parser: LayoutParser;
   constructor(protected readonly vim: Neovim) {
     this.logger = getLogger("buffer");
+    this.parser = new LayoutParser(vim);
   }
 
   public async open(info: unknown): Promise<void> {
-    const parser = new LayoutParser(this.vim);
-    const layoutItem = parser.parse(info);
+    const layoutItem = this.parser.parse(info);
     await this.vim.command("tabnew");
     await layoutItem.open();
   }

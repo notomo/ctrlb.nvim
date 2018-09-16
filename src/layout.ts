@@ -43,7 +43,8 @@ class LayoutItem {
   constructor(
     protected readonly items: Item[],
     protected readonly direction: Direction,
-    protected readonly vim: Neovim
+    protected readonly vim: Neovim,
+    protected readonly emptyBuffer: Layout
   ) {
     this.logger = getLogger("layout");
     this.lazyOpenItems = [];
@@ -53,37 +54,39 @@ class LayoutItem {
     if (this.items.length === 0) {
       return;
     }
+
     const firstItem = this.items[0];
     await this.openItem(firstItem, Direction.NOTHING);
     for (const item of this.items.slice(1)) {
       await this.openItem(item, this.direction);
     }
+
     for (const dict of this.lazyOpenItems) {
       await this.vim.setWindow(dict.window);
       await dict.item.open();
     }
+    this.lazyOpenItems.length = 0;
   }
 
   protected async openItem(item: Item, direction: Direction) {
     if (item instanceof LayoutItem) {
-      await new Layout(this.vim).open(direction);
+      await this.emptyBuffer.open(direction);
       const window = await this.vim.window;
       this.lazyOpenItems.push({ window: window, item: item });
       return;
     }
+
     return await item.open(direction);
   }
 }
 
-interface BufferJson {
-  name: CtrlbBufferType;
-}
-
 export class LayoutParser {
   protected readonly buffers: Buffers;
+  protected readonly emptyBuffer: Layout;
 
   constructor(protected readonly vim: Neovim) {
     this.buffers = new Buffers(vim);
+    this.emptyBuffer = new Layout(vim);
   }
 
   public parse(json: unknown): LayoutItem {
@@ -93,14 +96,14 @@ export class LayoutParser {
     if (!this.hasDirection(json)) {
       throw new Error("");
     }
-    const directionValue = this.toDirectionTransform(json.direction);
+    const directionValue = json.direction.toUpperCase();
     if (!this.isDirection(directionValue)) {
       throw new Error("");
     }
     return this.parseLayoutItem(json.items, directionValue);
   }
 
-  protected isBufferJson(json: any): json is BufferJson {
+  protected hasName(json: any): json is { name: CtrlbBufferType } {
     return typeof json.name === "string" && json.name in CtrlbBufferType;
   }
 
@@ -112,10 +115,6 @@ export class LayoutParser {
     return typeof json.direction === "string";
   }
 
-  protected toDirectionTransform(value: string): string {
-    return value.toUpperCase();
-  }
-
   protected isDirection(value: string): value is Direction {
     return value in Direction;
   }
@@ -123,7 +122,7 @@ export class LayoutParser {
   protected parseLayoutItem(items: any[], direction: Direction): LayoutItem {
     const parsedItems: Item[] = [];
     for (const item of items) {
-      if (this.isBufferJson(item)) {
+      if (this.hasName(item)) {
         const buf = this.buffers.get(item.name);
         parsedItems.push(buf);
         continue;
@@ -131,6 +130,6 @@ export class LayoutParser {
       const layoutItem = this.parse(item);
       parsedItems.push(layoutItem);
     }
-    return new LayoutItem(parsedItems, direction, this.vim);
+    return new LayoutItem(parsedItems, direction, this.vim, this.emptyBuffer);
   }
 }
