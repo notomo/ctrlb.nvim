@@ -7,10 +7,6 @@ function! ctrlb#open(arg_string) abort
     return _ctrlb_open(a:arg_string)
 endfunction
 
-function! ctrlb#test(arg_string) abort
-    return _ctrlb_open_test(a:arg_string)
-endfunction
-
 let s:custom = {
     \ 'executable_path': 'wsxhub',
 \ }

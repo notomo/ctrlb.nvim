@@ -6,7 +6,7 @@ import { BufferOpener } from "./buffer";
 import { getLogger } from "./logger";
 
 @Plugin({ dev: true })
-export default class TestPlugin {
+export default class CtrlbPlugin {
   protected readonly ctrlb: Ctrlb;
 
   constructor(
@@ -24,7 +24,7 @@ export default class TestPlugin {
     this.ctrlb.requestAsync(args[0]).catch(e => this.reportError(e));
   }
 
-  @Function("_ctrlb_open_test", { sync: true })
+  @Function("_ctrlb_open", { sync: true })
   public open(args: any[]): void {
     this.ctrlb.open(args[0]).catch(e => this.reportError(e));
   }
