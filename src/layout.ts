@@ -91,14 +91,14 @@ export class LayoutParser {
 
   public parse(json: unknown): LayoutItem {
     if (!this.hasItems(json)) {
-      throw new Error("");
+      throw new Error("'items' must be array, but actual: " + json);
     }
     if (!this.hasDirection(json)) {
-      throw new Error("");
+      throw new Error("'direction' must be string");
     }
     const directionValue = json.direction.toUpperCase();
     if (!this.isDirection(directionValue)) {
-      throw new Error("");
+      throw new Error("'direction' must be Direction");
     }
     return this.parseLayoutItem(json.items, directionValue);
   }
