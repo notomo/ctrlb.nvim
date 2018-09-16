@@ -31,14 +31,4 @@ export class CurrentTab extends BaseBuffer {
       buffer.replace(tab.body.url, 1);
     });
   }
-
-  protected subscribe(eventName: string) {
-    this.requester.executeAsync({
-      actionGroupName: "event",
-      actionName: "subscribe",
-      args: {
-        eventName: eventName,
-      },
-    });
-  }
 }

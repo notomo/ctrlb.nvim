@@ -65,4 +65,14 @@ export abstract class BaseBuffer {
   protected get fileType(): string {
     return "ctrlb-" + this.type;
   }
+
+  protected subscribe(eventName: string) {
+    this.requester.executeAsync({
+      actionGroupName: "event",
+      actionName: "subscribe",
+      args: {
+        eventName: eventName,
+      },
+    });
+  }
 }
