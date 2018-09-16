@@ -9,9 +9,10 @@ export class Ctrlb {
     protected readonly opener: BufferOpener
   ) {}
 
-  public requestAsync(arg: string): Promise<void> {
+  public async requestAsync(arg: string): Promise<void> {
     const actionInfo = this.argParser.parse(arg);
-    return this.requester.executeAsync(actionInfo);
+    this.requester.executeAsync(actionInfo);
+    return;
   }
 
   public async open(arg: string): Promise<void> {
