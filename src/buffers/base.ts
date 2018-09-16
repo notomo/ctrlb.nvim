@@ -1,15 +1,18 @@
 import { Neovim, Buffer } from "neovim";
 import { Direction } from "../layout";
+import { Requester } from "../requester";
 import { Logger, getLogger } from "../logger";
 
 export abstract class BaseBuffer {
   abstract readonly type: string;
   protected readonly logger: Logger;
+  protected readonly requester: Requester;
   protected buffer: Buffer | null;
 
   constructor(protected readonly vim: Neovim) {
     this.buffer = null;
     this.logger = getLogger("buffer.base");
+    this.requester = new Requester();
   }
 
   protected async create(): Promise<Buffer> {
@@ -49,12 +52,15 @@ export abstract class BaseBuffer {
       const fileType = this.fileType;
       await buffer.setOption("filetype", fileType);
       await this.vim.command("silent doautocmd FileType " + fileType);
+      this.setup(buffer);
     }
   }
 
   public async echomsg(message: Object): Promise<void> {
     await this.vim.command("echomsg '" + message.toString() + "'");
   }
+
+  protected async setup(buffer: Buffer): Promise<void> {}
 
   protected get fileType(): string {
     return "ctrlb-" + this.type;

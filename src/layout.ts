@@ -1,4 +1,5 @@
 import { Ctrl } from "./buffers/ctrl";
+import { CurrentTab } from "./buffers/current-tab";
 import { Layout } from "./buffers/layout";
 import { Neovim, Window } from "neovim";
 import { Logger, getLogger } from "./logger";
@@ -15,10 +16,12 @@ interface CtrlbBuffer {
 
 enum CtrlbBufferType {
   ctrl = "ctrl",
+  currentTab = "currentTab",
 }
 
 type CtrlbBuffers = {
-  ctrl: Ctrl;
+  [CtrlbBufferType.ctrl]: Ctrl;
+  [CtrlbBufferType.currentTab]: CurrentTab;
 } & { [P in CtrlbBufferType]: CtrlbBuffer };
 
 class Buffers {
@@ -26,7 +29,8 @@ class Buffers {
 
   constructor(protected readonly vim: Neovim) {
     this.buffers = {
-      ctrl: new Ctrl(vim),
+      [CtrlbBufferType.ctrl]: new Ctrl(vim),
+      [CtrlbBufferType.currentTab]: new CurrentTab(vim),
     };
   }
 
