@@ -56,10 +56,6 @@ export abstract class BaseBuffer {
     }
   }
 
-  public async echomsg(message: Object): Promise<void> {
-    await this.vim.command("echomsg '" + message.toString() + "'");
-  }
-
   protected async setup(buffer: Buffer): Promise<void> {}
 
   protected get fileType(): string {
