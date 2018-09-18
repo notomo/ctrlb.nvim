@@ -20,7 +20,7 @@ export abstract class BaseBuffer {
       return this.buffer;
     }
     const bufferName = this.fileType;
-    this.vim.command("badd " + bufferName);
+    this.vim.command("badd ctrlb://" + bufferName);
     const bufferNumber = await this.vim.call("bufnr", bufferName);
     const buffers = await this.vim.buffers;
     for (const buf of buffers) {
