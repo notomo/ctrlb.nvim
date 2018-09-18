@@ -5,7 +5,7 @@ import { Requester } from "./requester";
 import { BufferOpener } from "./buffer";
 import { getLogger } from "./logger";
 
-@Plugin({ dev: true })
+@Plugin({ dev: false, alwaysInit: false })
 export default class CtrlbPlugin {
   protected readonly ctrlb: Ctrlb;
 
