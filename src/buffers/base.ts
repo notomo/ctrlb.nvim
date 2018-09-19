@@ -20,7 +20,7 @@ export abstract class BaseBuffer {
       return this.buffer;
     }
     const bufferName = this.fileType;
-    this.vim.command("badd ctrlb://" + bufferName);
+    await this.vim.command("badd ctrlb://" + bufferName);
     const bufferNumber = await this.vim.call("bufnr", bufferName);
     const buffers = await this.vim.buffers;
     for (const buf of buffers) {
@@ -46,17 +46,19 @@ export abstract class BaseBuffer {
     } else {
       await this.vim.command("rightbelow vsplit #" + buffer.id);
     }
+    await this.adjustBuffer(buffer);
     await this.vim.command("silent doautocmd WinEnter");
     await this.vim.command("silent doautocmd BufWinEnter");
     if (!isInitialized) {
       const fileType = this.fileType;
       await buffer.setOption("filetype", fileType);
       await this.vim.command("silent doautocmd FileType " + fileType);
-      this.setup(buffer);
+      await this.setup(buffer);
     }
   }
 
   protected async setup(buffer: Buffer): Promise<void> {}
+  protected async adjustBuffer(buffer: Buffer): Promise<void> {}
 
   protected get fileType(): string {
     return "ctrlb-" + this.type;
