@@ -2,12 +2,13 @@ import { Plugin, Function, Neovim, NvimPlugin } from "neovim";
 import { Ctrlb } from "./ctrlb";
 import { ArgParser } from "./info";
 import { Requester } from "./requester";
+import { Reporter } from "./reporter";
 import { BufferOpener } from "./buffer";
-import { getLogger } from "./logger";
 
 @Plugin({ dev: false, alwaysInit: false })
 export default class CtrlbPlugin {
   protected readonly ctrlb: Ctrlb;
+  protected readonly reporter: Reporter;
 
   constructor(
     protected readonly nvim: Neovim,
@@ -17,30 +18,16 @@ export default class CtrlbPlugin {
     const requester = new Requester();
     const opener = new BufferOpener(nvim);
     this.ctrlb = new Ctrlb(requester, parser, opener);
+    this.reporter = new Reporter(nvim);
   }
 
   @Function("_ctrlb_execute", { sync: true })
   public executeAsync(args: any[]): void {
-    this.ctrlb.requestAsync(args[0]).catch(e => this.reportError(e));
+    this.ctrlb.requestAsync(args[0]).catch(e => this.reporter.error(e));
   }
 
   @Function("_ctrlb_open", { sync: true })
   public open(args: any[]): void {
-    this.ctrlb.open(args[0]).catch(e => this.reportError(e));
-  }
-
-  protected async reportError(error: unknown) {
-    if (!this.isError(error)) {
-      return;
-    }
-    const logger = getLogger("index");
-    logger.error(error);
-
-    const message = error.stack !== undefined ? error.stack : error.message;
-    await this.nvim.errWrite(message).catch(e => logger.error(e));
-  }
-
-  protected isError(e: any): e is Error {
-    return typeof e.name === "string" && typeof e.message === "string";
+    this.ctrlb.open(args[0]).catch(e => this.reporter.error(e));
   }
 }
