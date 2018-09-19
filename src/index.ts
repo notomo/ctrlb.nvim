@@ -4,6 +4,7 @@ import { ArgParser } from "./info";
 import { Requester } from "./requester";
 import { Reporter } from "./reporter";
 import { BufferOpener } from "./buffer";
+import { getLogger } from "./logger";
 
 @Plugin({ dev: false, alwaysInit: false })
 export default class CtrlbPlugin {
@@ -18,7 +19,8 @@ export default class CtrlbPlugin {
     const requester = new Requester();
     const opener = new BufferOpener(nvim);
     this.ctrlb = new Ctrlb(requester, parser, opener);
-    this.reporter = new Reporter(nvim);
+    const logger = getLogger("index");
+    this.reporter = new Reporter(nvim, logger);
   }
 
   @Function("_ctrlb_execute", { sync: true })

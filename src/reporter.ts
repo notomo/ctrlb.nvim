@@ -1,12 +1,11 @@
 import { Neovim } from "neovim";
-import { getLogger, Logger } from "./logger";
+import { Logger } from "./logger";
 
 export class Reporter {
-  protected readonly logger: Logger;
-
-  constructor(protected readonly nvim: Neovim) {
-    this.logger = getLogger("repoter");
-  }
+  constructor(
+    protected readonly nvim: Neovim,
+    protected readonly logger: Logger
+  ) {}
 
   public async error(error: unknown) {
     if (!this.isError(error)) {
