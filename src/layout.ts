@@ -8,6 +8,7 @@ export enum Direction {
   VERTICAL = "VERTICAL",
   HORIZONTAL = "HORIZONTAL",
   NOTHING = "NOTHING",
+  TAB = "TAB",
 }
 
 interface CtrlbBuffer {
@@ -52,6 +53,11 @@ class LayoutItem {
   ) {
     this.logger = getLogger("layout");
     this.lazyOpenItems = [];
+  }
+
+  public async openLayout() {
+    await this.emptyBuffer.open(Direction.TAB);
+    await this.open();
   }
 
   public async open() {

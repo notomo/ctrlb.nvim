@@ -29,7 +29,7 @@ export default class CtrlbPlugin {
   }
 
   @Function("_ctrlb_open", { sync: true })
-  public open(args: any[]): void {
-    this.ctrlb.open(args[0]).catch(e => this.reporter.error(e));
+  public async open(args: any[]): Promise<void> {
+    await this.ctrlb.open(args[0]).catch(e => this.reporter.error(e));
   }
 }

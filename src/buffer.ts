@@ -12,7 +12,6 @@ export class BufferOpener {
 
   public async open(info: unknown): Promise<void> {
     const layoutItem = this.parser.parse(info);
-    await this.vim.command("tabnew");
-    await layoutItem.open();
+    await layoutItem.openLayout();
   }
 }
