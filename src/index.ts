@@ -3,8 +3,8 @@ import { Ctrlb } from "./ctrlb";
 import { ArgParser } from "./info";
 import { Requester } from "./requester";
 import { Reporter } from "./reporter";
-import { BufferOpener } from "./buffer";
 import { getLogger } from "./logger";
+import { LayoutParser } from "./layout";
 
 @Plugin({ dev: false, alwaysInit: false })
 export default class CtrlbPlugin {
@@ -15,10 +15,11 @@ export default class CtrlbPlugin {
     protected readonly nvim: Neovim,
     protected readonly plugin: NvimPlugin
   ) {
-    const parser = new ArgParser();
+    const argParser = new ArgParser();
     const requester = new Requester();
-    const opener = new BufferOpener(nvim);
-    this.ctrlb = new Ctrlb(requester, parser, opener);
+    const layoutParser = new LayoutParser(nvim);
+    this.ctrlb = new Ctrlb(requester, argParser, layoutParser);
+
     const logger = getLogger("index");
     this.reporter = new Reporter(nvim, logger);
   }

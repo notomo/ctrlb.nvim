@@ -2,43 +2,24 @@ import { Neovim, Buffer } from "neovim";
 import { Direction } from "../layout";
 import { Requester } from "../requester";
 import { Logger, getLogger } from "../logger";
+import { BufferContainer } from "./container";
 
 export abstract class BaseBuffer {
   abstract readonly type: string;
   protected readonly logger: Logger;
   protected readonly requester: Requester;
-  protected buffer: Buffer | null;
+  protected readonly bufferContainer: BufferContainer;
 
   constructor(protected readonly vim: Neovim) {
-    this.buffer = null;
+    this.bufferContainer = new BufferContainer(vim);
     this.logger = getLogger("buffer.base");
     this.requester = new Requester();
   }
 
-  protected async create(): Promise<Buffer> {
-    if (this.isInitialized(this.buffer)) {
-      return this.buffer;
-    }
-    const bufferName = this.fileType;
-    await this.vim.command("badd ctrlb://" + bufferName);
-    const bufferNumber = await this.vim.call("bufnr", bufferName);
-    const buffers = await this.vim.buffers;
-    for (const buf of buffers) {
-      if (buf.id === bufferNumber) {
-        this.buffer = buf;
-        return this.buffer;
-      }
-    }
-    throw new Error("buffer not found: " + bufferNumber);
-  }
-
-  protected isInitialized(buffer: Buffer | null): buffer is Buffer {
-    return buffer !== null;
-  }
-
   public async open(direction: Direction): Promise<void> {
-    const isInitialized = this.isInitialized(this.buffer);
-    const buffer = await this.create();
+    const isInitialized = await this.bufferContainer.isInitialized();
+    const buffer = await this.bufferContainer.get(this.bufferPath);
+
     switch (direction) {
       case Direction.VERTICAL:
         await this.vim.command("rightbelow split #" + buffer.id);
@@ -56,9 +37,12 @@ export abstract class BaseBuffer {
         this.assertNever(direction);
         break;
     }
+
     await this.adjustBuffer(buffer);
+
     await this.vim.command("silent doautocmd WinEnter");
     await this.vim.command("silent doautocmd BufWinEnter");
+
     if (!isInitialized) {
       const fileType = this.fileType;
       await buffer.setOption("filetype", fileType);
@@ -72,6 +56,10 @@ export abstract class BaseBuffer {
 
   protected get fileType(): string {
     return "ctrlb-" + this.type;
+  }
+
+  protected get bufferPath(): string {
+    return "ctrlb://" + this.fileType;
   }
 
   protected subscribe(eventName: string) {

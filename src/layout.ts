@@ -42,7 +42,7 @@ class Buffers {
 
 type Item = LayoutItem | CtrlbBuffer;
 
-class LayoutItem {
+export class LayoutItem {
   protected readonly logger: Logger;
   protected readonly lazyOpenItems: { window: Window; item: LayoutItem }[];
   constructor(

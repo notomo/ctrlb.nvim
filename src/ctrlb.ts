@@ -1,12 +1,12 @@
 import { Requester } from "./requester";
 import { ArgParser } from "./info";
-import { BufferOpener } from "./buffer";
+import { LayoutParser } from "./layout";
 
 export class Ctrlb {
   constructor(
     protected readonly requester: Requester,
     protected readonly argParser: ArgParser,
-    protected readonly opener: BufferOpener
+    protected readonly layoutParser: LayoutParser
   ) {}
 
   public async requestAsync(arg: string): Promise<void> {
@@ -17,6 +17,7 @@ export class Ctrlb {
 
   public async open(arg: string): Promise<void> {
     const bufferOpenInfos = this.argParser.parseBufferOpenArg(arg);
-    return await this.opener.open(bufferOpenInfos);
+    const layoutItem = this.layoutParser.parse(bufferOpenInfos);
+    await layoutItem.openLayout();
   }
 }
