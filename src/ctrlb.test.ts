@@ -1,14 +1,15 @@
 import { Ctrlb } from "./ctrlb";
 import { Requester } from "./requester";
 import { ArgParser } from "./info";
-import { BufferOpener } from "./buffer";
+import { LayoutParser, LayoutItem } from "./layout";
 
 describe("Ctrlb", () => {
   let ctrlb: Ctrlb;
   let parse: jest.Mock;
   let parseBufferOpenArg: jest.Mock;
-  let open: jest.Mock;
+  let layoutParse: jest.Mock;
   let executeAsync: jest.Mock;
+  let openLayout: jest.Mock;
 
   beforeEach(() => {
     executeAsync = jest.fn();
@@ -25,13 +26,20 @@ describe("Ctrlb", () => {
     }));
     const argParser = new ArgParserClass();
 
-    open = jest.fn();
-    const BufferOpenerClass = jest.fn<BufferOpener>(() => ({
-      open: open,
+    openLayout = jest.fn();
+    const LayoutItemClass = jest.fn<LayoutItem>(() => ({
+      openLayout: openLayout,
     }));
-    const bufferOpener = new BufferOpenerClass();
+    const layoutItem = new LayoutItemClass();
 
-    ctrlb = new Ctrlb(requester, argParser, bufferOpener);
+    layoutParse = jest.fn();
+    layoutParse.mockReturnValue(layoutItem);
+    const LayoutParserClass = jest.fn<LayoutParser>(() => ({
+      parse: layoutParse,
+    }));
+    const layoutParser = new LayoutParserClass();
+
+    ctrlb = new Ctrlb(requester, argParser, layoutParser);
   });
 
   it("requestAsync", async () => {
@@ -53,6 +61,7 @@ describe("Ctrlb", () => {
     await ctrlb.open(arg);
 
     expect(parseBufferOpenArg).toHaveBeenCalledWith(arg);
-    expect(open).toHaveBeenCalledWith(info);
+    expect(layoutParse).toHaveBeenCalledWith(info);
+    expect(openLayout).toHaveBeenCalled();
   });
 });
