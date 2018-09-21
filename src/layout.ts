@@ -4,13 +4,7 @@ import { Layout } from "./buffers/layout";
 import { Neovim, Window } from "neovim";
 import { Logger, getLogger } from "./logger";
 import { Requester } from "./requester";
-
-export enum Direction {
-  VERTICAL = "VERTICAL",
-  HORIZONTAL = "HORIZONTAL",
-  NOTHING = "NOTHING",
-  TAB = "TAB",
-}
+import { Direction } from "./direction";
 
 interface CtrlbBuffer {
   open(direction: Direction): void;

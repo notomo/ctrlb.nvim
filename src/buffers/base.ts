@@ -1,5 +1,5 @@
 import { Neovim, Buffer } from "neovim";
-import { Direction } from "../layout";
+import { Direction } from "../direction";
 import { Requester } from "../requester";
 import { Logger, getLogger } from "../logger";
 import { BufferContainer } from "./container";
