@@ -12,17 +12,17 @@ export default class CtrlbPlugin {
   protected readonly reporter: Reporter;
 
   constructor(
-    protected readonly nvim: Neovim,
+    protected readonly vim: Neovim,
     protected readonly plugin: NvimPlugin
   ) {
     const argParser = new ArgParser();
     const requester = new Requester();
-    const buffers = new Buffers(nvim, requester);
-    const layoutParser = new LayoutParser(nvim, buffers);
+    const buffers = new Buffers(vim, requester);
+    const layoutParser = new LayoutParser(vim, buffers);
     this.ctrlb = new Ctrlb(requester, argParser, layoutParser);
 
     const logger = getLogger("index");
-    this.reporter = new Reporter(nvim, logger);
+    this.reporter = new Reporter(vim, logger);
   }
 
   @Function("_ctrlb_execute", { sync: true })
