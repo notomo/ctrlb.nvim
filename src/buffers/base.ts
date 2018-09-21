@@ -1,19 +1,21 @@
 import { Neovim, Buffer } from "neovim";
-import { Direction } from "../layout";
+import { Direction } from "../direction";
 import { Requester } from "../requester";
 import { Logger, getLogger } from "../logger";
 import { BufferContainer } from "./container";
+import { CtrlbBufferType } from "./type";
 
 export abstract class BaseBuffer {
-  abstract readonly type: string;
+  abstract readonly type: CtrlbBufferType;
   protected readonly logger: Logger;
-  protected readonly requester: Requester;
   protected readonly bufferContainer: BufferContainer;
 
-  constructor(protected readonly vim: Neovim) {
+  constructor(
+    protected readonly vim: Neovim,
+    protected readonly requester: Requester
+  ) {
     this.bufferContainer = new BufferContainer(vim);
     this.logger = getLogger("buffer.base");
-    this.requester = new Requester();
   }
 
   public async open(direction: Direction): Promise<void> {

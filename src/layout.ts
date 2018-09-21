@@ -1,46 +1,12 @@
-import { Ctrl } from "./buffers/ctrl";
-import { CurrentTab } from "./buffers/current-tab";
-import { Layout } from "./buffers/layout";
+import { Nothing } from "./buffers/nothing";
+import { Buffers } from "./buffers";
+import { BaseBuffer } from "./buffers/base";
+import { CtrlbBufferType } from "./buffers/type";
 import { Neovim, Window } from "neovim";
 import { Logger, getLogger } from "./logger";
+import { Direction } from "./direction";
 
-export enum Direction {
-  VERTICAL = "VERTICAL",
-  HORIZONTAL = "HORIZONTAL",
-  NOTHING = "NOTHING",
-  TAB = "TAB",
-}
-
-interface CtrlbBuffer {
-  open(direction: Direction): void;
-}
-
-enum CtrlbBufferType {
-  ctrl = "ctrl",
-  currentTab = "currentTab",
-}
-
-type CtrlbBuffers = {
-  [CtrlbBufferType.ctrl]: Ctrl;
-  [CtrlbBufferType.currentTab]: CurrentTab;
-} & { [P in CtrlbBufferType]: CtrlbBuffer };
-
-class Buffers {
-  protected readonly buffers: CtrlbBuffers;
-
-  constructor(protected readonly vim: Neovim) {
-    this.buffers = {
-      [CtrlbBufferType.ctrl]: new Ctrl(vim),
-      [CtrlbBufferType.currentTab]: new CurrentTab(vim),
-    };
-  }
-
-  public get<T extends CtrlbBufferType>(name: T): CtrlbBuffers[T] {
-    return this.buffers[name];
-  }
-}
-
-type Item = LayoutItem | CtrlbBuffer;
+type Item = LayoutItem | BaseBuffer;
 
 export class LayoutItem {
   protected readonly logger: Logger;
@@ -49,7 +15,7 @@ export class LayoutItem {
     protected readonly items: Item[],
     protected readonly direction: Direction,
     protected readonly vim: Neovim,
-    protected readonly emptyBuffer: Layout
+    protected readonly emptyBuffer: Nothing
   ) {
     this.logger = getLogger("layout");
     this.lazyOpenItems = [];
@@ -91,13 +57,10 @@ export class LayoutItem {
 }
 
 export class LayoutParser {
-  protected readonly buffers: Buffers;
-  protected readonly emptyBuffer: Layout;
-
-  constructor(protected readonly vim: Neovim) {
-    this.buffers = new Buffers(vim);
-    this.emptyBuffer = new Layout(vim);
-  }
+  constructor(
+    protected readonly vim: Neovim,
+    protected readonly buffers: Buffers
+  ) {}
 
   public parse(json: unknown): LayoutItem {
     if (!this.hasItems(json)) {
@@ -140,6 +103,11 @@ export class LayoutParser {
       const layoutItem = this.parse(item);
       parsedItems.push(layoutItem);
     }
-    return new LayoutItem(parsedItems, direction, this.vim, this.emptyBuffer);
+    return new LayoutItem(
+      parsedItems,
+      direction,
+      this.vim,
+      this.buffers.get(CtrlbBufferType.nothing)
+    );
   }
 }
