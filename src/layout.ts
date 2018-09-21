@@ -1,43 +1,12 @@
-import { Ctrl } from "./buffers/ctrl";
-import { CurrentTab } from "./buffers/current-tab";
-import { Layout } from "./buffers/layout";
+import { Nothing } from "./buffers/nothing";
+import { Buffers } from "./buffers";
+import { BaseBuffer } from "./buffers/base";
+import { CtrlbBufferType } from "./buffers/type";
 import { Neovim, Window } from "neovim";
 import { Logger, getLogger } from "./logger";
-import { Requester } from "./requester";
 import { Direction } from "./direction";
 
-interface CtrlbBuffer {
-  open(direction: Direction): void;
-}
-
-enum CtrlbBufferType {
-  ctrl = "ctrl",
-  currentTab = "currentTab",
-}
-
-type CtrlbBuffers = {
-  [CtrlbBufferType.ctrl]: Ctrl;
-  [CtrlbBufferType.currentTab]: CurrentTab;
-} & { [P in CtrlbBufferType]: CtrlbBuffer };
-
-export class Buffers {
-  protected readonly buffers: CtrlbBuffers;
-  public readonly emptyBuffer: Layout;
-
-  constructor(protected readonly vim: Neovim, requester: Requester) {
-    this.buffers = {
-      [CtrlbBufferType.ctrl]: new Ctrl(vim, requester),
-      [CtrlbBufferType.currentTab]: new CurrentTab(vim, requester),
-    };
-    this.emptyBuffer = new Layout(vim, requester);
-  }
-
-  public get<T extends CtrlbBufferType>(name: T): CtrlbBuffers[T] {
-    return this.buffers[name];
-  }
-}
-
-type Item = LayoutItem | CtrlbBuffer;
+type Item = LayoutItem | BaseBuffer;
 
 export class LayoutItem {
   protected readonly logger: Logger;
@@ -46,7 +15,7 @@ export class LayoutItem {
     protected readonly items: Item[],
     protected readonly direction: Direction,
     protected readonly vim: Neovim,
-    protected readonly emptyBuffer: Layout
+    protected readonly emptyBuffer: Nothing
   ) {
     this.logger = getLogger("layout");
     this.lazyOpenItems = [];
@@ -138,7 +107,7 @@ export class LayoutParser {
       parsedItems,
       direction,
       this.vim,
-      this.buffers.emptyBuffer
+      this.buffers.get(CtrlbBufferType.nothing)
     );
   }
 }

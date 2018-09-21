@@ -1,8 +1,9 @@
 import { BaseBuffer } from "./base";
 import { Buffer } from "neovim";
+import { CtrlbBufferType } from "./type";
 
 export class CurrentTab extends BaseBuffer {
-  public readonly type = "currentTab";
+  public readonly type = CtrlbBufferType.currentTab;
 
   protected async setup(buffer: Buffer): Promise<void> {
     buffer.setOption("buftype", "nofile");

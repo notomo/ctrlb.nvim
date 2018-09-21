@@ -4,7 +4,8 @@ import { ArgParser } from "./info";
 import { Requester } from "./requester";
 import { Reporter } from "./reporter";
 import { getLogger } from "./logger";
-import { LayoutParser, Buffers } from "./layout";
+import { LayoutParser } from "./layout";
+import { Buffers } from "./buffers";
 
 @Plugin({ dev: false, alwaysInit: false })
 export default class CtrlbPlugin {

@@ -3,9 +3,10 @@ import { Direction } from "../direction";
 import { Requester } from "../requester";
 import { Logger, getLogger } from "../logger";
 import { BufferContainer } from "./container";
+import { CtrlbBufferType } from "./type";
 
 export abstract class BaseBuffer {
-  abstract readonly type: string;
+  abstract readonly type: CtrlbBufferType;
   protected readonly logger: Logger;
   protected readonly bufferContainer: BufferContainer;
 
