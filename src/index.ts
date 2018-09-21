@@ -4,7 +4,7 @@ import { ArgParser } from "./info";
 import { Requester } from "./requester";
 import { Reporter } from "./reporter";
 import { getLogger } from "./logger";
-import { LayoutParser } from "./layout";
+import { LayoutParser, Buffers } from "./layout";
 
 @Plugin({ dev: false, alwaysInit: false })
 export default class CtrlbPlugin {
@@ -17,7 +17,8 @@ export default class CtrlbPlugin {
   ) {
     const argParser = new ArgParser();
     const requester = new Requester();
-    const layoutParser = new LayoutParser(nvim);
+    const buffers = new Buffers(nvim, requester);
+    const layoutParser = new LayoutParser(nvim, buffers);
     this.ctrlb = new Ctrlb(requester, argParser, layoutParser);
 
     const logger = getLogger("index");

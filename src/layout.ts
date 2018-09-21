@@ -3,6 +3,7 @@ import { CurrentTab } from "./buffers/current-tab";
 import { Layout } from "./buffers/layout";
 import { Neovim, Window } from "neovim";
 import { Logger, getLogger } from "./logger";
+import { Requester } from "./requester";
 
 export enum Direction {
   VERTICAL = "VERTICAL",
@@ -25,14 +26,16 @@ type CtrlbBuffers = {
   [CtrlbBufferType.currentTab]: CurrentTab;
 } & { [P in CtrlbBufferType]: CtrlbBuffer };
 
-class Buffers {
+export class Buffers {
   protected readonly buffers: CtrlbBuffers;
+  public readonly emptyBuffer: Layout;
 
-  constructor(protected readonly vim: Neovim) {
+  constructor(protected readonly vim: Neovim, requester: Requester) {
     this.buffers = {
-      [CtrlbBufferType.ctrl]: new Ctrl(vim),
-      [CtrlbBufferType.currentTab]: new CurrentTab(vim),
+      [CtrlbBufferType.ctrl]: new Ctrl(vim, requester),
+      [CtrlbBufferType.currentTab]: new CurrentTab(vim, requester),
     };
+    this.emptyBuffer = new Layout(vim, requester);
   }
 
   public get<T extends CtrlbBufferType>(name: T): CtrlbBuffers[T] {
@@ -91,13 +94,10 @@ export class LayoutItem {
 }
 
 export class LayoutParser {
-  protected readonly buffers: Buffers;
-  protected readonly emptyBuffer: Layout;
-
-  constructor(protected readonly vim: Neovim) {
-    this.buffers = new Buffers(vim);
-    this.emptyBuffer = new Layout(vim);
-  }
+  constructor(
+    protected readonly vim: Neovim,
+    protected readonly buffers: Buffers
+  ) {}
 
   public parse(json: unknown): LayoutItem {
     if (!this.hasItems(json)) {
@@ -140,6 +140,11 @@ export class LayoutParser {
       const layoutItem = this.parse(item);
       parsedItems.push(layoutItem);
     }
-    return new LayoutItem(parsedItems, direction, this.vim, this.emptyBuffer);
+    return new LayoutItem(
+      parsedItems,
+      direction,
+      this.vim,
+      this.buffers.emptyBuffer
+    );
   }
 }

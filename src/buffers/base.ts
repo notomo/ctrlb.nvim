@@ -7,13 +7,14 @@ import { BufferContainer } from "./container";
 export abstract class BaseBuffer {
   abstract readonly type: string;
   protected readonly logger: Logger;
-  protected readonly requester: Requester;
   protected readonly bufferContainer: BufferContainer;
 
-  constructor(protected readonly vim: Neovim) {
+  constructor(
+    protected readonly vim: Neovim,
+    protected readonly requester: Requester
+  ) {
     this.bufferContainer = new BufferContainer(vim);
     this.logger = getLogger("buffer.base");
-    this.requester = new Requester();
   }
 
   public async open(direction: Direction): Promise<void> {
