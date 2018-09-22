@@ -28,6 +28,6 @@ log4js.configure({
 
 export type Logger = log4js.Logger;
 
-export const getLogger = (name: string = "ctrlb"): Logger => {
+export const getLogger = (name: string): Logger => {
   return log4js.getLogger(name);
 };

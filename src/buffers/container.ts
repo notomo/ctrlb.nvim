@@ -30,4 +30,28 @@ export class BufferContainer {
   public isInitialized(): boolean {
     return this._isInitialized(this.buffer);
   }
+
+  public async verticalOpen(bufferPath: string): Promise<Buffer> {
+    const buffer = await this.get(bufferPath);
+    await this.vim.command("rightbelow vsplit #" + buffer.id);
+    return buffer;
+  }
+
+  public async horizontalOpen(bufferPath: string): Promise<Buffer> {
+    const buffer = await this.get(bufferPath);
+    await this.vim.command("rightbelow split #" + buffer.id);
+    return buffer;
+  }
+
+  public async tabOpen(bufferPath: string): Promise<Buffer> {
+    const buffer = await this.get(bufferPath);
+    await this.vim.command("tabedit #" + buffer.id);
+    return buffer;
+  }
+
+  public async open(bufferPath: string): Promise<Buffer> {
+    const buffer = await this.get(bufferPath);
+    await this.vim.command("buffer " + buffer.id);
+    return buffer;
+  }
 }

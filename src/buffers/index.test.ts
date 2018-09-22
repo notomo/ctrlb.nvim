@@ -3,6 +3,7 @@ import { Buffers } from "./index";
 import { CtrlbBufferType } from "./type";
 import { Requester } from "../requester";
 import { Nothing } from "./nothing";
+import { BufferContainer } from "./container";
 
 describe("Buffers", () => {
   it("get", () => {
@@ -14,7 +15,10 @@ describe("Buffers", () => {
 
     const buffers = new Buffers(vim, requester);
 
+    const BufferContainerClass = jest.fn<BufferContainer>(() => ({}));
+    const bufferContainer = new BufferContainerClass(vim);
+
     const buf = buffers.get(CtrlbBufferType.nothing);
-    expect(buf).toEqual(new Nothing(vim, requester));
+    expect(buf.type).toEqual(new Nothing(vim, requester, bufferContainer).type);
   });
 });
