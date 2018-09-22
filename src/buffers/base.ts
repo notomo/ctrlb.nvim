@@ -19,25 +19,7 @@ export abstract class BaseBuffer {
 
   public async open(direction: Direction): Promise<void> {
     const isInitialized = await this.bufferContainer.isInitialized();
-    const buffer = await this.bufferContainer.get(this.bufferPath);
-
-    switch (direction) {
-      case Direction.VERTICAL:
-        await this.vim.command("rightbelow split #" + buffer.id);
-        break;
-      case Direction.HORIZONTAL:
-        await this.vim.command("rightbelow vsplit #" + buffer.id);
-        break;
-      case Direction.NOTHING:
-        await this.vim.command("buffer " + buffer.id);
-        break;
-      case Direction.TAB:
-        await this.vim.command("tabedit #" + buffer.id);
-        break;
-      default:
-        this.assertNever(direction);
-        break;
-    }
+    const buffer = await this._open(direction);
 
     await this.adjustBuffer(buffer);
 
@@ -49,6 +31,19 @@ export abstract class BaseBuffer {
       await buffer.setOption("filetype", fileType);
       await this.vim.command("silent doautocmd FileType " + fileType);
       await this.setup(buffer);
+    }
+  }
+
+  protected async _open(direction: Direction): Promise<Buffer> {
+    switch (direction) {
+      case Direction.VERTICAL:
+        return await this.bufferContainer.horizontalOpen(this.bufferPath);
+      case Direction.HORIZONTAL:
+        return await this.bufferContainer.verticalOpen(this.bufferPath);
+      case Direction.NOTHING:
+        return await this.bufferContainer.open(this.bufferPath);
+      case Direction.TAB:
+        return await this.bufferContainer.tabOpen(this.bufferPath);
     }
   }
 
@@ -71,9 +66,5 @@ export abstract class BaseBuffer {
         eventName: eventName,
       },
     });
-  }
-
-  protected assertNever(x: never): never {
-    throw new Error("Unexpected object: " + x);
   }
 }
