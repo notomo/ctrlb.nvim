@@ -8,13 +8,12 @@ import { CtrlbBufferType } from "./type";
 export abstract class BaseBuffer {
   abstract readonly type: CtrlbBufferType;
   protected readonly logger: Logger;
-  protected readonly bufferContainer: BufferContainer;
 
   constructor(
     protected readonly vim: Neovim,
-    protected readonly requester: Requester
+    protected readonly requester: Requester,
+    protected readonly bufferContainer: BufferContainer
   ) {
-    this.bufferContainer = new BufferContainer(vim);
     this.logger = getLogger("buffer.base");
   }
 
