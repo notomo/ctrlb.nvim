@@ -10,6 +10,7 @@ export class BookmarkTree extends BaseBuffer {
 
   protected async setup(buffer: Buffer): Promise<void> {
     this.actions["open"] = (buffer: Buffer) => this.openBookmark(buffer);
+    this.actions["tabOpen"] = (buffer: Buffer) => this.tabOpenBookmark(buffer);
 
     await buffer.setOption("buftype", "nofile");
     await buffer.setOption("swapfile", false);
@@ -46,6 +47,19 @@ export class BookmarkTree extends BaseBuffer {
     await this.openTree(buffer, id);
   }
 
+  public async tabOpenBookmark(buffer: Buffer) {
+    const bookmark = await this.getCurrent();
+    if (bookmark === null || bookmark.url === undefined) {
+      return;
+    }
+
+    await this.requester.executeAsync({
+      actionGroupName: "bookmark",
+      actionName: "tabOpen",
+      args: { id: Number(bookmark.id) },
+    });
+  }
+
   protected async openTree(buffer: Buffer, id: number | null) {
     const bookmarks = await this.requester.execute<Bookmark[]>({
       actionGroupName: "bookmark",
@@ -57,9 +71,9 @@ export class BookmarkTree extends BaseBuffer {
     await buffer.remove(0, this.bookmarks.length, false);
     for (const bookmark of bookmarks) {
       if (bookmark.url !== undefined) {
-        buffer.replace(bookmark.title + "\t" + bookmark.url, i);
+        await buffer.replace(bookmark.title + "\t" + bookmark.url, i);
       } else {
-        buffer.replace(bookmark.title, i);
+        await buffer.replace(bookmark.title, i);
       }
       i++;
     }
