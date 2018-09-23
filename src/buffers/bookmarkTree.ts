@@ -20,9 +20,9 @@ export class BookmarkTree extends BaseBuffer {
   }
 
   protected async getCurrent(): Promise<Bookmark | null> {
-    const row = await this.vim.call("line", ".");
-    if (row in this.bookmarks) {
-      return this.bookmarks[row - 1];
+    const index = (await this.vim.call("line", ".")) - 1;
+    if (index in this.bookmarks) {
+      return this.bookmarks[index];
     }
     return null;
   }
