@@ -1,4 +1,5 @@
 import { readFileSync } from "fs";
+import { CtrlbBufferType } from "./buffers/type";
 
 export interface ActionInfo {
   actionGroupName: string;
@@ -87,6 +88,10 @@ export class ArgParser {
 
   protected isFloat(value: string): boolean {
     return this.isNumber(value.replace(".", "1"));
+  }
+
+  public isBufferType(value: string): value is CtrlbBufferType {
+    return value in CtrlbBufferType;
   }
 
   public parseBufferOpenArg(arg: string): {} {

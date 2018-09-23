@@ -1,7 +1,9 @@
 import { Ctrlb } from "./ctrlb";
+import { Neovim } from "neovim";
 import { Requester } from "./requester";
 import { ArgParser } from "./info";
 import { LayoutParser, LayoutItem } from "./layout";
+import { Buffers } from "./buffers";
 
 describe("Ctrlb", () => {
   let ctrlb: Ctrlb;
@@ -39,7 +41,13 @@ describe("Ctrlb", () => {
     }));
     const layoutParser = new LayoutParserClass();
 
-    ctrlb = new Ctrlb(requester, argParser, layoutParser);
+    const NeovimClass = jest.fn<Neovim>(() => ({}));
+    const vim = new NeovimClass();
+
+    const BuffersClass = jest.fn<Buffers>(() => ({}));
+    const buffers = new BuffersClass(vim, requester);
+
+    ctrlb = new Ctrlb(requester, argParser, layoutParser, buffers);
   });
 
   it("requestAsync", async () => {

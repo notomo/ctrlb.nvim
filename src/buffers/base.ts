@@ -5,9 +5,12 @@ import { Logger, getLogger } from "../logger";
 import { BufferContainer } from "./container";
 import { CtrlbBufferType } from "./type";
 
+export type Actions = { [index: string]: { (buffer: Buffer): Promise<void> } };
+
 export abstract class BaseBuffer {
   abstract readonly type: CtrlbBufferType;
   protected readonly logger: Logger;
+  protected readonly actions: Actions = {};
 
   constructor(
     protected readonly vim: Neovim,
@@ -49,6 +52,15 @@ export abstract class BaseBuffer {
 
   protected async setup(buffer: Buffer): Promise<void> {}
   protected async adjustBuffer(buffer: Buffer): Promise<void> {}
+
+  public async doAction(actionName: string): Promise<void> {
+    if (!(actionName in this.actions)) {
+      throw new Error("Invalid actionName: " + actionName);
+    }
+    const action = this.actions[actionName];
+    const buffer = await this.bufferContainer.get(this.bufferPath);
+    await action(buffer);
+  }
 
   protected get fileType(): string {
     return "ctrlb-" + this.type;

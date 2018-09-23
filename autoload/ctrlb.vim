@@ -7,6 +7,10 @@ function! ctrlb#open(arg_string) abort
     return _ctrlb_open(a:arg_string)
 endfunction
 
+function! ctrlb#do_action(buffer_type, action_name) abort
+    return _ctrlb_do_action(a:buffer_type, a:action_name)
+endfunction
+
 let s:custom = {
     \ 'executable_path': 'wsxhub',
 \ }

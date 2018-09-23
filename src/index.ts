@@ -20,7 +20,7 @@ export default class CtrlbPlugin {
     const requester = new Requester();
     const buffers = new Buffers(vim, requester);
     const layoutParser = new LayoutParser(vim, buffers);
-    this.ctrlb = new Ctrlb(requester, argParser, layoutParser);
+    this.ctrlb = new Ctrlb(requester, argParser, layoutParser, buffers);
 
     const logger = getLogger("index");
     this.reporter = new Reporter(vim, logger);
@@ -34,5 +34,12 @@ export default class CtrlbPlugin {
   @Function("_ctrlb_open", { sync: true })
   public async open(args: any[]): Promise<void> {
     await this.ctrlb.open(args[0]).catch(e => this.reporter.error(e));
+  }
+
+  @Function("_ctrlb_do_action", { sync: true })
+  public async doAction(args: string[]): Promise<void> {
+    await this.ctrlb
+      .doAction(args[0], args[1])
+      .catch(e => this.reporter.error(e));
   }
 }
