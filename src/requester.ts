@@ -15,13 +15,11 @@ export class Requester {
   }
 
   public async execute<T>(info: ActionInfo): Promise<T> {
-    const result = await promisifyExecFile("wsxhub", [
-      "--timeout",
-      "3",
-      "send",
-      "--json",
-      JSON.stringify(info),
-    ]);
+    const result = await promisifyExecFile(
+      "wsxhub",
+      ["--timeout", "3", "send", "--json", JSON.stringify(info)],
+      { timeout: 4000 }
+    );
 
     const stdout: { body: T } = JSON.parse(result.stdout.trim().split("\n")[0]);
     return stdout.body;
