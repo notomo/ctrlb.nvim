@@ -65,4 +65,12 @@ describe("BufferContainer", () => {
 
     expect(bufferContainer.get("")).rejects.toThrowError(/buffer not found: 1/);
   });
+
+  it("open", async () => {
+    const bufferPath = "bufferPath";
+    await bufferContainer.open(bufferPath);
+    await bufferContainer.verticalOpen(bufferPath);
+    await bufferContainer.horizontalOpen(bufferPath);
+    await bufferContainer.tabOpen(bufferPath);
+  });
 });
