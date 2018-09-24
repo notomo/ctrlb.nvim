@@ -11,7 +11,8 @@ type Item = LayoutItem | BufferItem;
 class BufferItem {
   constructor(
     protected readonly buffer: BaseBuffer,
-    public readonly sizeParcent: number | null
+    public readonly sizeParcent: number | null,
+    public readonly isActive: boolean
   ) {}
 
   public async open(direction: Direction) {
@@ -23,6 +24,7 @@ export class LayoutItem {
   protected readonly logger: Logger;
   protected readonly lazyOpenItems: { window: Window; item: LayoutItem }[];
   protected readonly windowAndItems: { window: Window; item: Item }[];
+  public readonly isActive = false;
   constructor(
     protected readonly items: Item[],
     protected readonly direction: Direction,
@@ -66,6 +68,9 @@ export class LayoutItem {
 
     for (const dict of this.windowAndItems) {
       await this.setWindowSize(dict.item, dict.window, this.direction, size);
+      if (dict.item.isActive) {
+        await this.vim.setWindow(dict.window);
+      }
     }
     this.windowAndItems.length = 0;
   }
@@ -165,6 +170,10 @@ export class LayoutParser {
     return Array.isArray(json.sizeParcents);
   }
 
+  protected hasActive(json: any): json is { active: boolean } {
+    return typeof json.active === "boolean";
+  }
+
   protected isSizeParcents(value: any[], length: number): value is number[] {
     return (
       value.length === length &&
@@ -192,8 +201,11 @@ export class LayoutParser {
     for (const itemAndSize of itemAndSizes) {
       const item = itemAndSize.item;
       if (this.hasName(item)) {
+        const isActive = this.hasActive(item);
         const buf = this.buffers.get(item.name);
-        parsedItems.push(new BufferItem(buf, itemAndSize.sizeParcent));
+        parsedItems.push(
+          new BufferItem(buf, itemAndSize.sizeParcent, isActive)
+        );
         continue;
       }
       const layoutItem = this.parse(item, itemAndSize.sizeParcent);
