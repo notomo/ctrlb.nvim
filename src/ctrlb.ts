@@ -19,7 +19,7 @@ export class Ctrlb {
 
   public async open(arg: string): Promise<void> {
     const bufferOpenInfos = this.argParser.parseBufferOpenArg(arg);
-    const layoutItem = this.layoutParser.parse(bufferOpenInfos);
+    const layoutItem = this.layoutParser.parse(bufferOpenInfos, null);
     await layoutItem.openLayout();
   }
 
