@@ -8,7 +8,7 @@ import { Direction } from "./direction";
 
 type Item = LayoutItem | BufferItem;
 
-class BufferItem {
+export class BufferItem {
   constructor(
     protected readonly buffer: BaseBuffer,
     public readonly sizeParcent: number | null,
