@@ -60,4 +60,16 @@ describe("ArgParser", () => {
       expect(() => parser.parse(arg)).toThrowError(expected);
     });
   });
+
+  [
+    { arg: "ctrl", expected: true },
+    { arg: "invalid", expected: false },
+  ].forEach(data => {
+    let arg = data.arg;
+    let expected = data.expected;
+    it(`isBufferType is ${expected} if value is "${arg}"`, () => {
+      const parser = new ArgParser();
+      expect(parser.isBufferType(arg)).toBe(expected);
+    });
+  });
 });

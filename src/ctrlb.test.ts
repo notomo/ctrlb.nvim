@@ -4,27 +4,36 @@ import { Requester } from "./requester";
 import { ArgParser } from "./info";
 import { LayoutParser, LayoutItem } from "./layout";
 import { Buffers } from "./buffers";
+import { BaseBuffer } from "./buffers/base";
 
 describe("Ctrlb", () => {
   let ctrlb: Ctrlb;
   let parse: jest.Mock;
   let parseBufferOpenArg: jest.Mock;
+  let isBufferType: jest.Mock;
   let layoutParse: jest.Mock;
   let executeAsync: jest.Mock;
   let openLayout: jest.Mock;
+  let get: jest.Mock;
+  let doAction: jest.Mock;
+  let layoutParser: LayoutParser;
+  let requester: Requester;
+  let buffers: Buffers;
 
   beforeEach(() => {
     executeAsync = jest.fn();
     const RequesterClass = jest.fn<Requester>(() => ({
       executeAsync: executeAsync,
     }));
-    const requester = new RequesterClass();
+    requester = new RequesterClass();
 
     parse = jest.fn();
     parseBufferOpenArg = jest.fn();
+    isBufferType = jest.fn().mockReturnValue(true);
     const ArgParserClass = jest.fn<ArgParser>(() => ({
       parse: parse,
       parseBufferOpenArg: parseBufferOpenArg,
+      isBufferType: isBufferType,
     }));
     const argParser = new ArgParserClass();
 
@@ -39,13 +48,22 @@ describe("Ctrlb", () => {
     const LayoutParserClass = jest.fn<LayoutParser>(() => ({
       parse: layoutParse,
     }));
-    const layoutParser = new LayoutParserClass();
+    layoutParser = new LayoutParserClass();
 
     const NeovimClass = jest.fn<Neovim>(() => ({}));
     const vim = new NeovimClass();
 
-    const BuffersClass = jest.fn<Buffers>(() => ({}));
-    const buffers = new BuffersClass(vim, requester);
+    doAction = jest.fn();
+    const BaseBufferClass = jest.fn<BaseBuffer>(() => ({
+      doAction: doAction,
+    }));
+    const buffer = new BaseBufferClass();
+
+    get = jest.fn().mockReturnValue(buffer);
+    const BuffersClass = jest.fn<Buffers>(() => ({
+      get: get,
+    }));
+    buffers = new BuffersClass(vim, requester);
 
     ctrlb = new Ctrlb(requester, argParser, layoutParser, buffers);
   });
@@ -71,5 +89,24 @@ describe("Ctrlb", () => {
     expect(parseBufferOpenArg).toHaveBeenCalledWith(arg);
     expect(layoutParse).toHaveBeenCalledWith(info);
     expect(openLayout).toHaveBeenCalled();
+  });
+
+  it("doAction", async () => {
+    const bufferType = "bufferType";
+    await ctrlb.doAction(bufferType, "actionName");
+  });
+
+  it("doAction throws error if bufferType is invalid", () => {
+    const bufferType = "invalidBufferType";
+    isBufferType = jest.fn().mockReturnValue(false);
+    const ArgParserClass = jest.fn<ArgParser>(() => ({
+      isBufferType: isBufferType,
+    }));
+    const argParser = new ArgParserClass();
+    ctrlb = new Ctrlb(requester, argParser, layoutParser, buffers);
+
+    expect(ctrlb.doAction(bufferType, "actionName")).rejects.toEqual(
+      new Error("Inavalid bufferType: " + bufferType)
+    );
   });
 });
