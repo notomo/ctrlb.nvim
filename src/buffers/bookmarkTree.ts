@@ -32,7 +32,7 @@ export class BookmarkTree extends BaseBuffer {
     let id = null;
     let url = undefined;
     if (bookmark !== null) {
-      id = Number(bookmark.id);
+      id = bookmark.id;
       url = bookmark.url;
     }
     if (url !== undefined) {
@@ -56,11 +56,11 @@ export class BookmarkTree extends BaseBuffer {
     await this.requester.executeAsync({
       actionGroupName: "bookmark",
       actionName: "tabOpen",
-      args: { id: Number(bookmark.id) },
+      args: { id: bookmark.id },
     });
   }
 
-  protected async openTree(buffer: Buffer, id: number | null) {
+  protected async openTree(buffer: Buffer, id: string | null) {
     const bookmarks = await this.requester.execute<Bookmark[]>({
       actionGroupName: "bookmark",
       actionName: "getTree",
