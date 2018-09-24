@@ -174,7 +174,14 @@ export class LayoutParser {
     return typeof json.active === "boolean";
   }
 
-  protected isSizeParcents(value: any[], length: number): value is number[] {
+  protected isSizeParcents(
+    value: any[],
+    length: number
+  ): value is (number | null)[] {
+    if (value.every((v: any) => v === null)) {
+      return true;
+    }
+
     return (
       value.length === length &&
       value.every((v: any) => {
