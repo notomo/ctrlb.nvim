@@ -6,19 +6,33 @@ import { Neovim, Window } from "neovim";
 import { Logger, getLogger } from "./logger";
 import { Direction } from "./direction";
 
-type Item = LayoutItem | BaseBuffer;
+type Item = LayoutItem | BufferItem;
+
+class BufferItem {
+  constructor(
+    protected readonly buffer: BaseBuffer,
+    public readonly sizeParcent: number | null
+  ) {}
+
+  public async open(direction: Direction) {
+    return await this.buffer.open(direction);
+  }
+}
 
 export class LayoutItem {
   protected readonly logger: Logger;
   protected readonly lazyOpenItems: { window: Window; item: LayoutItem }[];
+  protected readonly windowAndItems: { window: Window; item: Item }[];
   constructor(
     protected readonly items: Item[],
     protected readonly direction: Direction,
+    public readonly sizeParcent: number | null,
     protected readonly vim: Neovim,
     protected readonly emptyBuffer: Nothing
   ) {
     this.logger = getLogger("layout");
     this.lazyOpenItems = [];
+    this.windowAndItems = [];
   }
 
   public async openLayout() {
@@ -31,10 +45,17 @@ export class LayoutItem {
       return;
     }
 
+    let size = 0;
+    if (this.direction === Direction.HORIZONTAL) {
+      size = await this.vim.window.width;
+    } else if (this.direction === Direction.VERTICAL) {
+      size = await this.vim.window.height;
+    }
+
     const firstItem = this.items[0];
-    await this.openItem(firstItem, Direction.NOTHING);
+    await this.openItem(firstItem, Direction.NOTHING, size);
     for (const item of this.items.slice(1)) {
-      await this.openItem(item, this.direction);
+      await this.openItem(item, this.direction, size);
     }
 
     for (const dict of this.lazyOpenItems) {
@@ -42,17 +63,43 @@ export class LayoutItem {
       await dict.item.open();
     }
     this.lazyOpenItems.length = 0;
+
+    for (const dict of this.windowAndItems) {
+      await this.setWindowSize(dict.item, dict.window, this.direction, size);
+    }
+    this.windowAndItems.length = 0;
   }
 
-  protected async openItem(item: Item, direction: Direction) {
+  protected async openItem(item: Item, direction: Direction, size: number) {
     if (item instanceof LayoutItem) {
       await this.emptyBuffer.open(direction);
       const window = await this.vim.window;
+      this.windowAndItems.push({ window: window, item: item });
       this.lazyOpenItems.push({ window: window, item: item });
       return;
     }
 
-    return await item.open(direction);
+    await item.open(direction);
+    const window = await this.vim.window;
+    this.windowAndItems.push({ window: window, item: item });
+  }
+
+  protected async setWindowSize(
+    item: Item,
+    window: Window,
+    direction: Direction,
+    layoutWindowSize: number
+  ) {
+    if (item.sizeParcent === null) {
+      return;
+    }
+
+    const size = Math.round(layoutWindowSize * item.sizeParcent * 0.01);
+    if (direction === Direction.HORIZONTAL) {
+      window.width = await size;
+    } else if (direction === Direction.VERTICAL) {
+      window.height = await size;
+    }
   }
 }
 
@@ -62,7 +109,7 @@ export class LayoutParser {
     protected readonly buffers: Buffers
   ) {}
 
-  public parse(json: unknown): LayoutItem {
+  public parse(json: unknown, sizeParcent: number | null): LayoutItem {
     if (!this.hasItems(json)) {
       throw new Error("'items' must be array, but actual: " + json);
     }
@@ -73,7 +120,29 @@ export class LayoutParser {
     if (!this.isDirection(directionValue)) {
       throw new Error("'direction' must be Direction");
     }
-    return this.parseLayoutItem(json.items, directionValue);
+
+    const validLength = json.items.length;
+    let sizeParcents: (number | null)[];
+    if (!this.hasSizeParcents(json)) {
+      sizeParcents = Array(validLength).fill(null);
+    } else {
+      sizeParcents = json.sizeParcents;
+    }
+
+    if (!this.isSizeParcents(sizeParcents, validLength)) {
+      throw new Error(
+        "'sizeParcents' must be number[] and length must be " +
+          validLength +
+          " and summation is 100"
+      );
+    }
+
+    return this.parseLayoutItem(
+      json.items,
+      directionValue,
+      sizeParcent,
+      sizeParcents
+    );
   }
 
   protected hasName(json: any): json is { name: CtrlbBufferType } {
@@ -92,20 +161,49 @@ export class LayoutParser {
     return value in Direction;
   }
 
-  protected parseLayoutItem(items: any[], direction: Direction): LayoutItem {
+  protected hasSizeParcents(json: any): json is { sizeParcents: any[] } {
+    return Array.isArray(json.sizeParcents);
+  }
+
+  protected isSizeParcents(value: any[], length: number): value is number[] {
+    return (
+      value.length === length &&
+      value.every((v: any) => {
+        return !isNaN(Number(v));
+      }) &&
+      value.reduce((previous, current) => {
+        return previous + current;
+      }, 0) === 100
+    );
+  }
+
+  protected parseLayoutItem(
+    items: any[],
+    direction: Direction,
+    sizeParcent: number | null,
+    sizeParcents: (number | null)[]
+  ): LayoutItem {
     const parsedItems: Item[] = [];
-    for (const item of items) {
+
+    const itemAndSizes = sizeParcents.map((sizeParcent, i) => {
+      return { item: items[i], sizeParcent: sizeParcent };
+    });
+
+    for (const itemAndSize of itemAndSizes) {
+      const item = itemAndSize.item;
       if (this.hasName(item)) {
         const buf = this.buffers.get(item.name);
-        parsedItems.push(buf);
+        parsedItems.push(new BufferItem(buf, itemAndSize.sizeParcent));
         continue;
       }
-      const layoutItem = this.parse(item);
+      const layoutItem = this.parse(item, itemAndSize.sizeParcent);
       parsedItems.push(layoutItem);
     }
+
     return new LayoutItem(
       parsedItems,
       direction,
+      sizeParcent,
       this.vim,
       this.buffers.get(CtrlbBufferType.nothing)
     );

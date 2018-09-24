@@ -87,7 +87,7 @@ describe("Ctrlb", () => {
     await ctrlb.open(arg);
 
     expect(parseBufferOpenArg).toHaveBeenCalledWith(arg);
-    expect(layoutParse).toHaveBeenCalledWith(info);
+    expect(layoutParse).toHaveBeenCalledWith(info, null);
     expect(openLayout).toHaveBeenCalled();
   });
 
