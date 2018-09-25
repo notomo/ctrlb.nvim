@@ -5,7 +5,7 @@ import { Neovim, Window } from "neovim";
 import { Buffers } from "./buffers";
 import { Requester } from "./requester";
 import { BaseBuffer } from "./buffers/base";
-import { Nothing } from "./buffers/nothing";
+import { Empty } from "./buffers/empty";
 
 describe("BufferItem", () => {
   let bufferItem: BufferItem;
@@ -32,7 +32,7 @@ describe("BufferItem", () => {
 describe("LayoutItem", () => {
   let open: jest.Mock;
   let layoutItem: LayoutItem;
-  let nothing: Nothing;
+  let empty: Empty;
   let vim: Neovim;
 
   beforeEach(() => {
@@ -60,10 +60,10 @@ describe("LayoutItem", () => {
     vim = new NeovimClass();
 
     open = jest.fn();
-    const NothingClass = jest.fn<Nothing>(() => ({
+    const EmptyClass = jest.fn<Empty>(() => ({
       open: open,
     }));
-    nothing = new NothingClass();
+    empty = new EmptyClass();
 
     const BufferItemClass = jest.fn<BufferItem>(() => ({
       open: open,
@@ -76,7 +76,7 @@ describe("LayoutItem", () => {
       Direction.VERTICAL,
       null,
       vim,
-      nothing
+      empty
     );
 
     layoutItem = new LayoutItem(
@@ -84,7 +84,7 @@ describe("LayoutItem", () => {
       Direction.HORIZONTAL,
       null,
       vim,
-      nothing
+      empty
     );
   });
 
@@ -98,7 +98,7 @@ describe("LayoutItem", () => {
       Direction.HORIZONTAL,
       null,
       vim,
-      nothing
+      empty
     );
     await layoutItem.openLayout();
   });

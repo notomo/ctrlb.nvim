@@ -1,4 +1,4 @@
-import { Nothing } from "./buffers/nothing";
+import { Empty } from "./buffers/empty";
 import { Buffers } from "./buffers";
 import { BaseBuffer } from "./buffers/base";
 import { CtrlbBufferType } from "./buffers/type";
@@ -30,7 +30,7 @@ export class LayoutItem {
     protected readonly direction: Direction,
     public readonly sizeParcent: number | null,
     protected readonly vim: Neovim,
-    protected readonly emptyBuffer: Nothing
+    protected readonly emptyBuffer: Empty
   ) {
     this.logger = getLogger("layout");
     this.lazyOpenItems = [];
@@ -224,7 +224,7 @@ export class LayoutParser {
       direction,
       sizeParcent,
       this.vim,
-      this.buffers.get(CtrlbBufferType.nothing)
+      this.buffers.get(CtrlbBufferType.empty)
     );
   }
 }

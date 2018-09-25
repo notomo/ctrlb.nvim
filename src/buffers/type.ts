@@ -1,6 +1,6 @@
 export enum CtrlbBufferType {
   ctrl = "ctrl",
   currentTab = "currentTab",
-  nothing = "nothing",
+  empty = "empty",
   bookmarkTree = "bookmarkTree",
 }

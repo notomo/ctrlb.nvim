@@ -98,7 +98,7 @@ describe("BaseBuffer", () => {
 });
 
 class Example extends BaseBuffer {
-  public readonly type = CtrlbBufferType.nothing;
+  public readonly type = CtrlbBufferType.empty;
 
   constructor(
     vim: Neovim,
@@ -115,5 +115,5 @@ class Example extends BaseBuffer {
 }
 
 class Example2 extends BaseBuffer {
-  public readonly type = CtrlbBufferType.nothing;
+  public readonly type = CtrlbBufferType.empty;
 }
