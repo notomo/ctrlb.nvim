@@ -2,7 +2,7 @@ import { BaseBuffer } from "./base";
 import { Neovim } from "neovim";
 import { Ctrl } from "./ctrl";
 import { BookmarkTree } from "./bookmarkTree";
-import { CurrentTab } from "./current-tab";
+import { CurrentTab } from "./currentTab";
 import { Empty } from "./empty";
 import { Requester } from "../requester";
 import { CtrlbBufferType } from "./type";
