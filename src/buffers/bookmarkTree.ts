@@ -12,6 +12,7 @@ export class BookmarkTree extends BaseBuffer {
   protected async setup(buffer: Buffer): Promise<void> {
     this.actions["open"] = (buffer: Buffer) => this.openBookmark(buffer);
     this.actions["tabOpen"] = (buffer: Buffer) => this.tabOpenBookmark(buffer);
+    this.actions["debug"] = (buffer: Buffer) => this.debug(buffer);
 
     await buffer.setOption("buftype", "nofile");
     await buffer.setOption("swapfile", false);
@@ -40,6 +41,11 @@ export class BookmarkTree extends BaseBuffer {
       return this.bookmarks[index];
     }
     return null;
+  }
+
+  public async debug(buffer: Buffer) {
+    const message = JSON.stringify(await this.getCurrent());
+    await this.vim.command(`echomsg '${message}'`);
   }
 
   public async openBookmark(buffer: Buffer) {
