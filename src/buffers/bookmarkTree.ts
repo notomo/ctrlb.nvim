@@ -16,6 +16,20 @@ export class BookmarkTree extends BaseBuffer {
     await buffer.setOption("swapfile", false);
     await buffer.setOption("modifiable", true);
 
+    await this.vim.command(
+      "highlight default link CtrlbBookmarkTreeDirectory String"
+    );
+    await this.vim.command(
+      "syntax match CtrlbBookmarkTreeDirectory /^[^[:tab:]]*\\/$/"
+    );
+
+    await this.vim.command(
+      "highlight default link CtrlbBookmarkTreeUrl Underlined"
+    );
+    await this.vim.command(
+      "syntax match CtrlbBookmarkTreeUrl /[[:tab:]]\\zs.*$/"
+    );
+
     await this.openBookmark(buffer);
   }
 
@@ -73,7 +87,7 @@ export class BookmarkTree extends BaseBuffer {
       if (bookmark.url !== undefined) {
         await buffer.replace(bookmark.title + "\t" + bookmark.url, i);
       } else {
-        await buffer.replace(bookmark.title, i);
+        await buffer.replace(bookmark.title + "/", i);
       }
       i++;
     }
