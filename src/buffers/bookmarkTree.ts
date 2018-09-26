@@ -2,7 +2,13 @@ import { BaseBuffer } from "./base";
 import { Buffer } from "neovim";
 import { CtrlbBufferType } from "./type";
 
-type Bookmark = { title: string; url?: string; id: string; parentId?: string };
+type Bookmark = {
+  title: string;
+  url?: string;
+  id: string;
+  parentId?: string;
+  isParent?: boolean;
+};
 
 export class BookmarkTree extends BaseBuffer {
   public readonly type = CtrlbBufferType.bookmarkTree;
@@ -12,6 +18,7 @@ export class BookmarkTree extends BaseBuffer {
   protected async setup(buffer: Buffer): Promise<void> {
     this.actions["open"] = (buffer: Buffer) => this.openBookmark(buffer);
     this.actions["tabOpen"] = (buffer: Buffer) => this.tabOpenBookmark(buffer);
+    this.actions["openParent"] = (buffer: Buffer) => this.openParent(buffer);
     this.actions["debug"] = (buffer: Buffer) => this.debug(buffer);
 
     await buffer.setOption("buftype", "nofile");
@@ -46,6 +53,18 @@ export class BookmarkTree extends BaseBuffer {
   public async debug(buffer: Buffer) {
     const message = JSON.stringify(await this.getCurrent());
     await this.vim.command(`echomsg '${message}'`);
+  }
+
+  public async openParent(buffer: Buffer) {
+    const bookmark = this.bookmarks.find(bookmark => {
+      return bookmark.isParent || false;
+    });
+
+    if (bookmark === undefined) {
+      return;
+    }
+
+    await this.openTree(buffer, bookmark.id);
   }
 
   public async openBookmark(buffer: Buffer) {
