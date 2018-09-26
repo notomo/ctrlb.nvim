@@ -7,6 +7,7 @@ type Bookmark = { title: string; url?: string; id: string; parentId?: string };
 export class BookmarkTree extends BaseBuffer {
   public readonly type = CtrlbBufferType.bookmarkTree;
   protected bookmarks: Bookmark[] = [];
+  protected directoryId: string | null = null;
 
   protected async setup(buffer: Buffer): Promise<void> {
     this.actions["open"] = (buffer: Buffer) => this.openBookmark(buffer);
@@ -91,6 +92,15 @@ export class BookmarkTree extends BaseBuffer {
       }
       i++;
     }
+
+    const lastBookmarkIndex = bookmarks.findIndex(bookmark => {
+      return this.directoryId === bookmark.id;
+    });
+    if (lastBookmarkIndex !== -1) {
+      this.vim.window.cursor = [lastBookmarkIndex + 1, 0];
+    }
+
+    this.directoryId = id;
     this.bookmarks = bookmarks;
   }
 }
