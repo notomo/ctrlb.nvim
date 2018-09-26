@@ -15,11 +15,11 @@ describe("ArgParser", () => {
       },
     },
     {
-      arg: "tab:open -url=https://example.com/",
+      arg: "tab:open -url=https://example.com/?test=1",
       expected: {
         actionGroupName: "tab",
         actionName: "open",
-        args: { url: "https://example.com/" },
+        args: { url: "https://example.com/?test=1" },
       },
     },
     {

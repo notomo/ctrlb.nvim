@@ -51,9 +51,9 @@ export class ArgParser {
         continue;
       }
 
-      const argKeyValue = value.split("=");
-      const argKey = this.parseArgKey(argKeyValue[0]);
-      const argValue = this.convertValue(argKeyValue[1]);
+      const equalIndex = value.indexOf("=");
+      const argKey = this.parseArgKey(value.slice(0, equalIndex));
+      const argValue = this.convertValue(value.slice(equalIndex + 1));
 
       actionArgs[argKey] = argValue;
     }
