@@ -3,6 +3,9 @@
 ctrlb.nvim is a [ctrlb](https://github.com/notomo/ctrlb) client plugin for Neovim.  
 This plugin can control web browsers without moving the focus from Neovim.
 
+## Demo
+<img src="https://raw.github.com/wiki/notomo/ctrlb.nvim/images/demo.gif" width="1280">
+
 ## Requirements
 - Neovim
     - Node.js provider
