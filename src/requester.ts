@@ -25,13 +25,22 @@ export class Requester {
     return stdout.body;
   }
 
-  public receiveAsync(keyFilter: any, filter: any): ChildProcess {
-    return spawn("wsxhub", [
+  public receiveAsyncOnEvent(
+    keyFilter: any,
+    filter: any,
+    eventCallback: { (): any }
+  ): void {
+    const p = spawn("wsxhub", [
       "--key",
       JSON.stringify(keyFilter),
       "--filter",
       JSON.stringify(filter),
       "receive",
     ]);
+
+    p.stdout.setEncoding("utf-8");
+    p.stdout.on("data", data => {
+      eventCallback();
+    });
   }
 }
