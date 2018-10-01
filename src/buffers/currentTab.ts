@@ -49,7 +49,6 @@ export class CurrentTab extends BaseBuffer {
       return;
     }
 
-    await buffer.replace(tab.title, 0);
-    await buffer.replace(tab.url, 1);
+    await buffer.replace([tab.title, tab.url], 0);
   }
 }
