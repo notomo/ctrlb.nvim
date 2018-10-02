@@ -25,10 +25,10 @@ export class Requester {
     return stdout.body;
   }
 
-  public receiveAsyncOnEvent(
+  public receiveAsyncOnEvent<T>(
     keyFilter: any,
     filter: any,
-    eventCallback: { (): any }
+    eventCallback: { (arg: T): any }
   ): void {
     const p = spawn("wsxhub", [
       "--key",
@@ -40,7 +40,8 @@ export class Requester {
 
     p.stdout.setEncoding("utf-8");
     p.stdout.on("data", data => {
-      eventCallback();
+      const stdout: { body: T } = JSON.parse(data.trim().split("\n")[0]);
+      eventCallback(stdout.body);
     });
   }
 }

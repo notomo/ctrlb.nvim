@@ -4,6 +4,7 @@ import { Ctrl } from "./ctrl";
 import { BookmarkTree } from "./bookmarkTree";
 import { CurrentTab } from "./currentTab";
 import { Empty } from "./empty";
+import { HistoryList } from "./historyList";
 import { Requester } from "../requester";
 import { CtrlbBufferType } from "./type";
 import { BufferContainer } from "./container";
@@ -13,6 +14,7 @@ type CtrlbBuffers = {
   [CtrlbBufferType.currentTab]: CurrentTab;
   [CtrlbBufferType.empty]: Empty;
   [CtrlbBufferType.bookmarkTree]: BookmarkTree;
+  [CtrlbBufferType.historyList]: HistoryList;
 } & { [P in CtrlbBufferType]: BaseBuffer };
 
 export class Buffers {
@@ -24,6 +26,7 @@ export class Buffers {
       [CtrlbBufferType.currentTab]: this.create(CurrentTab, vim, requester),
       [CtrlbBufferType.empty]: this.create(Empty, vim, requester),
       [CtrlbBufferType.bookmarkTree]: this.create(BookmarkTree, vim, requester),
+      [CtrlbBufferType.historyList]: this.create(HistoryList, vim, requester),
     };
   }
 
