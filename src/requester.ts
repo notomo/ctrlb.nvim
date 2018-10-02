@@ -1,9 +1,16 @@
 import { spawn, ChildProcess, execFile } from "child_process";
 import { ActionInfo } from "./info";
 import { promisify } from "util";
+import { Logger, getLogger } from "./logger";
 const promisifyExecFile = promisify(execFile);
 
 export class Requester {
+  protected readonly logger: Logger;
+
+  constructor() {
+    this.logger = getLogger("requester");
+  }
+
   public async executeAsync(info: ActionInfo): Promise<ChildProcess> {
     return spawn("wsxhub", [
       "--timeout",
@@ -25,10 +32,10 @@ export class Requester {
     return stdout.body;
   }
 
-  public receiveAsyncOnEvent(
+  public receiveAsyncOnEvent<T>(
     keyFilter: any,
     filter: any,
-    eventCallback: { (): any }
+    eventCallback: { (arg: T): any }
   ): void {
     const p = spawn("wsxhub", [
       "--key",
@@ -40,7 +47,8 @@ export class Requester {
 
     p.stdout.setEncoding("utf-8");
     p.stdout.on("data", data => {
-      eventCallback();
+      const stdout: { body: T } = JSON.parse(data.trim().split("\n")[0]);
+      eventCallback(stdout.body);
     });
   }
 }
