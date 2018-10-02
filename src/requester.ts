@@ -1,9 +1,16 @@
 import { spawn, ChildProcess, execFile } from "child_process";
 import { ActionInfo } from "./info";
 import { promisify } from "util";
+import { Logger, getLogger } from "./logger";
 const promisifyExecFile = promisify(execFile);
 
 export class Requester {
+  protected readonly logger: Logger;
+
+  constructor() {
+    this.logger = getLogger("requester");
+  }
+
   public async executeAsync(info: ActionInfo): Promise<ChildProcess> {
     return spawn("wsxhub", [
       "--timeout",
