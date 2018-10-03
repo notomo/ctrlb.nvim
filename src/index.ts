@@ -32,6 +32,9 @@ export class CtrlbPlugin {
     plugin.registerFunction("_ctrlb_do_action", [this, this.doAction], {
       sync: true,
     });
+    plugin.registerFunction("_ctrlb_clear_all", [this, this.clearAll], {
+      sync: true,
+    });
   }
 
   public executeAsync(args: any[]): void {
@@ -46,6 +49,10 @@ export class CtrlbPlugin {
     await this.ctrlb
       .doAction(args[0], args[1])
       .catch(e => this.reporter.error(e));
+  }
+
+  public async clearAll(): Promise<void> {
+    await this.ctrlb.clearAll().catch(e => this.reporter.error(e));
   }
 }
 

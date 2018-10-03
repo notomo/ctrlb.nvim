@@ -37,6 +37,11 @@ export abstract class BaseBuffer {
     }
   }
 
+  public async unload() {
+    await this.bufferContainer.unload();
+    // TODO: stop event receive
+  }
+
   protected async _open(direction: Direction): Promise<Buffer> {
     switch (direction) {
       case Direction.VERTICAL:

@@ -11,6 +11,10 @@ function! ctrlb#do_action(buffer_type, action_name) abort
     return _ctrlb_do_action(a:buffer_type, a:action_name)
 endfunction
 
+function! ctrlb#clear_all() abort
+    return _ctrlb_clear_all()
+endfunction
+
 let s:custom = {
     \ 'executable_path': 'wsxhub',
 \ }

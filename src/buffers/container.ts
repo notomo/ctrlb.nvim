@@ -31,6 +31,14 @@ export class BufferContainer {
     return this._isInitialized(this.buffer);
   }
 
+  public async unload(): Promise<void> {
+    if (!this._isInitialized(this.buffer)) {
+      return;
+    }
+    await this.vim.command("bdelete " + this.buffer.id);
+    return;
+  }
+
   public async verticalOpen(bufferPath: string): Promise<Buffer> {
     const buffer = await this.get(bufferPath);
     await this.vim.command("rightbelow vsplit #" + buffer.id);
