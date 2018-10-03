@@ -47,7 +47,6 @@ export class Buffers {
 
   public async clear<T extends CtrlbBufferType>(name: T): Promise<void> {
     await this.buffers[name].unload();
-    this.buffers[name] = this.create(name);
   }
 
   public async clearAll(): Promise<void> {

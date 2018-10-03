@@ -35,7 +35,8 @@ export class BufferContainer {
     if (!this._isInitialized(this.buffer)) {
       return;
     }
-    await this.vim.command("bdelete " + this.buffer.id);
+    await this.vim.command("bwipeout " + this.buffer.id);
+    this.buffer = null;
     return;
   }
 

@@ -36,7 +36,7 @@ export class Requester {
     keyFilter: any,
     filter: any,
     eventCallback: { (arg: T): any }
-  ): void {
+  ): ChildProcess {
     const p = spawn("wsxhub", [
       "--key",
       JSON.stringify(keyFilter),
@@ -50,5 +50,7 @@ export class Requester {
       const stdout: { body: T } = JSON.parse(data.trim().split("\n")[0]);
       eventCallback(stdout.body);
     });
+
+    return p;
   }
 }

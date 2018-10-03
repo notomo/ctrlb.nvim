@@ -30,11 +30,12 @@ export class HistoryList extends BaseBuffer {
 
     this.subscribe("historyCreated");
 
-    this.requester.receiveAsyncOnEvent<History>(
+    const p = this.requester.receiveAsyncOnEvent<History>(
       {},
       { option: { eventName: "historyCreated" } },
       history => this.update(history, buffer)
     );
+    this.receivers.push(p);
 
     await this.create(buffer);
   }

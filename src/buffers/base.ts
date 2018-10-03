@@ -1,4 +1,5 @@
 import { Neovim, Buffer } from "neovim";
+import { ChildProcess } from "child_process";
 import { Direction } from "../direction";
 import { Requester } from "../requester";
 import { Logger, getLogger } from "../logger";
@@ -11,6 +12,7 @@ export abstract class BaseBuffer {
   abstract readonly type: CtrlbBufferType;
   protected readonly logger: Logger;
   protected readonly actions: Actions = {};
+  protected readonly receivers: ChildProcess[] = [];
 
   constructor(
     protected readonly vim: Neovim,
@@ -38,8 +40,16 @@ export abstract class BaseBuffer {
   }
 
   public async unload() {
+    this.receivers
+      .filter(p => {
+        return !p.killed;
+      })
+      .map(p => {
+        p.kill();
+      });
+    this.receivers.length = 0;
     await this.bufferContainer.unload();
-    // TODO: stop event receive
+    // TODO: unsubscribe events
   }
 
   protected async _open(direction: Direction): Promise<Buffer> {

@@ -1,4 +1,5 @@
 import { Neovim, Buffer } from "neovim";
+import { ChildProcess } from "child_process";
 import { Requester } from "../requester";
 import { BufferContainer } from "./container";
 import { BaseBuffer } from "./base";
@@ -14,6 +15,7 @@ describe("BaseBuffer", () => {
   let verticalOpen: jest.Mock;
   let horizontalOpen: jest.Mock;
   let tabOpen: jest.Mock;
+  let unload: jest.Mock;
   let command: jest.Mock;
   let setOption: jest.Mock;
   let executeAsync: jest.Mock;
@@ -46,6 +48,7 @@ describe("BaseBuffer", () => {
     verticalOpen = jest.fn().mockReturnValue(vimBuffer);
     horizontalOpen = jest.fn().mockReturnValue(vimBuffer);
     tabOpen = jest.fn().mockReturnValue(vimBuffer);
+    unload = jest.fn().mockReturnValue(vimBuffer);
     const BufferContainerClass = jest.fn<BufferContainer>(() => ({
       isInitialized: isInitialized,
       open: open,
@@ -53,6 +56,7 @@ describe("BaseBuffer", () => {
       verticalOpen: verticalOpen,
       horizontalOpen: horizontalOpen,
       tabOpen: tabOpen,
+      unload: unload,
     }));
     const bufferContainer = new BufferContainerClass(vim);
 
@@ -95,6 +99,13 @@ describe("BaseBuffer", () => {
       new Error("Invalid actionName: invalidActionName")
     );
   });
+
+  it("unload", async () => {
+    await buffer.open(Direction.HORIZONTAL);
+    await buffer.unload();
+
+    expect(unload).toHaveBeenCalled();
+  });
 });
 
 class Example extends BaseBuffer {
@@ -111,6 +122,14 @@ class Example extends BaseBuffer {
 
   protected async setup(buffer: Buffer): Promise<void> {
     await this.subscribe("eventName");
+
+    const kill = jest.fn();
+    const ChildProcessClass = jest.fn<ChildProcess>(() => ({
+      kill: kill,
+      killed: false,
+    }));
+    const p = new ChildProcessClass();
+    this.receivers.push(p);
   }
 }
 
