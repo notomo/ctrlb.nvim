@@ -105,6 +105,7 @@ describe("BaseBuffer", () => {
     await buffer.unload();
 
     expect(unload).toHaveBeenCalled();
+    expect(executeAsync).toHaveBeenCalled();
   });
 });
 

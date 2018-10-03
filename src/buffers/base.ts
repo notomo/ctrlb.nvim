@@ -13,6 +13,7 @@ export abstract class BaseBuffer {
   protected readonly logger: Logger;
   protected readonly actions: Actions = {};
   protected readonly receivers: ChildProcess[] = [];
+  protected readonly subscribedEvents: string[] = [];
 
   constructor(
     protected readonly vim: Neovim,
@@ -48,8 +49,19 @@ export abstract class BaseBuffer {
         p.kill();
       });
     this.receivers.length = 0;
+
+    Object.keys(this.subscribedEvents).map(eventName => {
+      this.requester.executeAsync({
+        actionGroupName: "event",
+        actionName: "unsubscribe",
+        args: {
+          eventName: eventName,
+        },
+      });
+    });
+    this.subscribedEvents.length = 0;
+
     await this.bufferContainer.unload();
-    // TODO: unsubscribe events
   }
 
   protected async _open(direction: Direction): Promise<Buffer> {
@@ -93,5 +105,6 @@ export abstract class BaseBuffer {
         eventName: eventName,
       },
     });
+    this.subscribedEvents.push(eventName);
   }
 }
