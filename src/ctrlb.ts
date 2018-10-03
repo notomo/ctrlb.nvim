@@ -30,4 +30,8 @@ export class Ctrlb {
     const buffer = this.buffers.get(bufferType);
     await buffer.doAction(actionName);
   }
+
+  public async clearAll(): Promise<void> {
+    await this.buffers.clearAll();
+  }
 }

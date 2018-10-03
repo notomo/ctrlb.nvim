@@ -6,19 +6,35 @@ import { Empty } from "./empty";
 import { BufferContainer } from "./container";
 
 describe("Buffers", () => {
-  it("get", () => {
+  let buffers: Buffers;
+  let vim: Neovim;
+  let requester: Requester;
+  let empty: Empty;
+
+  beforeEach(() => {
     const NeovimClass = jest.fn<Neovim>(() => ({}));
-    const vim = new NeovimClass();
+    vim = new NeovimClass();
 
     const RequesterClass = jest.fn<Requester>(() => ({}));
-    const requester = new RequesterClass();
+    requester = new RequesterClass();
 
-    const buffers = new Buffers(vim, requester);
+    buffers = new Buffers(vim, requester);
 
     const BufferContainerClass = jest.fn<BufferContainer>(() => ({}));
     const bufferContainer = new BufferContainerClass(vim);
+    empty = new Empty(vim, requester, bufferContainer);
+  });
 
+  it("get", () => {
     const buf = buffers.get(CtrlbBufferType.empty);
-    expect(buf.type).toEqual(new Empty(vim, requester, bufferContainer).type);
+    expect(buf.type).toEqual(empty.type);
+  });
+
+  it("clear", async () => {
+    await buffers.clear(CtrlbBufferType.empty);
+  });
+
+  it("clearAll", async () => {
+    await buffers.clearAll();
   });
 });

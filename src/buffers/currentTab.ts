@@ -24,13 +24,14 @@ export class CurrentTab extends BaseBuffer {
     this.subscribe("windowCreated");
     this.subscribe("windowRemoved");
 
-    this.requester.receiveAsyncOnEvent<any>(
+    const p = this.requester.receiveAsyncOnEvent<any>(
       // TODO: receive only
       // ["tabActivated", "tabCreated", "tabRemoved", "tabUpdated", "windowActivated", "windowCreated", "windowRemoved"]
       { option: { eventName: true } },
       {},
       data => this.update(buffer)
     );
+    this.receivers.push(p);
 
     await this.update(buffer);
   }

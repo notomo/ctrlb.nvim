@@ -15,6 +15,7 @@ describe("Ctrlb", () => {
   let executeAsync: jest.Mock;
   let openLayout: jest.Mock;
   let get: jest.Mock;
+  let clearAll: jest.Mock;
   let doAction: jest.Mock;
   let layoutParser: LayoutParser;
   let requester: Requester;
@@ -60,8 +61,10 @@ describe("Ctrlb", () => {
     const buffer = new BaseBufferClass();
 
     get = jest.fn().mockReturnValue(buffer);
+    clearAll = jest.fn().mockReturnValue(buffer);
     const BuffersClass = jest.fn<Buffers>(() => ({
       get: get,
+      clearAll: clearAll,
     }));
     buffers = new BuffersClass(vim, requester);
 
@@ -108,5 +111,10 @@ describe("Ctrlb", () => {
     expect(ctrlb.doAction(bufferType, "actionName")).rejects.toEqual(
       new Error("Inavalid bufferType: " + bufferType)
     );
+  });
+
+  it("clearAll", async () => {
+    await ctrlb.clearAll();
+    expect(clearAll).toHaveBeenCalledTimes(1);
   });
 });

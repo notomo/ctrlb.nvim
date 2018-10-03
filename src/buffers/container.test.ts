@@ -73,4 +73,20 @@ describe("BufferContainer", () => {
     await bufferContainer.horizontalOpen(bufferPath);
     await bufferContainer.tabOpen(bufferPath);
   });
+
+  it("unload does nothing if buffer is not initialized", async () => {
+    await bufferContainer.unload();
+
+    expect(command).not.toHaveBeenCalled();
+  });
+
+  it("unload", async () => {
+    await bufferContainer.get("");
+    await bufferContainer.unload();
+
+    expect(command).toHaveBeenCalled();
+
+    const result = bufferContainer.isInitialized();
+    expect(result).toBe(false);
+  });
 });
