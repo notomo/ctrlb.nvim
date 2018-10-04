@@ -2,6 +2,7 @@ import { Requester } from "./requester";
 import { ArgParser } from "./info";
 import { LayoutParser } from "./layout";
 import { Buffers } from "./buffers";
+import { Direction } from "./direction";
 
 export class Ctrlb {
   constructor(
@@ -17,9 +18,17 @@ export class Ctrlb {
     return;
   }
 
-  public async open(arg: string): Promise<void> {
-    const bufferOpenInfos = this.argParser.parseBufferOpenArg(arg);
-    const layoutItem = this.layoutParser.parse(bufferOpenInfos, null);
+  public async open(bufferType: string): Promise<void> {
+    if (!this.argParser.isBufferType(bufferType)) {
+      throw new Error("Inavalid bufferType: " + bufferType);
+    }
+    const buffer = this.buffers.get(bufferType);
+    await buffer.open(Direction.TAB);
+  }
+
+  public async openLayout(jsonFilePath: string): Promise<void> {
+    const layoutInfo = this.argParser.parseJsonFile(jsonFilePath);
+    const layoutItem = this.layoutParser.parse(layoutInfo, null);
     await layoutItem.openLayout();
   }
 

@@ -29,6 +29,9 @@ export class CtrlbPlugin {
       sync: true,
     });
     plugin.registerFunction("_ctrlb_open", [this, this.open], { sync: true });
+    plugin.registerFunction("_ctrlb_open_layout", [this, this.openLayout], {
+      sync: true,
+    });
     plugin.registerFunction("_ctrlb_do_action", [this, this.doAction], {
       sync: true,
     });
@@ -43,6 +46,10 @@ export class CtrlbPlugin {
 
   public async open(args: any[]): Promise<void> {
     await this.ctrlb.open(args[0]).catch(e => this.reporter.error(e));
+  }
+
+  public async openLayout(args: string[]): Promise<void> {
+    await this.ctrlb.openLayout(args[0]).catch(e => this.reporter.error(e));
   }
 
   public async doAction(args: string[]): Promise<void> {
