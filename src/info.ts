@@ -7,27 +7,7 @@ export interface ActionInfo {
   args?: ActionArgs;
 }
 
-enum BufferOpenOption {
-  jsonFile = "json-file",
-  json = "json",
-}
-
 export class ArgParser {
-  protected readonly bufferOpenOptionHandlers: BufferOpenOptionHandler;
-  constructor() {
-    this.bufferOpenOptionHandlers = {
-      [BufferOpenOption.jsonFile]: (filePath: string) => {
-        const content = readFileSync(filePath);
-        const json = JSON.parse(content.toString());
-        return json;
-      },
-      [BufferOpenOption.json]: (jsonString: string) => {
-        const json = JSON.parse(jsonString);
-        return json;
-      },
-    };
-  }
-
   public parse(arg: string): ActionInfo {
     let actionGroupName = "";
     let actionName = "";
@@ -94,26 +74,12 @@ export class ArgParser {
     return value in CtrlbBufferType;
   }
 
-  public parseBufferOpenArg(arg: string): {} {
-    for (const value of arg.split(" ")) {
-      if (!value.startsWith("-")) {
-        continue;
-      }
-
-      const optionKeyValue = value.split("=");
-      const optionKey = this.parseArgKey(optionKeyValue[0]);
-      return this.bufferOpenOptionHandlers[optionKey](optionKeyValue[1]);
-    }
-
-    return {};
+  public parseJsonFile(jsonFilePath: string): {} {
+    const content = readFileSync(jsonFilePath);
+    const json = JSON.parse(content.toString());
+    return json;
   }
 }
-
-type BufferOpenOptionHandler = {
-  [P in BufferOpenOption]: (value: string) => any
-} & {
-  [index: string]: (value: string) => any;
-};
 
 type ActionArgs = {
   [index: string]: string | number | boolean | null;

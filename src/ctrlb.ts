@@ -2,6 +2,8 @@ import { Requester } from "./requester";
 import { ArgParser } from "./info";
 import { LayoutParser } from "./layout";
 import { Buffers } from "./buffers";
+import { Direction } from "./direction";
+import { CtrlbBufferType } from "./buffers/type";
 
 export class Ctrlb {
   constructor(
@@ -17,9 +19,17 @@ export class Ctrlb {
     return;
   }
 
-  public async open(arg: string): Promise<void> {
-    const bufferOpenInfos = this.argParser.parseBufferOpenArg(arg);
-    const layoutItem = this.layoutParser.parse(bufferOpenInfos, null);
+  public async open(bufferType: string): Promise<void> {
+    if (!this.argParser.isBufferType(bufferType)) {
+      throw new Error("Inavalid bufferType: " + bufferType);
+    }
+    const buffer = this.buffers.get(bufferType);
+    await buffer.open(Direction.TAB);
+  }
+
+  public async openLayout(jsonFilePath: string): Promise<void> {
+    const layoutInfo = this.argParser.parseJsonFile(jsonFilePath);
+    const layoutItem = this.layoutParser.parse(layoutInfo, null);
     await layoutItem.openLayout();
   }
 
@@ -33,5 +43,14 @@ export class Ctrlb {
 
   public async clearAll(): Promise<void> {
     await this.buffers.clearAll();
+  }
+
+  public async complete(
+    currentArg: string,
+    line: string,
+    cursorPosition: number
+  ): Promise<string[]> {
+    // TODO: other command completion
+    return Object.keys(CtrlbBufferType);
   }
 }

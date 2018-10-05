@@ -9,7 +9,7 @@ import { BaseBuffer } from "./buffers/base";
 describe("Ctrlb", () => {
   let ctrlb: Ctrlb;
   let parse: jest.Mock;
-  let parseBufferOpenArg: jest.Mock;
+  let parseJsonFile: jest.Mock;
   let isBufferType: jest.Mock;
   let layoutParse: jest.Mock;
   let executeAsync: jest.Mock;
@@ -17,6 +17,7 @@ describe("Ctrlb", () => {
   let get: jest.Mock;
   let clearAll: jest.Mock;
   let doAction: jest.Mock;
+  let open: jest.Mock;
   let layoutParser: LayoutParser;
   let requester: Requester;
   let buffers: Buffers;
@@ -29,11 +30,11 @@ describe("Ctrlb", () => {
     requester = new RequesterClass();
 
     parse = jest.fn();
-    parseBufferOpenArg = jest.fn();
+    parseJsonFile = jest.fn();
     isBufferType = jest.fn().mockReturnValue(true);
     const ArgParserClass = jest.fn<ArgParser>(() => ({
       parse: parse,
-      parseBufferOpenArg: parseBufferOpenArg,
+      parseJsonFile: parseJsonFile,
       isBufferType: isBufferType,
     }));
     const argParser = new ArgParserClass();
@@ -55,8 +56,10 @@ describe("Ctrlb", () => {
     const vim = new NeovimClass();
 
     doAction = jest.fn();
+    open = jest.fn();
     const BaseBufferClass = jest.fn<BaseBuffer>(() => ({
       doAction: doAction,
+      open: open,
     }));
     const buffer = new BaseBufferClass();
 
@@ -83,13 +86,34 @@ describe("Ctrlb", () => {
   });
 
   it("open", async () => {
-    const arg = "";
+    const bufferType = "bufferType";
+    await ctrlb.open(bufferType);
+
+    expect(open).toHaveBeenCalled();
+  });
+
+  it("open throws error if bufferType is invalid", () => {
+    const bufferType = "invalidBufferType";
+    isBufferType = jest.fn().mockReturnValue(false);
+    const ArgParserClass = jest.fn<ArgParser>(() => ({
+      isBufferType: isBufferType,
+    }));
+    const argParser = new ArgParserClass();
+    ctrlb = new Ctrlb(requester, argParser, layoutParser, buffers);
+
+    expect(ctrlb.open(bufferType)).rejects.toEqual(
+      new Error("Inavalid bufferType: " + bufferType)
+    );
+  });
+
+  it("openLayout", async () => {
+    const jsonFilePath = "jsonFilePath";
     const info = {};
-    parseBufferOpenArg.mockReturnValue(info);
+    parseJsonFile.mockReturnValue(info);
 
-    await ctrlb.open(arg);
+    await ctrlb.openLayout(jsonFilePath);
 
-    expect(parseBufferOpenArg).toHaveBeenCalledWith(arg);
+    expect(parseJsonFile).toHaveBeenCalledWith(jsonFilePath);
     expect(layoutParse).toHaveBeenCalledWith(info, null);
     expect(openLayout).toHaveBeenCalled();
   });
