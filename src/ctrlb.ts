@@ -3,6 +3,7 @@ import { ArgParser } from "./info";
 import { LayoutParser } from "./layout";
 import { Buffers } from "./buffers";
 import { Direction } from "./direction";
+import { CtrlbBufferType } from "./buffers/type";
 
 export class Ctrlb {
   constructor(
@@ -42,5 +43,14 @@ export class Ctrlb {
 
   public async clearAll(): Promise<void> {
     await this.buffers.clearAll();
+  }
+
+  public async complete(
+    currentArg: string,
+    line: string,
+    cursorPosition: number
+  ): Promise<string[]> {
+    // TODO: other command completion
+    return Object.keys(CtrlbBufferType);
   }
 }

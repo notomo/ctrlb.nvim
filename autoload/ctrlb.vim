@@ -19,6 +19,11 @@ function! ctrlb#clear_all() abort
     return _ctrlb_clear_all()
 endfunction
 
+function! ctrlb#_complete(current_arg, line, cursor_position) abort
+    let candidates = _ctrlb_complete(a:current_arg, a:line, a:cursor_position)
+    return join(candidates, "\n")
+endfunction
+
 let s:custom = {
     \ 'executable_path': 'wsxhub',
 \ }

@@ -38,6 +38,10 @@ export class CtrlbPlugin {
     plugin.registerFunction("_ctrlb_clear_all", [this, this.clearAll], {
       sync: true,
     });
+
+    plugin.registerFunction("_ctrlb_complete", [this, this.complete], {
+      sync: true,
+    });
   }
 
   public executeAsync(args: any[]): void {
@@ -60,6 +64,19 @@ export class CtrlbPlugin {
 
   public async clearAll(): Promise<void> {
     await this.ctrlb.clearAll().catch(e => this.reporter.error(e));
+  }
+
+  public async complete(
+    currentArg: string,
+    line: string,
+    cursorPosition: number
+  ): Promise<string[]> {
+    return await this.ctrlb
+      .complete(currentArg, line, cursorPosition)
+      .catch(e => {
+        this.reporter.error(e);
+        return [];
+      });
   }
 }
 
