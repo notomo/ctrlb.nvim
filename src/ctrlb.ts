@@ -2,15 +2,16 @@ import { Requester } from "./requester";
 import { ArgParser } from "./info";
 import { LayoutParser } from "./layout";
 import { Buffers } from "./buffers";
+import { Completer } from "./complete";
 import { Direction } from "./direction";
-import { CtrlbBufferType } from "./buffers/type";
 
 export class Ctrlb {
   constructor(
     protected readonly requester: Requester,
     protected readonly argParser: ArgParser,
     protected readonly layoutParser: LayoutParser,
-    protected readonly buffers: Buffers
+    protected readonly buffers: Buffers,
+    protected readonly completer: Completer
   ) {}
 
   public async requestAsync(arg: string): Promise<void> {
@@ -50,7 +51,6 @@ export class Ctrlb {
     line: string,
     cursorPosition: number
   ): Promise<string[]> {
-    // TODO: other command completion
-    return Object.keys(CtrlbBufferType);
+    return this.completer.complete(currentArg, line, cursorPosition);
   }
 }

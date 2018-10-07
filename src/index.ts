@@ -5,6 +5,7 @@ import { Requester } from "./requester";
 import { Reporter } from "./reporter";
 import { getLogger } from "./logger";
 import { LayoutParser } from "./layout";
+import { Completer } from "./complete";
 import { Buffers } from "./buffers";
 
 export class CtrlbPlugin {
@@ -18,7 +19,14 @@ export class CtrlbPlugin {
     const requester = new Requester();
     const buffers = new Buffers(vim, requester);
     const layoutParser = new LayoutParser(vim, buffers);
-    this.ctrlb = new Ctrlb(requester, argParser, layoutParser, buffers);
+    const completer = new Completer(requester);
+    this.ctrlb = new Ctrlb(
+      requester,
+      argParser,
+      layoutParser,
+      buffers,
+      completer
+    );
 
     const logger = getLogger("index");
     this.reporter = new Reporter(vim, logger);
@@ -66,17 +74,11 @@ export class CtrlbPlugin {
     await this.ctrlb.clearAll().catch(e => this.reporter.error(e));
   }
 
-  public async complete(
-    currentArg: string,
-    line: string,
-    cursorPosition: number
-  ): Promise<string[]> {
-    return await this.ctrlb
-      .complete(currentArg, line, cursorPosition)
-      .catch(e => {
-        this.reporter.error(e);
-        return [];
-      });
+  public async complete(args: any[]): Promise<string[]> {
+    return await this.ctrlb.complete(args[0], args[1], args[2]).catch(e => {
+      this.reporter.error(e);
+      return [];
+    });
   }
 }
 
