@@ -1,9 +1,9 @@
-import { ActionName } from "./actionName";
+import { Action } from "./action";
 import { ApiInfoRepository } from "../../repository/apiInfo";
 
-describe("ActionName", () => {
+describe("Action", () => {
   let get: jest.Mock;
-  let actionName: ActionName;
+  let action: Action;
 
   beforeEach(() => {
     get = jest.fn().mockReturnValue({
@@ -14,16 +14,16 @@ describe("ActionName", () => {
     }));
     const apiInfoRepository = new ApiInfoRepositoryClass();
 
-    actionName = new ActionName(apiInfoRepository);
+    action = new Action(apiInfoRepository);
   });
 
   it("get returns empty array if actionGroupName is invalid", async () => {
-    const result = await actionName.get("");
+    const result = await action.get("");
     expect(result).toEqual([]);
   });
 
   it("get", async () => {
-    const result = await actionName.get("tab");
+    const result = await action.get("tab");
     expect(result).toEqual(["next"]);
   });
 });

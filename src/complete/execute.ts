@@ -1,6 +1,6 @@
 import { Command } from "./command";
 import { ActionGroup } from "./source/actionGroup";
-import { ActionName } from "./source/actionName";
+import { Action } from "./source/action";
 import { ActionArgKey } from "./source/actionArgKey";
 
 export class Execute extends Command {
@@ -8,7 +8,7 @@ export class Execute extends Command {
 
   constructor(
     protected readonly actionGroupSource: ActionGroup,
-    protected readonly actionNameSource: ActionName,
+    protected readonly actionSource: Action,
     protected readonly actionArgKeySource: ActionArgKey
   ) {
     super();
@@ -43,7 +43,7 @@ export class Execute extends Command {
       });
 
     if (actionNames.length === 0 || currentArg.includes(prefix)) {
-      const actionNames = await this.actionNameSource.get(actionGroupName);
+      const actionNames = await this.actionSource.get(actionGroupName);
       return actionNames.map(actionName => {
         return prefix + actionName;
       });

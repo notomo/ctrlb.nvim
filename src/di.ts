@@ -9,7 +9,7 @@ import { getLogger } from "./logger";
 import { Reporter } from "./reporter";
 import { BufferType } from "./complete/source/bufferType";
 import { ActionGroup } from "./complete/source/actionGroup";
-import { ActionName } from "./complete/source/actionName";
+import { Action } from "./complete/source/action";
 import { ActionArgKey } from "./complete/source/actionArgKey";
 import { ApiInfoRepository } from "./repository/apiInfo";
 import { Execute } from "./complete/execute";
@@ -48,9 +48,9 @@ export class Di {
     Execute: (vim: Neovim) => {
       const apiInfoRepository = Di.get("ApiInfoRepository", vim);
       const actionGroup = new ActionGroup(apiInfoRepository);
-      const actionName = new ActionName(apiInfoRepository);
+      const action = new Action(apiInfoRepository);
       const actionArgKey = new ActionArgKey();
-      return new Execute(actionGroup, actionName, actionArgKey);
+      return new Execute(actionGroup, action, actionArgKey);
     },
   };
 

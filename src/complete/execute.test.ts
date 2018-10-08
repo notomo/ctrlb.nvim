@@ -1,6 +1,6 @@
 import { Execute } from "./execute";
 import { ActionGroup } from "./source/actionGroup";
-import { ActionName } from "./source/actionName";
+import { Action } from "./source/action";
 import { ActionArgKey } from "./source/actionArgKey";
 
 describe("Execute", () => {
@@ -17,10 +17,10 @@ describe("Execute", () => {
     const actionGroup = new ActionGroupClass();
 
     getActions = jest.fn().mockReturnValue(["name"]);
-    const ActionNameClass = jest.fn<ActionName>(() => ({
+    const ActionClass = jest.fn<Action>(() => ({
       get: getActions,
     }));
-    const actionName = new ActionNameClass();
+    const action = new ActionClass();
 
     getActionArgs = jest.fn();
     const ActionArgKeyClass = jest.fn<ActionArgKey>(() => ({
@@ -28,7 +28,7 @@ describe("Execute", () => {
     }));
     const actionArgKey = new ActionArgKeyClass();
 
-    execute = new Execute(actionGroup, actionName, actionArgKey);
+    execute = new Execute(actionGroup, action, actionArgKey);
   });
 
   it("findCandidates returns actionGroups", async () => {

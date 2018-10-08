@@ -1,6 +1,6 @@
 import { ApiInfoRepository } from "../../repository/apiInfo";
 
-export class ActionName {
+export class Action {
   constructor(protected readonly apiInfoRepository: ApiInfoRepository) {}
 
   public async get(actionGroupName: string): Promise<string[]> {
