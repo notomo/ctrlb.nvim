@@ -1,29 +1,14 @@
-import { Requester } from "../requester";
 import { Command } from "./command";
 import { Open } from "./open";
 import { Execute } from "./execute";
-import { BufferType } from "./source/bufferType";
-import { ActionGroup } from "./source/actionGroup";
-import { ActionName } from "./source/actionName";
-import { ActionArgKey } from "./source/actionArgKey";
 import { Logger, getLogger } from "../logger";
-import { ApiInfoRepository } from "../repository/apiInfo";
 
 export class Completer {
-  protected readonly commands: Command[] = [];
+  protected readonly commands: Command[];
   protected readonly logger: Logger;
 
-  constructor(protected readonly requester: Requester) {
-    const bufferTypeSource = new BufferType();
-
-    const apiInfoRepository = new ApiInfoRepository(requester);
-    const actionGroup = new ActionGroup(apiInfoRepository);
-    const actionName = new ActionName(apiInfoRepository);
-    const actionArgKey = new ActionArgKey();
-    this.commands = [
-      new Open(bufferTypeSource),
-      new Execute(actionGroup, actionName, actionArgKey),
-    ];
+  constructor(openCommand: Open, executeCommand: Execute) {
+    this.commands = [openCommand, executeCommand];
 
     this.logger = getLogger("complete.index");
   }

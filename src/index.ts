@@ -1,12 +1,7 @@
 import { NvimPlugin } from "neovim";
 import { Ctrlb } from "./ctrlb";
-import { ArgParser } from "./info";
-import { Requester } from "./requester";
 import { Reporter } from "./reporter";
-import { getLogger } from "./logger";
-import { LayoutParser } from "./layout";
-import { Completer } from "./complete";
-import { Buffers } from "./buffers";
+import { Di } from "./di";
 
 export class CtrlbPlugin {
   protected readonly ctrlb: Ctrlb;
@@ -14,22 +9,8 @@ export class CtrlbPlugin {
 
   constructor(protected readonly plugin: NvimPlugin) {
     const vim = plugin.nvim;
-
-    const argParser = new ArgParser();
-    const requester = new Requester();
-    const buffers = new Buffers(vim, requester);
-    const layoutParser = new LayoutParser(vim, buffers);
-    const completer = new Completer(requester);
-    this.ctrlb = new Ctrlb(
-      requester,
-      argParser,
-      layoutParser,
-      buffers,
-      completer
-    );
-
-    const logger = getLogger("index");
-    this.reporter = new Reporter(vim, logger);
+    this.ctrlb = Di.get("Ctrlb", vim);
+    this.reporter = Di.get("Reporter", vim);
 
     plugin.setOptions({ dev: false, alwaysInit: false });
 
@@ -52,11 +33,11 @@ export class CtrlbPlugin {
     });
   }
 
-  public executeAsync(args: any[]): void {
+  public executeAsync(args: string[]): void {
     this.ctrlb.requestAsync(args[0]).catch(e => this.reporter.error(e));
   }
 
-  public async open(args: any[]): Promise<void> {
+  public async open(args: string[]): Promise<void> {
     await this.ctrlb.open(args[0]).catch(e => this.reporter.error(e));
   }
 
