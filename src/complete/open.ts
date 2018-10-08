@@ -8,7 +8,10 @@ export class Open extends Command {
     super();
   }
 
-  public findCandidates(currentArg: string, args: string[]): string[] {
+  public async findCandidates(
+    currentArg: string,
+    args: string[]
+  ): Promise<string[]> {
     return this.bufferTypeSource.get();
   }
 }

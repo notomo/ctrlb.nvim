@@ -1,8 +1,13 @@
 import { Requester } from "../requester";
 import { Command } from "./command";
 import { Open } from "./open";
+import { Execute } from "./execute";
 import { BufferType } from "./source/bufferType";
+import { ActionGroup } from "./source/actionGroup";
+import { ActionName } from "./source/actionName";
+import { ActionArgKey } from "./source/actionArgKey";
 import { Logger, getLogger } from "../logger";
+import { ApiInfoRepository } from "../repository/apiInfo";
 
 export class Completer {
   protected readonly commands: Command[] = [];
@@ -10,9 +15,17 @@ export class Completer {
 
   constructor(protected readonly requester: Requester) {
     const bufferTypeSource = new BufferType();
-    this.commands = [new Open(bufferTypeSource)];
 
-    this.logger = getLogger("completer");
+    const apiInfoRepository = new ApiInfoRepository(requester);
+    const actionGroup = new ActionGroup(apiInfoRepository);
+    const actionName = new ActionName(apiInfoRepository);
+    const actionArgKey = new ActionArgKey();
+    this.commands = [
+      new Open(bufferTypeSource),
+      new Execute(actionGroup, actionName, actionArgKey),
+    ];
+
+    this.logger = getLogger("complete.index");
   }
 
   public async complete(
@@ -34,7 +47,9 @@ export class Completer {
     const splitted = line.split(/(?<!\\)[ ]+/);
     return {
       commandName: splitted[0],
-      args: splitted.slice(1),
+      args: splitted.slice(1).filter(arg => {
+        return arg.length !== 0;
+      }),
     };
   }
 }
