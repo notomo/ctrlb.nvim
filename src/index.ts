@@ -1,11 +1,7 @@
 import { NvimPlugin } from "neovim";
 import { Ctrlb } from "./ctrlb";
-import { ArgParser } from "./info";
-import { Requester } from "./requester";
 import { Reporter } from "./reporter";
-import { getLogger } from "./logger";
-import { LayoutParser } from "./layout";
-import { Buffers } from "./buffers";
+import { Di } from "./di";
 
 export class CtrlbPlugin {
   protected readonly ctrlb: Ctrlb;
@@ -13,15 +9,8 @@ export class CtrlbPlugin {
 
   constructor(protected readonly plugin: NvimPlugin) {
     const vim = plugin.nvim;
-
-    const argParser = new ArgParser();
-    const requester = new Requester();
-    const buffers = new Buffers(vim, requester);
-    const layoutParser = new LayoutParser(vim, buffers);
-    this.ctrlb = new Ctrlb(requester, argParser, layoutParser, buffers);
-
-    const logger = getLogger("index");
-    this.reporter = new Reporter(vim, logger);
+    this.ctrlb = Di.get("Ctrlb", vim);
+    this.reporter = Di.get("Reporter", vim);
 
     plugin.setOptions({ dev: false, alwaysInit: false });
 
@@ -44,11 +33,11 @@ export class CtrlbPlugin {
     });
   }
 
-  public executeAsync(args: any[]): void {
+  public executeAsync(args: string[]): void {
     this.ctrlb.requestAsync(args[0]).catch(e => this.reporter.error(e));
   }
 
-  public async open(args: any[]): Promise<void> {
+  public async open(args: string[]): Promise<void> {
     await this.ctrlb.open(args[0]).catch(e => this.reporter.error(e));
   }
 
@@ -66,17 +55,11 @@ export class CtrlbPlugin {
     await this.ctrlb.clearAll().catch(e => this.reporter.error(e));
   }
 
-  public async complete(
-    currentArg: string,
-    line: string,
-    cursorPosition: number
-  ): Promise<string[]> {
-    return await this.ctrlb
-      .complete(currentArg, line, cursorPosition)
-      .catch(e => {
-        this.reporter.error(e);
-        return [];
-      });
+  public async complete(args: any[]): Promise<string[]> {
+    return await this.ctrlb.complete(args[0], args[1], args[2]).catch(e => {
+      this.reporter.error(e);
+      return [];
+    });
   }
 }
 

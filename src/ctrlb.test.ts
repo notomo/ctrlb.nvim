@@ -1,6 +1,7 @@
 import { Ctrlb } from "./ctrlb";
 import { Neovim } from "neovim";
 import { Requester } from "./requester";
+import { Completer } from "./complete";
 import { ArgParser } from "./info";
 import { LayoutParser, LayoutItem } from "./layout";
 import { Buffers } from "./buffers";
@@ -21,6 +22,8 @@ describe("Ctrlb", () => {
   let layoutParser: LayoutParser;
   let requester: Requester;
   let buffers: Buffers;
+  let completer: Completer;
+  let complete: jest.Mock;
 
   beforeEach(() => {
     executeAsync = jest.fn();
@@ -28,6 +31,12 @@ describe("Ctrlb", () => {
       executeAsync: executeAsync,
     }));
     requester = new RequesterClass();
+
+    complete = jest.fn();
+    const CompleterClass = jest.fn<Completer>(() => ({
+      complete: complete,
+    }));
+    completer = new CompleterClass(requester);
 
     parse = jest.fn();
     parseJsonFile = jest.fn();
@@ -71,7 +80,7 @@ describe("Ctrlb", () => {
     }));
     buffers = new BuffersClass(vim, requester);
 
-    ctrlb = new Ctrlb(requester, argParser, layoutParser, buffers);
+    ctrlb = new Ctrlb(requester, argParser, layoutParser, buffers, completer);
   });
 
   it("requestAsync", async () => {
@@ -99,7 +108,7 @@ describe("Ctrlb", () => {
       isBufferType: isBufferType,
     }));
     const argParser = new ArgParserClass();
-    ctrlb = new Ctrlb(requester, argParser, layoutParser, buffers);
+    ctrlb = new Ctrlb(requester, argParser, layoutParser, buffers, completer);
 
     expect(ctrlb.open(bufferType)).rejects.toEqual(
       new Error("Inavalid bufferType: " + bufferType)
@@ -130,7 +139,7 @@ describe("Ctrlb", () => {
       isBufferType: isBufferType,
     }));
     const argParser = new ArgParserClass();
-    ctrlb = new Ctrlb(requester, argParser, layoutParser, buffers);
+    ctrlb = new Ctrlb(requester, argParser, layoutParser, buffers, completer);
 
     expect(ctrlb.doAction(bufferType, "actionName")).rejects.toEqual(
       new Error("Inavalid bufferType: " + bufferType)
@@ -140,5 +149,10 @@ describe("Ctrlb", () => {
   it("clearAll", async () => {
     await ctrlb.clearAll();
     expect(clearAll).toHaveBeenCalledTimes(1);
+  });
+
+  it("complete", async () => {
+    await ctrlb.complete("", "", 1);
+    expect(complete).toHaveBeenCalledTimes(1);
   });
 });
