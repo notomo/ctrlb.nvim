@@ -14,7 +14,7 @@ export class EventRepository {
 
   public async unsubscribe(eventName: string): Promise<ChildProcess> {
     return this.requester.executeAsync({
-      actionGroupName: "tab",
+      actionGroupName: "event",
       actionName: "unsubscribe",
       args: { eventName: eventName },
     });
