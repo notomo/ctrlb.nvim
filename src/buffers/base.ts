@@ -91,8 +91,10 @@ export abstract class BaseBuffer {
     return "ctrlb://" + this.fileType;
   }
 
-  protected subscribe(eventName: string) {
-    this.eventRepository.subscribe(eventName);
-    this.subscribedEvents.push(eventName);
+  protected subscribe(...eventNames: string[]) {
+    for (const eventName of eventNames) {
+      this.eventRepository.subscribe(eventName);
+      this.subscribedEvents.push(eventName);
+    }
   }
 }

@@ -23,13 +23,15 @@ export class CurrentTab extends BaseBuffer {
     await buffer.setOption("buflisted", true);
     await buffer.setOption("modifiable", true);
 
-    this.subscribe("tabActivated");
-    this.subscribe("tabCreated");
-    this.subscribe("tabRemoved");
-    this.subscribe("tabUpdated");
-    this.subscribe("windowActivated");
-    this.subscribe("windowCreated");
-    this.subscribe("windowRemoved");
+    this.subscribe(
+      "tabActivated",
+      "tabCreated",
+      "tabRemoved",
+      "tabUpdated",
+      "windowActivated",
+      "windowCreated",
+      "windowRemoved"
+    );
 
     const p = this.tabRepository.onChanged(data => this.update(buffer));
     this.receivers.push(p);
