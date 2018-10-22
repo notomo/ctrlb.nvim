@@ -1,19 +1,23 @@
 import { BaseBuffer } from "./base";
-import { Buffer } from "neovim";
+import { Neovim, Buffer } from "neovim";
 import { CtrlbBufferType } from "./type";
-
-type Bookmark = {
-  title: string;
-  url?: string;
-  id: string;
-  parentId?: string;
-  isParent?: boolean;
-};
+import { BufferContainer } from "./container";
+import { BookmarkRepository, Bookmark } from "../repository/bookmark";
+import { EventRepository } from "../repository/event";
 
 export class BookmarkTree extends BaseBuffer {
   public readonly type = CtrlbBufferType.bookmarkTree;
   protected bookmarks: Bookmark[] = [];
   protected directoryId: string | null = null;
+
+  constructor(
+    protected readonly vim: Neovim,
+    protected readonly bufferContainer: BufferContainer,
+    protected readonly eventRepository: EventRepository,
+    protected readonly bookmarkRepository: BookmarkRepository
+  ) {
+    super(vim, bufferContainer, eventRepository);
+  }
 
   protected async setup(buffer: Buffer): Promise<void> {
     this.actions["open"] = (buffer: Buffer) => this.openBookmark(buffer);
@@ -76,11 +80,7 @@ export class BookmarkTree extends BaseBuffer {
       url = bookmark.url;
     }
     if (url !== undefined) {
-      await this.requester.executeAsync({
-        actionGroupName: "bookmark",
-        actionName: "open",
-        args: { id: id },
-      });
+      await this.bookmarkRepository.open(id);
       return;
     }
 
@@ -93,19 +93,11 @@ export class BookmarkTree extends BaseBuffer {
       return;
     }
 
-    await this.requester.executeAsync({
-      actionGroupName: "bookmark",
-      actionName: "tabOpen",
-      args: { id: bookmark.id },
-    });
+    await this.bookmarkRepository.tabOpen(bookmark.id);
   }
 
   protected async openTree(buffer: Buffer, id: string | null) {
-    const bookmarks = await this.requester.execute<Bookmark[]>({
-      actionGroupName: "bookmark",
-      actionName: "getTree",
-      args: { id: id },
-    });
+    const bookmarks = await this.bookmarkRepository.getTree(id);
 
     let i = 0;
     await buffer.remove(0, this.bookmarks.length, false);

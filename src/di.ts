@@ -12,15 +12,25 @@ import { ActionGroup } from "./complete/source/actionGroup";
 import { Action } from "./complete/source/action";
 import { ActionArgKey } from "./complete/source/actionArgKey";
 import { ApiInfoRepository } from "./repository/apiInfo";
+import { BookmarkRepository } from "./repository/bookmark";
+import { TabRepository } from "./repository/tab";
+import { EventRepository } from "./repository/event";
+import { HistoryRepository } from "./repository/history";
 import { Execute } from "./complete/execute";
 import { Open } from "./complete/open";
+import { BufferContainer } from "./buffers/container";
+import { Ctrl } from "./buffers/ctrl";
+import { BookmarkTree } from "./buffers/bookmarkTree";
+import { CurrentTab } from "./buffers/currentTab";
+import { Empty } from "./buffers/empty";
+import { HistoryList } from "./buffers/historyList";
 
 export class Di {
   protected static readonly deps: Deps = {
     Ctrlb: (vim: Neovim) => {
       const argParser = new ArgParser();
       const requester = Di.get("Requester", vim);
-      const buffers = new Buffers(vim, requester);
+      const buffers = new Buffers(vim);
       const layoutParser = new LayoutParser(vim, buffers);
       const completer = Di.get("Completer", vim);
       return new Ctrlb(requester, argParser, layoutParser, buffers, completer);
@@ -41,6 +51,22 @@ export class Di {
       const requester = Di.get("Requester", vim);
       return new ApiInfoRepository(requester);
     },
+    HistoryRepository: (vim: Neovim) => {
+      const requester = Di.get("Requester", vim);
+      return new HistoryRepository(requester);
+    },
+    TabRepository: (vim: Neovim) => {
+      const requester = Di.get("Requester", vim);
+      return new TabRepository(requester);
+    },
+    BookmarkRepository: (vim: Neovim) => {
+      const requester = Di.get("Requester", vim);
+      return new BookmarkRepository(requester);
+    },
+    EventRepository: (vim: Neovim) => {
+      const requester = Di.get("Requester", vim);
+      return new EventRepository(requester);
+    },
     Open: (vim: Neovim) => {
       const bufferType = new BufferType();
       return new Open(bufferType);
@@ -52,6 +78,46 @@ export class Di {
       const actionArgKey = new ActionArgKey();
       return new Execute(actionGroup, action, actionArgKey);
     },
+    Ctrl: (vim: Neovim) => {
+      const eventRepository = Di.get("EventRepository", vim);
+      return new Ctrl(vim, new BufferContainer(vim), eventRepository);
+    },
+    BookmarkTree: (vim: Neovim) => {
+      const eventRepository = Di.get("EventRepository", vim);
+      const bookmarkRepository = Di.get("BookmarkRepository", vim);
+      return new BookmarkTree(
+        vim,
+        new BufferContainer(vim),
+        eventRepository,
+        bookmarkRepository
+      );
+    },
+    CurrentTab: (vim: Neovim) => {
+      const eventRepository = Di.get("EventRepository", vim);
+      const tabRepository = Di.get("TabRepository", vim);
+      return new CurrentTab(
+        vim,
+        new BufferContainer(vim),
+        eventRepository,
+        tabRepository
+      );
+    },
+    Empty: (vim: Neovim) => {
+      const eventRepository = Di.get("EventRepository", vim);
+      return new Empty(vim, new BufferContainer(vim), eventRepository);
+    },
+    HistoryList: (vim: Neovim) => {
+      const eventRepository = Di.get("EventRepository", vim);
+      const historyRepository = Di.get("HistoryRepository", vim);
+      const tabRepository = Di.get("TabRepository", vim);
+      return new HistoryList(
+        vim,
+        new BufferContainer(vim),
+        eventRepository,
+        historyRepository,
+        tabRepository
+      );
+    },
   };
 
   protected static readonly cache: DepsCache = {
@@ -62,8 +128,38 @@ export class Di {
     Execute: null,
     Completer: null,
     ApiInfoRepository: null,
+    BookmarkRepository: null,
+    TabRepository: null,
+    EventRepository: null,
+    HistoryRepository: null,
+    Ctrl: null,
+    BookmarkTree: null,
+    CurrentTab: null,
+    Empty: null,
+    HistoryList: null,
   };
 
+  public static get(cls: "Ctrl", vim: Neovim, cacheable: false): Ctrl;
+  public static get(
+    cls: "BookmarkTree",
+    vim: Neovim,
+    cacheable: false
+  ): BookmarkTree;
+  public static get(
+    cls: "CurrentTab",
+    vim: Neovim,
+    cacheable: false
+  ): CurrentTab;
+  public static get(cls: "Empty", vim: Neovim, cacheable: false): Empty;
+  public static get(
+    cls: "HistoryList",
+    vim: Neovim,
+    cacheable: false
+  ): HistoryList;
+  public static get(cls: "HistoryRepository", vim: Neovim): HistoryRepository;
+  public static get(cls: "EventRepository", vim: Neovim): EventRepository;
+  public static get(cls: "TabRepository", vim: Neovim): TabRepository;
+  public static get(cls: "BookmarkRepository", vim: Neovim): BookmarkRepository;
   public static get(cls: "ApiInfoRepository", vim: Neovim): ApiInfoRepository;
   public static get(cls: "Execute", vim: Neovim): Execute;
   public static get(cls: "Open", vim: Neovim): Open;
@@ -73,14 +169,17 @@ export class Di {
   public static get(cls: "Ctrlb", vim: Neovim): Ctrlb;
   public static get(
     cls: keyof Deps,
-    vim: Neovim
+    vim: Neovim,
+    cacheable: boolean = true
   ): ReturnType<Deps[keyof Deps]> {
     const cache = this.cache[cls];
     if (cache !== null) {
       return cache;
     }
     const resolved = this.deps[cls](vim);
-    this.cache[cls] = resolved;
+    if (cacheable) {
+      this.cache[cls] = resolved;
+    }
     return resolved;
   }
 
@@ -106,6 +205,15 @@ interface Deps {
   Execute: { (vim: Neovim): Execute };
   Completer: { (vim: Neovim): Completer };
   ApiInfoRepository: { (vim: Neovim): ApiInfoRepository };
+  BookmarkRepository: { (vim: Neovim): BookmarkRepository };
+  TabRepository: { (vim: Neovim): TabRepository };
+  EventRepository: { (vim: Neovim): EventRepository };
+  HistoryRepository: { (vim: Neovim): HistoryRepository };
+  Ctrl: { (vim: Neovim): Ctrl };
+  BookmarkTree: { (vim: Neovim): BookmarkTree };
+  CurrentTab: { (vim: Neovim): CurrentTab };
+  Empty: { (vim: Neovim): Empty };
+  HistoryList: { (vim: Neovim): HistoryList };
 }
 
 type DepsCache = { [P in keyof Deps]: ReturnType<Deps[P]> | null };

@@ -5,39 +5,28 @@ import { BookmarkTree } from "./bookmarkTree";
 import { CurrentTab } from "./currentTab";
 import { Empty } from "./empty";
 import { HistoryList } from "./historyList";
-import { Requester } from "../requester";
 import { CtrlbBufferType } from "./type";
-import { BufferContainer } from "./container";
+import { Di } from "../di";
 
+const BT = CtrlbBufferType;
 type CtrlbBuffers = {
-  [CtrlbBufferType.ctrl]: Ctrl;
-  [CtrlbBufferType.currentTab]: CurrentTab;
-  [CtrlbBufferType.empty]: Empty;
-  [CtrlbBufferType.bookmarkTree]: BookmarkTree;
-  [CtrlbBufferType.historyList]: HistoryList;
+  [BT.ctrl]: Ctrl;
+  [BT.currentTab]: CurrentTab;
+  [BT.empty]: Empty;
+  [BT.bookmarkTree]: BookmarkTree;
+  [BT.historyList]: HistoryList;
 } & { [P in CtrlbBufferType]: BaseBuffer };
 
 export class Buffers {
   protected readonly buffers: CtrlbBuffers;
 
-  protected readonly mapper = {
-    [CtrlbBufferType.ctrl]: Ctrl,
-    [CtrlbBufferType.currentTab]: CurrentTab,
-    [CtrlbBufferType.empty]: Empty,
-    [CtrlbBufferType.bookmarkTree]: BookmarkTree,
-    [CtrlbBufferType.historyList]: HistoryList,
-  };
-
-  constructor(
-    protected readonly vim: Neovim,
-    protected readonly requester: Requester
-  ) {
+  constructor(protected readonly vim: Neovim) {
     this.buffers = {
-      [CtrlbBufferType.ctrl]: this.create(CtrlbBufferType.ctrl),
-      [CtrlbBufferType.currentTab]: this.create(CtrlbBufferType.currentTab),
-      [CtrlbBufferType.empty]: this.create(CtrlbBufferType.empty),
-      [CtrlbBufferType.bookmarkTree]: this.create(CtrlbBufferType.bookmarkTree),
-      [CtrlbBufferType.historyList]: this.create(CtrlbBufferType.historyList),
+      [BT.ctrl]: Di.get("Ctrl", this.vim, false),
+      [BT.currentTab]: Di.get("CurrentTab", this.vim, false),
+      [BT.empty]: Di.get("Empty", this.vim, false),
+      [BT.bookmarkTree]: Di.get("BookmarkTree", this.vim, false),
+      [BT.historyList]: Di.get("HistoryList", this.vim, false),
     };
   }
 
@@ -45,22 +34,15 @@ export class Buffers {
     return this.buffers[name];
   }
 
-  public async clear<T extends CtrlbBufferType>(name: T): Promise<void> {
-    await this.buffers[name].unload();
-    this.buffers[name] = this.create(name);
-  }
-
   public async clearAll(): Promise<void> {
-    Object.keys(this.mapper).map(bufferType => {
-      this.clear(bufferType as CtrlbBufferType);
+    Object.keys(this.buffers).map(async bufferType => {
+      const buf = this.get(bufferType as CtrlbBufferType);
+      await buf.unload();
     });
-  }
-
-  protected create<T extends CtrlbBufferType>(name: T): CtrlbBuffers[T] {
-    return new this.mapper[name](
-      this.vim,
-      this.requester,
-      new BufferContainer(this.vim)
-    );
+    this.buffers[BT.ctrl] = Di.get("Ctrl", this.vim, false);
+    this.buffers[BT.currentTab] = Di.get("CurrentTab", this.vim, false);
+    this.buffers[BT.empty] = Di.get("Empty", this.vim, false);
+    this.buffers[BT.bookmarkTree] = Di.get("BookmarkTree", this.vim, false);
+    this.buffers[BT.historyList] = Di.get("HistoryList", this.vim, false);
   }
 }
