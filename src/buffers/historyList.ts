@@ -1,16 +1,25 @@
 import { BaseBuffer } from "./base";
-import { Buffer } from "neovim";
+import { Neovim, Buffer } from "neovim";
 import { CtrlbBufferType } from "./type";
-
-type History = {
-  title: string;
-  url: string;
-};
+import { BufferContainer } from "./container";
+import { HistoryRepository, History } from "../repository/history";
+import { TabRepository } from "../repository/tab";
+import { EventRepository } from "../repository/event";
 
 export class HistoryList extends BaseBuffer {
   public readonly type = CtrlbBufferType.historyList;
 
   protected histories: History[] = [];
+
+  constructor(
+    protected readonly vim: Neovim,
+    protected readonly bufferContainer: BufferContainer,
+    protected readonly eventRepository: EventRepository,
+    protected readonly historyRepository: HistoryRepository,
+    protected readonly tabRepository: TabRepository
+  ) {
+    super(vim, bufferContainer, eventRepository);
+  }
 
   protected async setup(buffer: Buffer): Promise<void> {
     this.actions["tabOpen"] = (buffer: Buffer) => this.tabOpenHistory(buffer);
@@ -30,10 +39,8 @@ export class HistoryList extends BaseBuffer {
 
     this.subscribe("historyCreated");
 
-    const p = this.requester.receiveAsyncOnEvent<History>(
-      {},
-      { option: { eventName: "historyCreated" } },
-      history => this.update(history, buffer)
+    const p = this.historyRepository.onCreated(history =>
+      this.update(history, buffer)
     );
     this.receivers.push(p);
 
@@ -41,11 +48,7 @@ export class HistoryList extends BaseBuffer {
   }
 
   protected async create(buffer: Buffer) {
-    const histories = await this.requester.execute<History[]>({
-      actionGroupName: "history",
-      actionName: "search",
-      args: {},
-    });
+    const histories = await this.historyRepository.search();
 
     const lines = histories.map(history => {
       return history.title + "\t" + history.url;
@@ -74,11 +77,7 @@ export class HistoryList extends BaseBuffer {
       return;
     }
 
-    await this.requester.executeAsync({
-      actionGroupName: "tab",
-      actionName: "open",
-      args: { url: history.url },
-    });
+    await this.tabRepository.open(history.url);
   }
 
   public async tabOpenHistory(buffer: Buffer) {
@@ -87,10 +86,6 @@ export class HistoryList extends BaseBuffer {
       return;
     }
 
-    await this.requester.executeAsync({
-      actionGroupName: "tab",
-      actionName: "tabOpen",
-      args: { url: history.url },
-    });
+    await this.tabRepository.tabOpen(history.url);
   }
 }

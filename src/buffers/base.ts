@@ -1,10 +1,10 @@
 import { Neovim, Buffer } from "neovim";
 import { ChildProcess } from "child_process";
 import { Direction } from "../direction";
-import { Requester } from "../requester";
 import { Logger, getLogger } from "../logger";
 import { BufferContainer } from "./container";
 import { CtrlbBufferType } from "./type";
+import { EventRepository } from "../repository/event";
 
 export type Actions = { [index: string]: { (buffer: Buffer): Promise<void> } };
 
@@ -17,8 +17,8 @@ export abstract class BaseBuffer {
 
   constructor(
     protected readonly vim: Neovim,
-    protected readonly requester: Requester,
-    protected readonly bufferContainer: BufferContainer
+    protected readonly bufferContainer: BufferContainer,
+    protected readonly eventRepository: EventRepository
   ) {
     this.logger = getLogger("buffer.base");
   }
@@ -51,13 +51,7 @@ export abstract class BaseBuffer {
     this.receivers.length = 0;
 
     Object.keys(this.subscribedEvents).map(eventName => {
-      this.requester.executeAsync({
-        actionGroupName: "event",
-        actionName: "unsubscribe",
-        args: {
-          eventName: eventName,
-        },
-      });
+      this.eventRepository.unsubscribe(eventName);
     });
     this.subscribedEvents.length = 0;
 
@@ -98,13 +92,7 @@ export abstract class BaseBuffer {
   }
 
   protected subscribe(eventName: string) {
-    this.requester.executeAsync({
-      actionGroupName: "event",
-      actionName: "subscribe",
-      args: {
-        eventName: eventName,
-      },
-    });
+    this.eventRepository.subscribe(eventName);
     this.subscribedEvents.push(eventName);
   }
 }

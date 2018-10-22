@@ -1,14 +1,21 @@
 import { BaseBuffer } from "./base";
-import { Buffer } from "neovim";
+import { Neovim, Buffer } from "neovim";
 import { CtrlbBufferType } from "./type";
-
-type Tab = {
-  title: string;
-  url: string;
-};
+import { TabRepository, Tab } from "../repository/tab";
+import { BufferContainer } from "./container";
+import { EventRepository } from "../repository/event";
 
 export class CurrentTab extends BaseBuffer {
   public readonly type = CtrlbBufferType.currentTab;
+
+  constructor(
+    protected readonly vim: Neovim,
+    protected readonly bufferContainer: BufferContainer,
+    protected readonly eventRepository: EventRepository,
+    protected readonly tabRepository: TabRepository
+  ) {
+    super(vim, bufferContainer, eventRepository);
+  }
 
   protected async setup(buffer: Buffer): Promise<void> {
     await buffer.setOption("buftype", "nofile");
@@ -24,13 +31,7 @@ export class CurrentTab extends BaseBuffer {
     this.subscribe("windowCreated");
     this.subscribe("windowRemoved");
 
-    const p = this.requester.receiveAsyncOnEvent<any>(
-      // TODO: receive only
-      // ["tabActivated", "tabCreated", "tabRemoved", "tabUpdated", "windowActivated", "windowCreated", "windowRemoved"]
-      { option: { eventName: true } },
-      {},
-      data => this.update(buffer)
-    );
+    const p = this.tabRepository.onChanged(data => this.update(buffer));
     this.receivers.push(p);
 
     await this.update(buffer);
@@ -41,10 +42,7 @@ export class CurrentTab extends BaseBuffer {
   }
 
   protected async update(buffer: Buffer) {
-    const tab = await this.requester.execute<unknown>({
-      actionGroupName: "tab",
-      actionName: "getCurrent",
-    });
+    const tab = await this.tabRepository.getCurrent();
 
     if (!this.isTab(tab)) {
       return;

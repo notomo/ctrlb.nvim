@@ -1,10 +1,10 @@
 import { Neovim, Buffer } from "neovim";
 import { ChildProcess } from "child_process";
-import { Requester } from "../requester";
 import { BufferContainer } from "./container";
 import { BaseBuffer } from "./base";
 import { CtrlbBufferType } from "./type";
 import { Direction } from "../direction";
+import { EventRepository } from "../repository/event";
 
 describe("BaseBuffer", () => {
   let buffer: Example;
@@ -18,7 +18,8 @@ describe("BaseBuffer", () => {
   let unload: jest.Mock;
   let command: jest.Mock;
   let setOption: jest.Mock;
-  let executeAsync: jest.Mock;
+  let subscribe: jest.Mock;
+  let unsubscribe: jest.Mock;
 
   beforeEach(() => {
     command = jest.fn();
@@ -27,11 +28,13 @@ describe("BaseBuffer", () => {
     }));
     const vim = new NeovimClass();
 
-    executeAsync = jest.fn();
-    const RequesterClass = jest.fn<Requester>(() => ({
-      executeAsync: executeAsync,
+    subscribe = jest.fn();
+    unsubscribe = jest.fn();
+    const EventRepositoryClass = jest.fn<EventRepository>(() => ({
+      subscribe: subscribe,
+      unsubscribe: unsubscribe,
     }));
-    const requester = new RequesterClass();
+    const eventRepository = new EventRepositoryClass();
 
     setOption = jest.fn();
     const BufferClass = jest.fn<Buffer>(() => ({
@@ -60,8 +63,8 @@ describe("BaseBuffer", () => {
     }));
     const bufferContainer = new BufferContainerClass(vim);
 
-    buffer = new Example(vim, requester, bufferContainer);
-    buffer2 = new Example2(vim, requester, bufferContainer);
+    buffer = new Example(vim, bufferContainer, eventRepository);
+    buffer2 = new Example2(vim, bufferContainer, eventRepository);
   });
 
   it("open", async () => {
@@ -105,7 +108,7 @@ describe("BaseBuffer", () => {
     await buffer.unload();
 
     expect(unload).toHaveBeenCalled();
-    expect(executeAsync).toHaveBeenCalled();
+    expect(unsubscribe).toHaveBeenCalled();
   });
 });
 
@@ -114,10 +117,10 @@ class Example extends BaseBuffer {
 
   constructor(
     vim: Neovim,
-    requester: Requester,
-    bufferContainer: BufferContainer
+    bufferContainer: BufferContainer,
+    eventRepository: EventRepository
   ) {
-    super(vim, requester, bufferContainer);
+    super(vim, bufferContainer, eventRepository);
     this.actions["actionName"] = async (buffer: Buffer) => {};
   }
 
