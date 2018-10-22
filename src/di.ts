@@ -139,11 +139,23 @@ export class Di {
     HistoryList: null,
   };
 
-  public static get(cls: "Ctrl", vim: Neovim): Ctrl;
-  public static get(cls: "BookmarkTree", vim: Neovim): BookmarkTree;
-  public static get(cls: "CurrentTab", vim: Neovim): CurrentTab;
-  public static get(cls: "Empty", vim: Neovim): Empty;
-  public static get(cls: "HistoryList", vim: Neovim): HistoryList;
+  public static get(cls: "Ctrl", vim: Neovim, cacheable: false): Ctrl;
+  public static get(
+    cls: "BookmarkTree",
+    vim: Neovim,
+    cacheable: false
+  ): BookmarkTree;
+  public static get(
+    cls: "CurrentTab",
+    vim: Neovim,
+    cacheable: false
+  ): CurrentTab;
+  public static get(cls: "Empty", vim: Neovim, cacheable: false): Empty;
+  public static get(
+    cls: "HistoryList",
+    vim: Neovim,
+    cacheable: false
+  ): HistoryList;
   public static get(cls: "HistoryRepository", vim: Neovim): HistoryRepository;
   public static get(cls: "EventRepository", vim: Neovim): EventRepository;
   public static get(cls: "TabRepository", vim: Neovim): TabRepository;
@@ -157,14 +169,17 @@ export class Di {
   public static get(cls: "Ctrlb", vim: Neovim): Ctrlb;
   public static get(
     cls: keyof Deps,
-    vim: Neovim
+    vim: Neovim,
+    cacheable: boolean = true
   ): ReturnType<Deps[keyof Deps]> {
     const cache = this.cache[cls];
     if (cache !== null) {
       return cache;
     }
     const resolved = this.deps[cls](vim);
-    this.cache[cls] = resolved;
+    if (cacheable) {
+      this.cache[cls] = resolved;
+    }
     return resolved;
   }
 
@@ -175,13 +190,7 @@ export class Di {
     this.cache[cls] = value;
   }
 
-  public static clear(): void;
-  public static clear(cls: keyof Deps): void;
-  public static clear(cls: keyof Deps | null = null): void {
-    if (cls !== null) {
-      this.cache[cls] = null;
-      return;
-    }
+  public static clear(): void {
     for (const key of Object.keys(this.deps)) {
       this.cache[key as keyof DepsCache] = null;
     }

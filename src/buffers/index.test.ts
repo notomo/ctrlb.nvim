@@ -15,7 +15,7 @@ describe("Buffers", () => {
 
     buffers = new Buffers(vim);
 
-    empty = Di.get("Empty", vim);
+    empty = Di.get("Empty", vim, false);
   });
 
   it("get", () => {

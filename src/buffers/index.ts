@@ -8,12 +8,13 @@ import { HistoryList } from "./historyList";
 import { CtrlbBufferType } from "./type";
 import { Di } from "../di";
 
+const BT = CtrlbBufferType;
 type CtrlbBuffers = {
-  [CtrlbBufferType.ctrl]: Ctrl;
-  [CtrlbBufferType.currentTab]: CurrentTab;
-  [CtrlbBufferType.empty]: Empty;
-  [CtrlbBufferType.bookmarkTree]: BookmarkTree;
-  [CtrlbBufferType.historyList]: HistoryList;
+  [BT.ctrl]: Ctrl;
+  [BT.currentTab]: CurrentTab;
+  [BT.empty]: Empty;
+  [BT.bookmarkTree]: BookmarkTree;
+  [BT.historyList]: HistoryList;
 } & { [P in CtrlbBufferType]: BaseBuffer };
 
 export class Buffers {
@@ -21,11 +22,11 @@ export class Buffers {
 
   constructor(protected readonly vim: Neovim) {
     this.buffers = {
-      [CtrlbBufferType.ctrl]: Di.get("Ctrl", this.vim),
-      [CtrlbBufferType.currentTab]: Di.get("CurrentTab", this.vim),
-      [CtrlbBufferType.empty]: Di.get("Empty", this.vim),
-      [CtrlbBufferType.bookmarkTree]: Di.get("BookmarkTree", this.vim),
-      [CtrlbBufferType.historyList]: Di.get("HistoryList", this.vim),
+      [BT.ctrl]: Di.get("Ctrl", this.vim, false),
+      [BT.currentTab]: Di.get("CurrentTab", this.vim, false),
+      [BT.empty]: Di.get("Empty", this.vim, false),
+      [BT.bookmarkTree]: Di.get("BookmarkTree", this.vim, false),
+      [BT.historyList]: Di.get("HistoryList", this.vim, false),
     };
   }
 
@@ -38,18 +39,10 @@ export class Buffers {
       const buf = this.get(bufferType as CtrlbBufferType);
       await buf.unload();
     });
-    Di.clear("Ctrl");
-    Di.clear("CurrentTab");
-    Di.clear("Empty");
-    Di.clear("BookmarkTree");
-    Di.clear("HistoryList");
-    this.buffers[CtrlbBufferType.ctrl] = Di.get("Ctrl", this.vim);
-    this.buffers[CtrlbBufferType.currentTab] = Di.get("CurrentTab", this.vim);
-    this.buffers[CtrlbBufferType.empty] = Di.get("Empty", this.vim);
-    this.buffers[CtrlbBufferType.bookmarkTree] = Di.get(
-      "BookmarkTree",
-      this.vim
-    );
-    this.buffers[CtrlbBufferType.historyList] = Di.get("HistoryList", this.vim);
+    this.buffers[BT.ctrl] = Di.get("Ctrl", this.vim, false);
+    this.buffers[BT.currentTab] = Di.get("CurrentTab", this.vim, false);
+    this.buffers[BT.empty] = Di.get("Empty", this.vim, false);
+    this.buffers[BT.bookmarkTree] = Di.get("BookmarkTree", this.vim, false);
+    this.buffers[BT.historyList] = Di.get("HistoryList", this.vim, false);
   }
 }
