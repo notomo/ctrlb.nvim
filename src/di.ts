@@ -13,13 +13,14 @@ import { Action } from "./complete/source/action";
 import { ActionArgKey } from "./complete/source/actionArgKey";
 import { ApiInfoRepository } from "./repository/apiInfo";
 import { BookmarkRepository } from "./repository/bookmark";
-import { TabRepository } from "./repository/tab";
+import { TabRepository, Tab } from "./repository/tab";
 import { EventRepository } from "./repository/event";
 import { HistoryRepository, History } from "./repository/history";
 import { Execute } from "./complete/execute";
 import { Open } from "./complete/open";
 import { BufferContainer } from "./buffers/container";
 import { ListBuffer } from "./buffers/list";
+import { ItemBuffer } from "./buffers/item";
 import { Ctrl } from "./buffers/ctrl";
 import { BookmarkTree } from "./buffers/bookmarkTree";
 import { CurrentTab } from "./buffers/currentTab";
@@ -100,9 +101,12 @@ export class Di {
     CurrentTab: (vim: Neovim) => {
       const eventRepository = Di.get("EventRepository", vim);
       const tabRepository = Di.get("TabRepository", vim);
+      const bufferContainer = new BufferContainer(vim, CurrentTab.type);
+      const itemBuffer = new ItemBuffer<Tab>(vim, bufferContainer);
       return new CurrentTab(
         vim,
-        new BufferContainer(vim, CurrentTab.type),
+        bufferContainer,
+        itemBuffer,
         eventRepository,
         tabRepository
       );

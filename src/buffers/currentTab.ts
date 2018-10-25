@@ -3,7 +3,20 @@ import { Neovim, Buffer } from "neovim";
 import { CtrlbBufferType } from "./type";
 import { TabRepository, Tab } from "../repository/tab";
 import { BufferContainer } from "./container";
+import { ItemBuffer } from "./item";
 import { EventRepository } from "../repository/event";
+
+class CurrentTabItem {
+  constructor(protected readonly tab: Tab) {}
+
+  public toStrings(): string[] {
+    return [this.tab.title, this.tab.url];
+  }
+
+  public toValue(): Tab {
+    return this.tab;
+  }
+}
 
 export class CurrentTab extends BaseBuffer {
   public static readonly type = CtrlbBufferType.currentTab;
@@ -11,6 +24,7 @@ export class CurrentTab extends BaseBuffer {
   constructor(
     protected readonly vim: Neovim,
     protected readonly bufferContainer: BufferContainer,
+    protected readonly itemBuffer: ItemBuffer<Tab>,
     protected readonly eventRepository: EventRepository,
     protected readonly tabRepository: TabRepository
   ) {
@@ -33,23 +47,24 @@ export class CurrentTab extends BaseBuffer {
       "windowRemoved"
     );
 
-    const p = this.tabRepository.onChanged(data => this.update(buffer));
+    const p = this.tabRepository.onChanged(data => this.update());
     this.receivers.push(p);
 
-    await this.update(buffer);
+    await this.update();
   }
 
   protected isTab(tab: any): tab is Tab {
     return typeof tab.title === "string" && typeof tab.url === "string";
   }
 
-  protected async update(buffer: Buffer) {
+  protected async update() {
     const tab = await this.tabRepository.getCurrent();
 
     if (!this.isTab(tab)) {
       return;
     }
 
-    await buffer.replace([tab.title, tab.url], 0);
+    const item = new CurrentTabItem(tab);
+    await this.itemBuffer.set(item);
   }
 }
