@@ -31,7 +31,7 @@ describe("BufferContainer", () => {
     }));
     const vim = new NeovimClass();
 
-    bufferContainer = new BufferContainer(vim);
+    bufferContainer = new BufferContainer(vim, "type");
   });
 
   it("isInitialized returns false if get is not called", () => {
@@ -40,12 +40,12 @@ describe("BufferContainer", () => {
   });
 
   it("get", async () => {
-    await bufferContainer.get("");
+    await bufferContainer.get();
 
     const result = bufferContainer.isInitialized();
     expect(result).toBe(true);
 
-    await bufferContainer.get("");
+    await bufferContainer.get();
   });
 
   it("get throws error if buffer is not found", async () => {
@@ -61,17 +61,16 @@ describe("BufferContainer", () => {
     }));
     const vim = new NeovimClass();
 
-    const bufferContainer = new BufferContainer(vim);
+    const bufferContainer = new BufferContainer(vim, "type");
 
-    expect(bufferContainer.get("")).rejects.toThrowError(/buffer not found: 1/);
+    expect(bufferContainer.get()).rejects.toThrowError(/buffer not found: 1/);
   });
 
   it("open", async () => {
-    const bufferPath = "bufferPath";
-    await bufferContainer.open(bufferPath);
-    await bufferContainer.verticalOpen(bufferPath);
-    await bufferContainer.horizontalOpen(bufferPath);
-    await bufferContainer.tabOpen(bufferPath);
+    await bufferContainer.open();
+    await bufferContainer.verticalOpen();
+    await bufferContainer.horizontalOpen();
+    await bufferContainer.tabOpen();
   });
 
   it("unload does nothing if buffer is not initialized", async () => {
@@ -81,7 +80,7 @@ describe("BufferContainer", () => {
   });
 
   it("unload", async () => {
-    await bufferContainer.get("");
+    await bufferContainer.get();
     await bufferContainer.unload();
 
     expect(command).toHaveBeenCalled();

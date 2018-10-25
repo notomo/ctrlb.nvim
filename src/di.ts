@@ -15,10 +15,11 @@ import { ApiInfoRepository } from "./repository/apiInfo";
 import { BookmarkRepository } from "./repository/bookmark";
 import { TabRepository } from "./repository/tab";
 import { EventRepository } from "./repository/event";
-import { HistoryRepository } from "./repository/history";
+import { HistoryRepository, History } from "./repository/history";
 import { Execute } from "./complete/execute";
 import { Open } from "./complete/open";
 import { BufferContainer } from "./buffers/container";
+import { ListBuffer } from "./buffers/list";
 import { Ctrl } from "./buffers/ctrl";
 import { BookmarkTree } from "./buffers/bookmarkTree";
 import { CurrentTab } from "./buffers/currentTab";
@@ -80,14 +81,18 @@ export class Di {
     },
     Ctrl: (vim: Neovim) => {
       const eventRepository = Di.get("EventRepository", vim);
-      return new Ctrl(vim, new BufferContainer(vim), eventRepository);
+      return new Ctrl(
+        vim,
+        new BufferContainer(vim, Ctrl.type),
+        eventRepository
+      );
     },
     BookmarkTree: (vim: Neovim) => {
       const eventRepository = Di.get("EventRepository", vim);
       const bookmarkRepository = Di.get("BookmarkRepository", vim);
       return new BookmarkTree(
         vim,
-        new BufferContainer(vim),
+        new BufferContainer(vim, BookmarkTree.type),
         eventRepository,
         bookmarkRepository
       );
@@ -97,22 +102,29 @@ export class Di {
       const tabRepository = Di.get("TabRepository", vim);
       return new CurrentTab(
         vim,
-        new BufferContainer(vim),
+        new BufferContainer(vim, CurrentTab.type),
         eventRepository,
         tabRepository
       );
     },
     Empty: (vim: Neovim) => {
       const eventRepository = Di.get("EventRepository", vim);
-      return new Empty(vim, new BufferContainer(vim), eventRepository);
+      return new Empty(
+        vim,
+        new BufferContainer(vim, Empty.type),
+        eventRepository
+      );
     },
     HistoryList: (vim: Neovim) => {
       const eventRepository = Di.get("EventRepository", vim);
       const historyRepository = Di.get("HistoryRepository", vim);
       const tabRepository = Di.get("TabRepository", vim);
+      const bufferContainer = new BufferContainer(vim, HistoryList.type);
+      const listBuffer = new ListBuffer<History>(vim, bufferContainer);
       return new HistoryList(
         vim,
-        new BufferContainer(vim),
+        bufferContainer,
+        listBuffer,
         eventRepository,
         historyRepository,
         tabRepository

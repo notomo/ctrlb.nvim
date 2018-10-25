@@ -6,7 +6,7 @@ import { BufferContainer } from "./container";
 import { EventRepository } from "../repository/event";
 
 export class CurrentTab extends BaseBuffer {
-  public readonly type = CtrlbBufferType.currentTab;
+  public static readonly type = CtrlbBufferType.currentTab;
 
   constructor(
     protected readonly vim: Neovim,

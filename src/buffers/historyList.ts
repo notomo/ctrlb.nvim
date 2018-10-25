@@ -2,18 +2,30 @@ import { BaseBuffer } from "./base";
 import { Neovim, Buffer } from "neovim";
 import { CtrlbBufferType } from "./type";
 import { BufferContainer } from "./container";
+import { ListBuffer } from "./list";
 import { HistoryRepository, History } from "../repository/history";
 import { TabRepository } from "../repository/tab";
 import { EventRepository } from "../repository/event";
 
-export class HistoryList extends BaseBuffer {
-  public readonly type = CtrlbBufferType.historyList;
+class HistoryListItem {
+  constructor(protected readonly history: History) {}
 
-  protected histories: History[] = [];
+  public toString(): string {
+    return this.history.title + "\t" + this.history.url;
+  }
+
+  public toValue(): History {
+    return this.history;
+  }
+}
+
+export class HistoryList extends BaseBuffer {
+  public static readonly type = CtrlbBufferType.historyList;
 
   constructor(
     protected readonly vim: Neovim,
     protected readonly bufferContainer: BufferContainer,
+    protected readonly listBuffer: ListBuffer<History>,
     protected readonly eventRepository: EventRepository,
     protected readonly historyRepository: HistoryRepository,
     protected readonly tabRepository: TabRepository
@@ -22,8 +34,8 @@ export class HistoryList extends BaseBuffer {
   }
 
   protected async setup(buffer: Buffer): Promise<void> {
-    this.actions["tabOpen"] = (buffer: Buffer) => this.tabOpenHistory(buffer);
-    this.actions["open"] = (buffer: Buffer) => this.openHistory(buffer);
+    this.actions["tabOpen"] = (buffer: Buffer) => this.tabOpenHistory();
+    this.actions["open"] = (buffer: Buffer) => this.openHistory();
 
     await buffer.setOption("buftype", "nofile");
     await buffer.setOption("swapfile", false);
@@ -39,40 +51,22 @@ export class HistoryList extends BaseBuffer {
 
     this.subscribe("historyCreated");
 
-    const p = this.historyRepository.onCreated(history =>
-      this.update(history, buffer)
-    );
+    const p = this.historyRepository.onCreated(history => this.update(history));
     this.receivers.push(p);
 
-    await this.create(buffer);
-  }
-
-  protected async create(buffer: Buffer) {
-    const histories = await this.historyRepository.search();
-
-    const lines = histories.map(history => {
-      return history.title + "\t" + history.url;
+    const items = (await this.historyRepository.search()).map(history => {
+      return new HistoryListItem(history);
     });
-    await buffer.replace(lines, 0);
-
-    this.histories = histories;
+    await this.listBuffer.set(items);
   }
 
-  protected async getCurrent(): Promise<History | null> {
-    const index = (await this.vim.call("line", ".")) - 1;
-    if (index in this.histories) {
-      return this.histories[index];
-    }
-    return null;
+  protected async update(history: History) {
+    const item = new HistoryListItem(history);
+    await this.listBuffer.prepend(item);
   }
 
-  protected async update(history: History, buffer: Buffer) {
-    await buffer.insert(history.title + "\t" + history.url, 0);
-    this.histories.unshift(history);
-  }
-
-  public async openHistory(buffer: Buffer) {
-    const history = await this.getCurrent();
+  public async openHistory() {
+    const history = await this.listBuffer.getCurrent();
     if (history === null || history.url === undefined) {
       return;
     }
@@ -80,8 +74,8 @@ export class HistoryList extends BaseBuffer {
     await this.tabRepository.open(history.url);
   }
 
-  public async tabOpenHistory(buffer: Buffer) {
-    const history = await this.getCurrent();
+  public async tabOpenHistory() {
+    const history = await this.listBuffer.getCurrent();
     if (history === null || history.url === undefined) {
       return;
     }

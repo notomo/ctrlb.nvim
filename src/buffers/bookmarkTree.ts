@@ -6,7 +6,7 @@ import { BookmarkRepository, Bookmark } from "../repository/bookmark";
 import { EventRepository } from "../repository/event";
 
 export class BookmarkTree extends BaseBuffer {
-  public readonly type = CtrlbBufferType.bookmarkTree;
+  public static readonly type = CtrlbBufferType.bookmarkTree;
   protected bookmarks: Bookmark[] = [];
   protected directoryId: string | null = null;
 
