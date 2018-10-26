@@ -86,4 +86,9 @@ export abstract class BaseBuffer {
       this.subscribedEvents.push(eventName);
     }
   }
+
+  protected async debug(stringSource: {} | null) {
+    const message = JSON.stringify(stringSource).replace(/'/g, "''");
+    await this.vim.command(`echomsg '${message}'`);
+  }
 }

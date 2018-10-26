@@ -46,7 +46,8 @@ export class BookmarkTree extends BaseBuffer {
     this.actions["open"] = () => this.openBookmark();
     this.actions["tabOpen"] = () => this.tabOpenBookmark();
     this.actions["openParent"] = () => this.openParent();
-    this.actions["debug"] = () => this.debug();
+    this.actions["debug"] = async () =>
+      this.debug(await this.treeBuffer.getCurrent());
 
     await buffer.setOption("buftype", "nofile");
     await buffer.setOption("swapfile", false);
@@ -67,11 +68,6 @@ export class BookmarkTree extends BaseBuffer {
     );
 
     await this.openBookmark();
-  }
-
-  public async debug() {
-    const message = JSON.stringify(await this.treeBuffer.getCurrent());
-    await this.vim.command(`echomsg '${message}'`);
   }
 
   public async openParent() {

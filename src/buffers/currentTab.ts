@@ -32,6 +32,9 @@ export class CurrentTab extends BaseBuffer {
   }
 
   protected async setup(buffer: Buffer): Promise<void> {
+    this.actions["debug"] = async () =>
+      this.debug(await this.itemBuffer.getCurrent());
+
     await buffer.setOption("buftype", "nofile");
     await buffer.setOption("swapfile", false);
     await buffer.setOption("buflisted", true);

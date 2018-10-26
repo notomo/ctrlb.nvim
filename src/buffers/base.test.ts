@@ -119,7 +119,7 @@ class Example extends BaseBuffer {
     eventRepository: EventRepository
   ) {
     super(vim, bufferContainer, eventRepository);
-    this.actions["actionName"] = async (buffer: Buffer) => {};
+    this.actions["actionName"] = async () => {};
   }
 
   protected async setup(buffer: Buffer): Promise<void> {
