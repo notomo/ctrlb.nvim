@@ -12,7 +12,7 @@ import { ActionGroup } from "./complete/source/actionGroup";
 import { Action } from "./complete/source/action";
 import { ActionArgKey } from "./complete/source/actionArgKey";
 import { ApiInfoRepository } from "./repository/apiInfo";
-import { BookmarkRepository } from "./repository/bookmark";
+import { BookmarkRepository, Bookmark } from "./repository/bookmark";
 import { TabRepository, Tab } from "./repository/tab";
 import { EventRepository } from "./repository/event";
 import { HistoryRepository, History } from "./repository/history";
@@ -21,6 +21,7 @@ import { Open } from "./complete/open";
 import { BufferContainer } from "./buffers/container";
 import { ListBuffer } from "./buffers/list";
 import { ItemBuffer } from "./buffers/item";
+import { TreeBuffer } from "./buffers/tree";
 import { Ctrl } from "./buffers/ctrl";
 import { BookmarkTree } from "./buffers/bookmarkTree";
 import { CurrentTab } from "./buffers/currentTab";
@@ -91,9 +92,12 @@ export class Di {
     BookmarkTree: (vim: Neovim) => {
       const eventRepository = Di.get("EventRepository", vim);
       const bookmarkRepository = Di.get("BookmarkRepository", vim);
+      const bufferContainer = new BufferContainer(vim, BookmarkTree.type);
+      const treeBuffer = new TreeBuffer<Bookmark>(vim, bufferContainer);
       return new BookmarkTree(
         vim,
-        new BufferContainer(vim, BookmarkTree.type),
+        bufferContainer,
+        treeBuffer,
         eventRepository,
         bookmarkRepository
       );
