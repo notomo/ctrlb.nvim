@@ -43,10 +43,10 @@ export class BookmarkTree extends BaseBuffer {
   }
 
   protected async setup(buffer: Buffer): Promise<void> {
-    this.actions["open"] = (buffer: Buffer) => this.openBookmark();
-    this.actions["tabOpen"] = (buffer: Buffer) => this.tabOpenBookmark();
-    this.actions["openParent"] = (buffer: Buffer) => this.openParent();
-    this.actions["debug"] = (buffer: Buffer) => this.debug();
+    this.actions["open"] = () => this.openBookmark();
+    this.actions["tabOpen"] = () => this.tabOpenBookmark();
+    this.actions["openParent"] = () => this.openParent();
+    this.actions["debug"] = () => this.debug();
 
     await buffer.setOption("buftype", "nofile");
     await buffer.setOption("swapfile", false);

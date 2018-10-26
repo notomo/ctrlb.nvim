@@ -34,8 +34,8 @@ export class HistoryList extends BaseBuffer {
   }
 
   protected async setup(buffer: Buffer): Promise<void> {
-    this.actions["tabOpen"] = (buffer: Buffer) => this.tabOpenHistory();
-    this.actions["open"] = (buffer: Buffer) => this.openHistory();
+    this.actions["tabOpen"] = () => this.tabOpenHistory();
+    this.actions["open"] = () => this.openHistory();
 
     await buffer.setOption("buftype", "nofile");
     await buffer.setOption("swapfile", false);

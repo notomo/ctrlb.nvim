@@ -6,7 +6,7 @@ import { BufferContainer } from "./container";
 import { CtrlbBufferType } from "./type";
 import { EventRepository } from "../repository/event";
 
-export type Actions = { [index: string]: { (buffer: Buffer): Promise<void> } };
+export type Actions = { [index: string]: { (): Promise<void> } };
 
 export abstract class BaseBuffer {
   public static readonly type: CtrlbBufferType = CtrlbBufferType.empty;
@@ -77,8 +77,7 @@ export abstract class BaseBuffer {
       throw new Error("Invalid actionName: " + actionName);
     }
     const action = this.actions[actionName];
-    const buffer = await this.bufferContainer.get();
-    await action(buffer);
+    await action();
   }
 
   protected subscribe(...eventNames: string[]) {
