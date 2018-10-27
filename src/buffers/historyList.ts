@@ -31,14 +31,13 @@ export class HistoryList extends BaseBuffer {
     protected readonly tabRepository: TabRepository
   ) {
     super(vim, bufferContainer, eventRepository);
-  }
-
-  protected async setup(buffer: Buffer): Promise<void> {
     this.actions["tabOpen"] = () => this.tabOpenHistory();
     this.actions["open"] = () => this.openHistory();
     this.actions["debug"] = async () =>
       this.debug(await this.listBuffer.getCurrent());
+  }
 
+  protected async setup(buffer: Buffer): Promise<void> {
     await buffer.setOption("buftype", "nofile");
     await buffer.setOption("swapfile", false);
     await buffer.setOption("buflisted", true);

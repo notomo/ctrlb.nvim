@@ -40,15 +40,14 @@ export class BookmarkTree extends BaseBuffer {
     protected readonly bookmarkRepository: BookmarkRepository
   ) {
     super(vim, bufferContainer, eventRepository);
-  }
-
-  protected async setup(buffer: Buffer): Promise<void> {
     this.actions["open"] = () => this.openBookmark();
     this.actions["tabOpen"] = () => this.tabOpenBookmark();
     this.actions["openParent"] = () => this.openParent();
     this.actions["debug"] = async () =>
       this.debug(await this.treeBuffer.getCurrent());
+  }
 
+  protected async setup(buffer: Buffer): Promise<void> {
     await buffer.setOption("buftype", "nofile");
     await buffer.setOption("swapfile", false);
     await buffer.setOption("modifiable", true);
