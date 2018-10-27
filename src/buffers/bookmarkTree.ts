@@ -2,29 +2,52 @@ import { BaseBuffer } from "./base";
 import { Neovim, Buffer } from "neovim";
 import { CtrlbBufferType } from "./type";
 import { BufferContainer } from "./container";
+import { TreeBuffer } from "./tree";
 import { BookmarkRepository, Bookmark } from "../repository/bookmark";
 import { EventRepository } from "../repository/event";
 
+export class BookmarkTreeItem {
+  constructor(protected readonly bookmark: Bookmark) {}
+
+  public toString(): string {
+    if (this.bookmark.url !== undefined) {
+      return this.bookmark.title + "\t" + this.bookmark.url;
+    }
+    return this.bookmark.title + "/";
+  }
+
+  public get value(): Bookmark {
+    return this.bookmark;
+  }
+
+  public get id(): string {
+    return this.bookmark.id;
+  }
+
+  public get isParent(): boolean {
+    return this.bookmark.isParent || false;
+  }
+}
+
 export class BookmarkTree extends BaseBuffer {
-  public readonly type = CtrlbBufferType.bookmarkTree;
-  protected bookmarks: Bookmark[] = [];
-  protected directoryId: string | null = null;
+  public static readonly type = CtrlbBufferType.bookmarkTree;
 
   constructor(
     protected readonly vim: Neovim,
     protected readonly bufferContainer: BufferContainer,
+    protected readonly treeBuffer: TreeBuffer<Bookmark>,
     protected readonly eventRepository: EventRepository,
     protected readonly bookmarkRepository: BookmarkRepository
   ) {
     super(vim, bufferContainer, eventRepository);
+    this.actions["open"] = () => this.openBookmark();
+    this.actions["tabOpen"] = () => this.tabOpenBookmark();
+    this.actions["openParent"] = () => this.openParent();
+    this.actions["debug"] = async () =>
+      this.debug(await this.treeBuffer.getCurrent());
   }
 
   protected async setup(buffer: Buffer): Promise<void> {
-    this.actions["open"] = (buffer: Buffer) => this.openBookmark(buffer);
-    this.actions["tabOpen"] = (buffer: Buffer) => this.tabOpenBookmark(buffer);
-    this.actions["openParent"] = (buffer: Buffer) => this.openParent(buffer);
-    this.actions["debug"] = (buffer: Buffer) => this.debug(buffer);
-
     await buffer.setOption("buftype", "nofile");
     await buffer.setOption("swapfile", false);
     await buffer.setOption("modifiable", true);
@@ -43,36 +66,21 @@ export class BookmarkTree extends BaseBuffer {
       "syntax match CtrlbBookmarkTreeUrl /[[:tab:]]\\zs.*$/"
     );
 
-    await this.openBookmark(buffer);
+    await this.openBookmark();
   }
 
-  protected async getCurrent(): Promise<Bookmark | null> {
-    const index = (await this.vim.call("line", ".")) - 1;
-    if (index in this.bookmarks) {
-      return this.bookmarks[index];
-    }
-    return null;
-  }
+  public async openParent() {
+    const bookmark = await this.treeBuffer.getParent();
 
-  public async debug(buffer: Buffer) {
-    const message = JSON.stringify(await this.getCurrent());
-    await this.vim.command(`echomsg '${message}'`);
-  }
-
-  public async openParent(buffer: Buffer) {
-    const bookmark = this.bookmarks.find(bookmark => {
-      return bookmark.isParent || false;
-    });
-
-    if (bookmark === undefined) {
+    if (bookmark === null) {
       return;
     }
 
-    await this.openTree(buffer, bookmark.id);
+    await this.openTree(bookmark.id);
   }
 
-  public async openBookmark(buffer: Buffer) {
-    const bookmark = await this.getCurrent();
+  public async openBookmark() {
+    const bookmark = await this.treeBuffer.getCurrent();
     let id = null;
     let url = undefined;
     if (bookmark !== null) {
@@ -84,11 +92,11 @@ export class BookmarkTree extends BaseBuffer {
       return;
     }
 
-    await this.openTree(buffer, id);
+    await this.openTree(id);
   }
 
-  public async tabOpenBookmark(buffer: Buffer) {
-    const bookmark = await this.getCurrent();
+  public async tabOpenBookmark() {
+    const bookmark = await this.treeBuffer.getCurrent();
     if (bookmark === null || bookmark.url === undefined) {
       return;
     }
@@ -96,28 +104,10 @@ export class BookmarkTree extends BaseBuffer {
     await this.bookmarkRepository.tabOpen(bookmark.id);
   }
 
-  protected async openTree(buffer: Buffer, id: string | null) {
-    const bookmarks = await this.bookmarkRepository.getTree(id);
-
-    let i = 0;
-    await buffer.remove(0, this.bookmarks.length, false);
-    for (const bookmark of bookmarks) {
-      if (bookmark.url !== undefined) {
-        await buffer.replace(bookmark.title + "\t" + bookmark.url, i);
-      } else {
-        await buffer.replace(bookmark.title + "/", i);
-      }
-      i++;
-    }
-
-    const lastBookmarkIndex = bookmarks.findIndex(bookmark => {
-      return this.directoryId === bookmark.id;
+  protected async openTree(id: string | null) {
+    const items = (await this.bookmarkRepository.getTree(id)).map(bookmark => {
+      return new BookmarkTreeItem(bookmark);
     });
-    if (lastBookmarkIndex !== -1) {
-      this.vim.window.cursor = [lastBookmarkIndex + 1, 0];
-    }
-
-    this.directoryId = id;
-    this.bookmarks = bookmarks;
+    await this.treeBuffer.set(items, id);
   }
 }

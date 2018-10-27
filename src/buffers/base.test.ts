@@ -17,9 +17,9 @@ describe("BaseBuffer", () => {
   let tabOpen: jest.Mock;
   let unload: jest.Mock;
   let command: jest.Mock;
-  let setOption: jest.Mock;
   let subscribe: jest.Mock;
   let unsubscribe: jest.Mock;
+  let setFileType: jest.Mock;
 
   beforeEach(() => {
     command = jest.fn();
@@ -36,10 +36,7 @@ describe("BaseBuffer", () => {
     }));
     const eventRepository = new EventRepositoryClass();
 
-    setOption = jest.fn();
-    const BufferClass = jest.fn<Buffer>(() => ({
-      setOption: setOption,
-    }));
+    const BufferClass = jest.fn<Buffer>(() => ({}));
     const vimBuffer = new BufferClass();
 
     isInitialized = jest
@@ -52,6 +49,7 @@ describe("BaseBuffer", () => {
     horizontalOpen = jest.fn().mockReturnValue(vimBuffer);
     tabOpen = jest.fn().mockReturnValue(vimBuffer);
     unload = jest.fn().mockReturnValue(vimBuffer);
+    setFileType = jest.fn();
     const BufferContainerClass = jest.fn<BufferContainer>(() => ({
       isInitialized: isInitialized,
       open: open,
@@ -60,6 +58,7 @@ describe("BaseBuffer", () => {
       horizontalOpen: horizontalOpen,
       tabOpen: tabOpen,
       unload: unload,
+      setFileType: setFileType,
     }));
     const bufferContainer = new BufferContainerClass(vim);
 
@@ -70,7 +69,6 @@ describe("BaseBuffer", () => {
   it("open", async () => {
     await buffer.open(Direction.NOTHING);
     await buffer.open(Direction.NOTHING);
-    expect(setOption).toHaveBeenCalledTimes(1);
     expect(open).toHaveBeenCalledTimes(2);
   });
 
@@ -121,7 +119,7 @@ class Example extends BaseBuffer {
     eventRepository: EventRepository
   ) {
     super(vim, bufferContainer, eventRepository);
-    this.actions["actionName"] = async (buffer: Buffer) => {};
+    this.actions["actionName"] = async () => {};
   }
 
   protected async setup(buffer: Buffer): Promise<void> {

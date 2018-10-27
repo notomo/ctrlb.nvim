@@ -6,10 +6,10 @@ import { BufferContainer } from "./container";
 import { CtrlbBufferType } from "./type";
 import { EventRepository } from "../repository/event";
 
-export type Actions = { [index: string]: { (buffer: Buffer): Promise<void> } };
+export type Actions = { [index: string]: { (): Promise<void> } };
 
 export abstract class BaseBuffer {
-  abstract readonly type: CtrlbBufferType;
+  public static readonly type: CtrlbBufferType = CtrlbBufferType.empty;
   protected readonly logger: Logger;
   protected readonly actions: Actions = {};
   protected readonly receivers: ChildProcess[] = [];
@@ -33,9 +33,7 @@ export abstract class BaseBuffer {
     await this.vim.command("silent doautocmd BufWinEnter");
 
     if (!isInitialized) {
-      const fileType = this.fileType;
-      await buffer.setOption("filetype", fileType);
-      await this.vim.command("silent doautocmd FileType " + fileType);
+      await this.bufferContainer.setFileType();
       await this.setup(buffer);
     }
   }
@@ -61,13 +59,13 @@ export abstract class BaseBuffer {
   protected async _open(direction: Direction): Promise<Buffer> {
     switch (direction) {
       case Direction.VERTICAL:
-        return await this.bufferContainer.horizontalOpen(this.bufferPath);
+        return await this.bufferContainer.horizontalOpen();
       case Direction.HORIZONTAL:
-        return await this.bufferContainer.verticalOpen(this.bufferPath);
+        return await this.bufferContainer.verticalOpen();
       case Direction.NOTHING:
-        return await this.bufferContainer.open(this.bufferPath);
+        return await this.bufferContainer.open();
       case Direction.TAB:
-        return await this.bufferContainer.tabOpen(this.bufferPath);
+        return await this.bufferContainer.tabOpen();
     }
   }
 
@@ -79,16 +77,7 @@ export abstract class BaseBuffer {
       throw new Error("Invalid actionName: " + actionName);
     }
     const action = this.actions[actionName];
-    const buffer = await this.bufferContainer.get(this.bufferPath);
-    await action(buffer);
-  }
-
-  protected get fileType(): string {
-    return "ctrlb-" + this.type;
-  }
-
-  protected get bufferPath(): string {
-    return "ctrlb://" + this.fileType;
+    await action();
   }
 
   protected subscribe(...eventNames: string[]) {
@@ -96,5 +85,10 @@ export abstract class BaseBuffer {
       this.eventRepository.subscribe(eventName);
       this.subscribedEvents.push(eventName);
     }
+  }
+
+  protected async debug(stringSource: {} | null) {
+    const message = JSON.stringify(stringSource).replace(/'/g, "''");
+    await this.vim.command(`echomsg '${message}'`);
   }
 }

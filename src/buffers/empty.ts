@@ -3,7 +3,7 @@ import { Buffer } from "neovim";
 import { CtrlbBufferType } from "./type";
 
 export class Empty extends BaseBuffer {
-  public readonly type = CtrlbBufferType.empty;
+  public static readonly type = CtrlbBufferType.empty;
 
   protected async setup(buffer: Buffer): Promise<void> {
     await buffer.setOption("buftype", "nofile");
