@@ -3,7 +3,7 @@ import { BufferContainer } from "./container";
 
 interface Item<Model> {
   toStrings(): string[];
-  toValue(): Model;
+  value: Model;
 }
 
 export class ItemBuffer<Model> {
@@ -18,7 +18,7 @@ export class ItemBuffer<Model> {
 
   public async getCurrent(): Promise<Model | null> {
     if (this.item !== null) {
-      return this.item.toValue();
+      return this.item.value;
     }
     return null;
   }

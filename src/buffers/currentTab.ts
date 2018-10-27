@@ -13,7 +13,7 @@ class CurrentTabItem {
     return [this.tab.title, this.tab.url];
   }
 
-  public toValue(): Tab {
+  public get value(): Tab {
     return this.tab;
   }
 }

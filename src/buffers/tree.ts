@@ -3,7 +3,7 @@ import { BufferContainer } from "./container";
 
 interface Item<Model> {
   toString(): string;
-  toValue(): Model;
+  value: Model;
   id: string;
   isParent: boolean;
 }
@@ -21,7 +21,7 @@ export class TreeBuffer<Model> {
   public async getCurrent(): Promise<Model | null> {
     const index = (await this.vim.call("line", ".")) - 1;
     if (index in this.items) {
-      return this.items[index].toValue();
+      return this.items[index].value;
     }
     return null;
   }
@@ -35,7 +35,7 @@ export class TreeBuffer<Model> {
       return null;
     }
 
-    return parentItem.toValue();
+    return parentItem.value;
   }
 
   public async set(items: Item<Model>[], nodeId: string | null) {

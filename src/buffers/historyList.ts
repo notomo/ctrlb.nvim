@@ -14,7 +14,7 @@ class HistoryListItem {
     return this.history.title + "\t" + this.history.url;
   }
 
-  public toValue(): History {
+  public get value(): History {
     return this.history;
   }
 }

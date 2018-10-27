@@ -3,7 +3,7 @@ import { BufferContainer } from "./container";
 
 interface Item<Model> {
   toString(): string;
-  toValue(): Model;
+  value: Model;
 }
 
 export class ListBuffer<Model> {
@@ -17,7 +17,7 @@ export class ListBuffer<Model> {
   public async getCurrent(): Promise<Model | null> {
     const index = (await this.vim.call("line", ".")) - 1;
     if (index in this.items) {
-      return this.items[index].toValue();
+      return this.items[index].value;
     }
     return null;
   }

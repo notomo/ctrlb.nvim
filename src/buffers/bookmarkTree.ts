@@ -16,15 +16,15 @@ export class BookmarkTreeItem {
     return this.bookmark.title + "/";
   }
 
-  public toValue(): Bookmark {
+  public get value(): Bookmark {
     return this.bookmark;
   }
 
-  get id(): string {
+  public get id(): string {
     return this.bookmark.id;
   }
 
-  get isParent(): boolean {
+  public get isParent(): boolean {
     return this.bookmark.isParent || false;
   }
 }
