@@ -3,7 +3,7 @@ import { ChildProcess } from "child_process";
 
 export type History = {
   title: string;
-  url: string;
+  url?: string;
 };
 
 export class HistoryRepository {

@@ -7,7 +7,7 @@ import { HistoryRepository, History } from "../repository/history";
 import { TabRepository } from "../repository/tab";
 import { EventRepository } from "../repository/event";
 
-class HistoryListItem {
+export class HistoryListItem {
   constructor(protected readonly history: History) {}
 
   public toString(): string {
