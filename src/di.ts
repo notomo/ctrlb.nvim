@@ -16,6 +16,7 @@ import { BookmarkRepository, Bookmark } from "./repository/bookmark";
 import { TabRepository, Tab } from "./repository/tab";
 import { EventRepository } from "./repository/event";
 import { HistoryRepository, History } from "./repository/history";
+import { BufferRepository } from "./repository/buffer";
 import { Execute } from "./complete/execute";
 import { Open } from "./complete/open";
 import { BufferContainer } from "./buffers/container";
@@ -71,6 +72,9 @@ export class Di {
       const requester = Di.get("Requester", vim);
       return new EventRepository(requester);
     },
+    BufferRepository: (vim: Neovim) => {
+      return new BufferRepository(vim);
+    },
     Open: (vim: Neovim) => {
       const bufferType = new BufferType();
       return new Open(bufferType);
@@ -84,16 +88,22 @@ export class Di {
     },
     Ctrl: (vim: Neovim) => {
       const eventRegisterer = Di.get("EventRegisterer", vim, false);
+      const bufferRepository = Di.get("BufferRepository", vim);
       return new Ctrl(
         vim,
-        new BufferContainer(vim, Ctrl.type),
+        new BufferContainer(vim, bufferRepository, Ctrl.type),
         eventRegisterer
       );
     },
     BookmarkTree: (vim: Neovim) => {
       const eventRegisterer = Di.get("EventRegisterer", vim, false);
       const bookmarkRepository = Di.get("BookmarkRepository", vim);
-      const bufferContainer = new BufferContainer(vim, BookmarkTree.type);
+      const bufferRepository = Di.get("BufferRepository", vim);
+      const bufferContainer = new BufferContainer(
+        vim,
+        bufferRepository,
+        BookmarkTree.type
+      );
       const treeBuffer = new TreeBuffer<Bookmark>(vim, bufferContainer);
       return new BookmarkTree(
         vim,
@@ -106,7 +116,12 @@ export class Di {
     CurrentTab: (vim: Neovim) => {
       const eventRegisterer = Di.get("EventRegisterer", vim, false);
       const tabRepository = Di.get("TabRepository", vim);
-      const bufferContainer = new BufferContainer(vim, CurrentTab.type);
+      const bufferRepository = Di.get("BufferRepository", vim);
+      const bufferContainer = new BufferContainer(
+        vim,
+        bufferRepository,
+        CurrentTab.type
+      );
       const itemBuffer = new ItemBuffer<Tab>(vim, bufferContainer);
       return new CurrentTab(
         vim,
@@ -118,17 +133,23 @@ export class Di {
     },
     Empty: (vim: Neovim) => {
       const eventRegisterer = Di.get("EventRegisterer", vim, false);
+      const bufferRepository = Di.get("BufferRepository", vim);
       return new Empty(
         vim,
-        new BufferContainer(vim, Empty.type),
+        new BufferContainer(vim, bufferRepository, Empty.type),
         eventRegisterer
       );
     },
     HistoryList: (vim: Neovim) => {
       const eventRegisterer = Di.get("EventRegisterer", vim, false);
+      const bufferRepository = Di.get("BufferRepository", vim);
       const historyRepository = Di.get("HistoryRepository", vim);
       const tabRepository = Di.get("TabRepository", vim);
-      const bufferContainer = new BufferContainer(vim, HistoryList.type);
+      const bufferContainer = new BufferContainer(
+        vim,
+        bufferRepository,
+        HistoryList.type
+      );
       const listBuffer = new ListBuffer<History>(vim, bufferContainer);
       return new HistoryList(
         vim,
@@ -157,6 +178,7 @@ export class Di {
     TabRepository: null,
     EventRepository: null,
     HistoryRepository: null,
+    BufferRepository: null,
     EventRegisterer: null,
     Ctrl: null,
     BookmarkTree: null,
@@ -187,6 +209,7 @@ export class Di {
     vim: Neovim,
     cacheable: false
   ): EventRegisterer;
+  public static get(cls: "BufferRepository", vim: Neovim): BufferRepository;
   public static get(cls: "HistoryRepository", vim: Neovim): HistoryRepository;
   public static get(cls: "EventRepository", vim: Neovim): EventRepository;
   public static get(cls: "TabRepository", vim: Neovim): TabRepository;
@@ -240,6 +263,7 @@ interface Deps {
   TabRepository: { (vim: Neovim): TabRepository };
   EventRepository: { (vim: Neovim): EventRepository };
   HistoryRepository: { (vim: Neovim): HistoryRepository };
+  BufferRepository: { (vim: Neovim): BufferRepository };
   EventRegisterer: { (vim: Neovim): EventRegisterer };
   Ctrl: { (vim: Neovim): Ctrl };
   BookmarkTree: { (vim: Neovim): BookmarkTree };

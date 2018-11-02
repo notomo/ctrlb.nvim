@@ -22,7 +22,7 @@ export abstract class BaseBuffer {
 
   public async open(direction: Direction): Promise<void> {
     const isInitialized = await this.bufferContainer.isInitialized();
-    const buffer = await this._open(direction);
+    const buffer = await this.bufferContainer.openByDirection(direction);
 
     await this.adjustBuffer(buffer);
 
@@ -38,19 +38,6 @@ export abstract class BaseBuffer {
   public async unload() {
     await this.eventRegisterer.unsubscribe();
     await this.bufferContainer.unload();
-  }
-
-  protected async _open(direction: Direction): Promise<Buffer> {
-    switch (direction) {
-      case Direction.VERTICAL:
-        return await this.bufferContainer.horizontalOpen();
-      case Direction.HORIZONTAL:
-        return await this.bufferContainer.verticalOpen();
-      case Direction.NOTHING:
-        return await this.bufferContainer.open();
-      case Direction.TAB:
-        return await this.bufferContainer.tabOpen();
-    }
   }
 
   protected async setup(buffer: Buffer): Promise<void> {}
