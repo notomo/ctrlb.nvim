@@ -27,6 +27,7 @@ import { BookmarkTree } from "./buffers/bookmarkTree";
 import { CurrentTab } from "./buffers/currentTab";
 import { Empty } from "./buffers/empty";
 import { HistoryList } from "./buffers/historyList";
+import { EventRegisterer } from "./buffers/event";
 
 export class Di {
   protected static readonly deps: Deps = {
@@ -82,15 +83,15 @@ export class Di {
       return new Execute(actionGroup, action, actionArgKey);
     },
     Ctrl: (vim: Neovim) => {
-      const eventRepository = Di.get("EventRepository", vim);
+      const eventRegisterer = Di.get("EventRegisterer", vim, false);
       return new Ctrl(
         vim,
         new BufferContainer(vim, Ctrl.type),
-        eventRepository
+        eventRegisterer
       );
     },
     BookmarkTree: (vim: Neovim) => {
-      const eventRepository = Di.get("EventRepository", vim);
+      const eventRegisterer = Di.get("EventRegisterer", vim, false);
       const bookmarkRepository = Di.get("BookmarkRepository", vim);
       const bufferContainer = new BufferContainer(vim, BookmarkTree.type);
       const treeBuffer = new TreeBuffer<Bookmark>(vim, bufferContainer);
@@ -98,12 +99,12 @@ export class Di {
         vim,
         bufferContainer,
         treeBuffer,
-        eventRepository,
+        eventRegisterer,
         bookmarkRepository
       );
     },
     CurrentTab: (vim: Neovim) => {
-      const eventRepository = Di.get("EventRepository", vim);
+      const eventRegisterer = Di.get("EventRegisterer", vim, false);
       const tabRepository = Di.get("TabRepository", vim);
       const bufferContainer = new BufferContainer(vim, CurrentTab.type);
       const itemBuffer = new ItemBuffer<Tab>(vim, bufferContainer);
@@ -111,20 +112,20 @@ export class Di {
         vim,
         bufferContainer,
         itemBuffer,
-        eventRepository,
+        eventRegisterer,
         tabRepository
       );
     },
     Empty: (vim: Neovim) => {
-      const eventRepository = Di.get("EventRepository", vim);
+      const eventRegisterer = Di.get("EventRegisterer", vim, false);
       return new Empty(
         vim,
         new BufferContainer(vim, Empty.type),
-        eventRepository
+        eventRegisterer
       );
     },
     HistoryList: (vim: Neovim) => {
-      const eventRepository = Di.get("EventRepository", vim);
+      const eventRegisterer = Di.get("EventRegisterer", vim, false);
       const historyRepository = Di.get("HistoryRepository", vim);
       const tabRepository = Di.get("TabRepository", vim);
       const bufferContainer = new BufferContainer(vim, HistoryList.type);
@@ -133,10 +134,14 @@ export class Di {
         vim,
         bufferContainer,
         listBuffer,
-        eventRepository,
+        eventRegisterer,
         historyRepository,
         tabRepository
       );
+    },
+    EventRegisterer: (vim: Neovim) => {
+      const eventRepository = Di.get("EventRepository", vim);
+      return new EventRegisterer(eventRepository);
     },
   };
 
@@ -152,6 +157,7 @@ export class Di {
     TabRepository: null,
     EventRepository: null,
     HistoryRepository: null,
+    EventRegisterer: null,
     Ctrl: null,
     BookmarkTree: null,
     CurrentTab: null,
@@ -176,6 +182,11 @@ export class Di {
     vim: Neovim,
     cacheable: false
   ): HistoryList;
+  public static get(
+    cls: "EventRegisterer",
+    vim: Neovim,
+    cacheable: false
+  ): EventRegisterer;
   public static get(cls: "HistoryRepository", vim: Neovim): HistoryRepository;
   public static get(cls: "EventRepository", vim: Neovim): EventRepository;
   public static get(cls: "TabRepository", vim: Neovim): TabRepository;
@@ -229,6 +240,7 @@ interface Deps {
   TabRepository: { (vim: Neovim): TabRepository };
   EventRepository: { (vim: Neovim): EventRepository };
   HistoryRepository: { (vim: Neovim): HistoryRepository };
+  EventRegisterer: { (vim: Neovim): EventRegisterer };
   Ctrl: { (vim: Neovim): Ctrl };
   BookmarkTree: { (vim: Neovim): BookmarkTree };
   CurrentTab: { (vim: Neovim): CurrentTab };

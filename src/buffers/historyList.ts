@@ -5,7 +5,7 @@ import { BufferContainer } from "./container";
 import { ListBuffer } from "./list";
 import { HistoryRepository, History } from "../repository/history";
 import { TabRepository } from "../repository/tab";
-import { EventRepository } from "../repository/event";
+import { EventRegisterer } from "./event";
 
 export class HistoryListItem {
   constructor(protected readonly history: History) {}
@@ -26,11 +26,11 @@ export class HistoryList extends BaseBuffer {
     protected readonly vim: Neovim,
     protected readonly bufferContainer: BufferContainer,
     protected readonly listBuffer: ListBuffer<History>,
-    protected readonly eventRepository: EventRepository,
+    protected readonly eventRegisterer: EventRegisterer,
     protected readonly historyRepository: HistoryRepository,
     protected readonly tabRepository: TabRepository
   ) {
-    super(vim, bufferContainer, eventRepository);
+    super(vim, bufferContainer, eventRegisterer);
     this.actions["tabOpen"] = () => this.tabOpenHistory();
     this.actions["open"] = () => this.openHistory();
     this.actions["debug"] = async () =>
@@ -50,10 +50,8 @@ export class HistoryList extends BaseBuffer {
       "syntax match CtrlbHistoryListUrl /[[:tab:]]\\zs.*$/"
     );
 
-    this.subscribe("historyCreated");
-
     const p = this.historyRepository.onCreated(history => this.update(history));
-    this.receivers.push(p);
+    this.eventRegisterer.subscribe(p, "historyCreated");
 
     const items = (await this.historyRepository.search()).map(history => {
       return new HistoryListItem(history);

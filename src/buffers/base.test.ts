@@ -1,14 +1,12 @@
 import { Neovim, Buffer } from "neovim";
-import { ChildProcess } from "child_process";
 import { BufferContainer } from "./container";
 import { BaseBuffer } from "./base";
 import { CtrlbBufferType } from "./type";
 import { Direction } from "../direction";
-import { EventRepository } from "../repository/event";
+import { EventRegisterer } from "./event";
 
 describe("BaseBuffer", () => {
   let buffer: Example;
-  let buffer2: Example2;
   let isInitialized: jest.Mock;
   let open: jest.Mock;
   let get: jest.Mock;
@@ -17,7 +15,6 @@ describe("BaseBuffer", () => {
   let tabOpen: jest.Mock;
   let unload: jest.Mock;
   let command: jest.Mock;
-  let subscribe: jest.Mock;
   let unsubscribe: jest.Mock;
   let setFileType: jest.Mock;
 
@@ -28,13 +25,11 @@ describe("BaseBuffer", () => {
     }));
     const vim = new NeovimClass();
 
-    subscribe = jest.fn();
     unsubscribe = jest.fn();
-    const EventRepositoryClass = jest.fn<EventRepository>(() => ({
-      subscribe: subscribe,
+    const EventRegistererClass = jest.fn<EventRegisterer>(() => ({
       unsubscribe: unsubscribe,
     }));
-    const eventRepository = new EventRepositoryClass();
+    const eventRegisterer = new EventRegistererClass();
 
     const BufferClass = jest.fn<Buffer>(() => ({}));
     const vimBuffer = new BufferClass();
@@ -62,8 +57,7 @@ describe("BaseBuffer", () => {
     }));
     const bufferContainer = new BufferContainerClass(vim);
 
-    buffer = new Example(vim, bufferContainer, eventRepository);
-    buffer2 = new Example2(vim, bufferContainer, eventRepository);
+    buffer = new Example(vim, bufferContainer, eventRegisterer);
   });
 
   it("open", async () => {
@@ -85,10 +79,6 @@ describe("BaseBuffer", () => {
   it("tabOpen", async () => {
     await buffer.open(Direction.TAB);
     expect(tabOpen).toHaveBeenCalledTimes(1);
-  });
-
-  it("open with base setup", async () => {
-    await buffer2.open(Direction.TAB);
   });
 
   it("doAction", async () => {
@@ -116,25 +106,9 @@ class Example extends BaseBuffer {
   constructor(
     vim: Neovim,
     bufferContainer: BufferContainer,
-    eventRepository: EventRepository
+    eventRegisterer: EventRegisterer
   ) {
-    super(vim, bufferContainer, eventRepository);
+    super(vim, bufferContainer, eventRegisterer);
     this.actions["actionName"] = async () => {};
   }
-
-  protected async setup(buffer: Buffer): Promise<void> {
-    await this.subscribe("eventName");
-
-    const kill = jest.fn();
-    const ChildProcessClass = jest.fn<ChildProcess>(() => ({
-      kill: kill,
-      killed: false,
-    }));
-    const p = new ChildProcessClass();
-    this.receivers.push(p);
-  }
-}
-
-class Example2 extends BaseBuffer {
-  public readonly type = CtrlbBufferType.empty;
 }

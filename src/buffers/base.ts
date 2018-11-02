@@ -1,10 +1,9 @@
 import { Neovim, Buffer } from "neovim";
-import { ChildProcess } from "child_process";
 import { Direction } from "../direction";
 import { Logger, getLogger } from "../logger";
 import { BufferContainer } from "./container";
 import { CtrlbBufferType } from "./type";
-import { EventRepository } from "../repository/event";
+import { EventRegisterer } from "./event";
 
 export type Actions = { [index: string]: { (): Promise<void> } };
 
@@ -12,13 +11,11 @@ export abstract class BaseBuffer {
   public static readonly type: CtrlbBufferType = CtrlbBufferType.empty;
   protected readonly logger: Logger;
   protected readonly actions: Actions = {};
-  protected readonly receivers: ChildProcess[] = [];
-  protected readonly subscribedEvents: string[] = [];
 
   constructor(
     protected readonly vim: Neovim,
     protected readonly bufferContainer: BufferContainer,
-    protected readonly eventRepository: EventRepository
+    protected readonly eventRegisterer: EventRegisterer
   ) {
     this.logger = getLogger("buffer.base");
   }
@@ -39,20 +36,7 @@ export abstract class BaseBuffer {
   }
 
   public async unload() {
-    this.receivers
-      .filter(p => {
-        return !p.killed;
-      })
-      .map(p => {
-        p.kill();
-      });
-    this.receivers.length = 0;
-
-    Object.keys(this.subscribedEvents).map(eventName => {
-      this.eventRepository.unsubscribe(eventName);
-    });
-    this.subscribedEvents.length = 0;
-
+    await this.eventRegisterer.unsubscribe();
     await this.bufferContainer.unload();
   }
 
@@ -78,13 +62,6 @@ export abstract class BaseBuffer {
     }
     const action = this.actions[actionName];
     await action();
-  }
-
-  protected subscribe(...eventNames: string[]) {
-    for (const eventName of eventNames) {
-      this.eventRepository.subscribe(eventName);
-      this.subscribedEvents.push(eventName);
-    }
   }
 
   protected async debug(stringSource: {} | null) {

@@ -4,7 +4,7 @@ import { CtrlbBufferType } from "./type";
 import { BufferContainer } from "./container";
 import { TreeBuffer } from "./tree";
 import { BookmarkRepository, Bookmark } from "../repository/bookmark";
-import { EventRepository } from "../repository/event";
+import { EventRegisterer } from "./event";
 
 export class BookmarkTreeItem {
   constructor(protected readonly bookmark: Bookmark) {}
@@ -36,10 +36,10 @@ export class BookmarkTree extends BaseBuffer {
     protected readonly vim: Neovim,
     protected readonly bufferContainer: BufferContainer,
     protected readonly treeBuffer: TreeBuffer<Bookmark>,
-    protected readonly eventRepository: EventRepository,
+    protected readonly eventRegisterer: EventRegisterer,
     protected readonly bookmarkRepository: BookmarkRepository
   ) {
-    super(vim, bufferContainer, eventRepository);
+    super(vim, bufferContainer, eventRegisterer);
     this.actions["open"] = () => this.openBookmark();
     this.actions["tabOpen"] = () => this.tabOpenBookmark();
     this.actions["openParent"] = () => this.openParent();
