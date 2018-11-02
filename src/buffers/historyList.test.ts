@@ -4,13 +4,13 @@ import { BufferContainer } from "./container";
 import { HistoryList, HistoryListItem } from "./historyList";
 import { HistoryRepository, History } from "../repository/history";
 import { TabRepository } from "../repository/tab";
-import { EventRepository } from "../repository/event";
+import { EventRegisterer } from "./event";
 
 describe("HistoryList", () => {
   let vim: Neovim;
   let bufferContainer: BufferContainer;
   let listBuffer: ListBuffer<History>;
-  let eventRepository: EventRepository;
+  let eventRegisterer: EventRegisterer;
   let historyRepository: HistoryRepository;
   let tabRepository: TabRepository;
   let historyList: HistoryList;
@@ -32,8 +32,8 @@ describe("HistoryList", () => {
     }));
     listBuffer = new TreeBufferClass();
 
-    const EventRepositoryClass = jest.fn<EventRepository>(() => ({}));
-    eventRepository = new EventRepositoryClass();
+    const EventRegistererClass = jest.fn<EventRegisterer>(() => ({}));
+    eventRegisterer = new EventRegistererClass();
 
     const HistoryRepositoryClass = jest.fn<HistoryRepository>(() => ({}));
     historyRepository = new HistoryRepositoryClass();
@@ -50,7 +50,7 @@ describe("HistoryList", () => {
       vim,
       bufferContainer,
       listBuffer,
-      eventRepository,
+      eventRegisterer,
       historyRepository,
       tabRepository
     );
@@ -76,7 +76,7 @@ describe("HistoryList", () => {
       vim,
       bufferContainer,
       listBuffer,
-      eventRepository,
+      eventRegisterer,
       historyRepository,
       tabRepository
     );
@@ -102,7 +102,7 @@ describe("HistoryList", () => {
       vim,
       bufferContainer,
       listBuffer,
-      eventRepository,
+      eventRegisterer,
       historyRepository,
       tabRepository
     );
@@ -132,7 +132,7 @@ describe("HistoryList", () => {
       vim,
       bufferContainer,
       listBuffer,
-      eventRepository,
+      eventRegisterer,
       historyRepository,
       tabRepository
     );
@@ -158,7 +158,7 @@ describe("HistoryList", () => {
       vim,
       bufferContainer,
       listBuffer,
-      eventRepository,
+      eventRegisterer,
       historyRepository,
       tabRepository
     );

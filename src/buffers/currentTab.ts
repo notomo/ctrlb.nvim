@@ -4,7 +4,7 @@ import { CtrlbBufferType } from "./type";
 import { TabRepository, Tab } from "../repository/tab";
 import { BufferContainer } from "./container";
 import { ItemBuffer } from "./item";
-import { EventRepository } from "../repository/event";
+import { EventRegisterer } from "./event";
 
 class CurrentTabItem {
   constructor(protected readonly tab: Tab) {}
@@ -25,10 +25,10 @@ export class CurrentTab extends BaseBuffer {
     protected readonly vim: Neovim,
     protected readonly bufferContainer: BufferContainer,
     protected readonly itemBuffer: ItemBuffer<Tab>,
-    protected readonly eventRepository: EventRepository,
+    protected readonly eventRegisterer: EventRegisterer,
     protected readonly tabRepository: TabRepository
   ) {
-    super(vim, bufferContainer, eventRepository);
+    super(vim, bufferContainer, eventRegisterer);
     this.actions["debug"] = async () =>
       this.debug(await this.itemBuffer.getCurrent());
   }
@@ -39,7 +39,9 @@ export class CurrentTab extends BaseBuffer {
     await buffer.setOption("buflisted", true);
     await buffer.setOption("modifiable", true);
 
-    this.subscribe(
+    const p = this.tabRepository.onChanged(data => this.update());
+    this.eventRegisterer.subscribe(
+      p,
       "tabActivated",
       "tabCreated",
       "tabRemoved",
@@ -48,9 +50,6 @@ export class CurrentTab extends BaseBuffer {
       "windowCreated",
       "windowRemoved"
     );
-
-    const p = this.tabRepository.onChanged(data => this.update());
-    this.receivers.push(p);
 
     await this.update();
   }
