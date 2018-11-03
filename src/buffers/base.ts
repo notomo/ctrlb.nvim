@@ -35,7 +35,9 @@ export abstract class BaseBuffer {
 
     if (this.bufferOptionStore === null) {
       this.bufferOptionStore = await this.bufferContainer.getOptionStore();
-      await this.bufferOptionStore.setFileType(this.bufferContainer.type);
+      await this.bufferOptionStore.setFileType(
+        "ctrlb-" + this.bufferContainer.type
+      );
       await this.bufferOptionStore.set(this.options);
       await this.setup();
     }

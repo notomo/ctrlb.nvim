@@ -138,4 +138,10 @@ describe("BufferContainer", () => {
 
     expect(deleteBuffer).toHaveBeenCalled();
   });
+
+  it("getOptionStore", async () => {
+    await bufferContainer.getOptionStore();
+
+    expect(create).toHaveBeenCalled();
+  });
 });

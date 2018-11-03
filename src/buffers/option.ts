@@ -34,8 +34,7 @@ export class BufferOptionStore {
     await Promise.all(promises);
   }
 
-  public async setFileType(type: string) {
-    const fileType = "ctrlb-" + type;
+  public async setFileType(fileType: string) {
     await this.buffer.setOption("filetype", fileType);
     await this.vim.command("silent doautocmd FileType " + fileType);
   }
