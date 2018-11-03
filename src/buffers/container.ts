@@ -1,24 +1,24 @@
 import { Neovim, Buffer } from "neovim";
+import { BufferOptionStore, BufferOptionStoreFactory } from "./option";
 import { Direction } from "../direction";
 import { BufferRepository } from "../repository/buffer";
 
 export class BufferContainer {
   protected buffer: Buffer | null;
-  protected readonly fileType: string;
   protected readonly bufferPath: string;
 
   constructor(
     protected readonly vim: Neovim,
     protected readonly bufferRepository: BufferRepository,
-    type: string
+    protected readonly bufferOptionStoreFactory: BufferOptionStoreFactory,
+    public readonly type: string
   ) {
     this.buffer = null;
-    this.fileType = "ctrlb-" + type;
     this.bufferPath = "ctrlb://" + type;
   }
 
   public async get(): Promise<Buffer> {
-    if (this._isInitialized(this.buffer)) {
+    if (this.buffer !== null) {
       return this.buffer;
     }
     await this.vim.command("badd " + this.bufferPath);
@@ -33,23 +33,8 @@ export class BufferContainer {
     throw new Error("buffer not found: " + bufferNumber);
   }
 
-  public async setFileType() {
-    if (this._isInitialized(this.buffer)) {
-      await this.buffer.setOption("filetype", this.fileType);
-      await this.vim.command("silent doautocmd FileType " + this.fileType);
-    }
-  }
-
-  protected _isInitialized(buffer: Buffer | null): buffer is Buffer {
-    return buffer !== null;
-  }
-
-  public isInitialized(): boolean {
-    return this._isInitialized(this.buffer);
-  }
-
   public async unload(): Promise<void> {
-    if (!this._isInitialized(this.buffer)) {
+    if (this.buffer === null) {
       return;
     }
     await this.bufferRepository.delete(this.buffer.id);
@@ -74,5 +59,10 @@ export class BufferContainer {
         await this.bufferRepository.tabOpen(id);
         return buffer;
     }
+  }
+
+  public async getOptionStore(): Promise<BufferOptionStore> {
+    const buffer = await this.get();
+    return this.bufferOptionStoreFactory.create(buffer);
   }
 }

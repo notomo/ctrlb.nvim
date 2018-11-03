@@ -1,5 +1,5 @@
 import { BaseBuffer } from "./base";
-import { Neovim, Buffer } from "neovim";
+import { Neovim } from "neovim";
 import { CtrlbBufferType } from "./type";
 import { TabRepository, Tab } from "../repository/tab";
 import { BufferContainer } from "./container";
@@ -21,6 +21,13 @@ class CurrentTabItem {
 export class CurrentTab extends BaseBuffer {
   public static readonly type = CtrlbBufferType.currentTab;
 
+  protected readonly options = {
+    buftype: "nofile",
+    swapfile: false,
+    buflisted: true,
+    modifiable: true,
+  };
+
   constructor(
     protected readonly vim: Neovim,
     protected readonly bufferContainer: BufferContainer,
@@ -33,12 +40,7 @@ export class CurrentTab extends BaseBuffer {
       this.debug(await this.itemBuffer.getCurrent());
   }
 
-  protected async setup(buffer: Buffer): Promise<void> {
-    await buffer.setOption("buftype", "nofile");
-    await buffer.setOption("swapfile", false);
-    await buffer.setOption("buflisted", true);
-    await buffer.setOption("modifiable", true);
-
+  protected async setup(): Promise<void> {
     const p = this.tabRepository.onChanged(data => this.update());
     this.eventRegisterer.subscribe(
       p,

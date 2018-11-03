@@ -1,4 +1,5 @@
 import { BufferContainer } from "./container";
+import { BufferOptionStoreFactory } from "./option";
 import { Direction } from "../direction";
 import { Neovim } from "neovim";
 import { BufferRepository } from "../repository/buffer";
@@ -15,6 +16,9 @@ describe("BufferContainer", () => {
   let verticalOpen: jest.Mock;
   let horizontalOpen: jest.Mock;
   let deleteBuffer: jest.Mock;
+
+  let bufferOptionStoreFactory: BufferOptionStoreFactory;
+  let create: jest.Mock;
 
   const bufferNumber = 1;
 
@@ -55,21 +59,28 @@ describe("BufferContainer", () => {
     }));
     bufferRepository = new BufferRepositoryClass();
 
-    bufferContainer = new BufferContainer(vim, bufferRepository, "type");
-  });
+    create = jest.fn();
+    const BufferOptionStoreFactoryClass = jest.fn<BufferOptionStoreFactory>(
+      () => ({
+        create: create,
+      })
+    );
+    bufferOptionStoreFactory = new BufferOptionStoreFactoryClass();
 
-  it("isInitialized returns false if get is not called", () => {
-    const result = bufferContainer.isInitialized();
-    expect(result).toBe(false);
+    bufferContainer = new BufferContainer(
+      vim,
+      bufferRepository,
+      bufferOptionStoreFactory,
+      "type"
+    );
   });
 
   it("get", async () => {
-    await bufferContainer.get();
+    const buffer = await bufferContainer.get();
+    expect(buffer.id).toEqual(bufferNumber);
 
-    const result = bufferContainer.isInitialized();
-    expect(result).toBe(true);
-
-    await bufferContainer.get();
+    const theSameBuffer = await bufferContainer.get();
+    expect(theSameBuffer.id).toEqual(buffer.id);
   });
 
   it("get throws error if buffer is not found", async () => {
@@ -85,7 +96,12 @@ describe("BufferContainer", () => {
     }));
     const vim = new NeovimClass();
 
-    const bufferContainer = new BufferContainer(vim, bufferRepository, "type");
+    const bufferContainer = new BufferContainer(
+      vim,
+      bufferRepository,
+      bufferOptionStoreFactory,
+      "type"
+    );
 
     expect(bufferContainer.get()).rejects.toThrowError(/buffer not found: 1/);
   });
@@ -121,8 +137,5 @@ describe("BufferContainer", () => {
     await bufferContainer.unload();
 
     expect(deleteBuffer).toHaveBeenCalled();
-
-    const result = bufferContainer.isInitialized();
-    expect(result).toBe(false);
   });
 });

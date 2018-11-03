@@ -23,6 +23,7 @@ import { BufferContainer } from "./buffers/container";
 import { ListBuffer } from "./buffers/list";
 import { ItemBuffer } from "./buffers/item";
 import { TreeBuffer } from "./buffers/tree";
+import { BufferOptionStoreFactory } from "./buffers/option";
 import { Ctrl } from "./buffers/ctrl";
 import { BookmarkTree } from "./buffers/bookmarkTree";
 import { CurrentTab } from "./buffers/currentTab";
@@ -158,7 +159,13 @@ export class Di {
     },
     BufferContainer: (vim: Neovim, type: string) => {
       const bufferRepository = Di.get("BufferRepository", vim);
-      return new BufferContainer(vim, bufferRepository, type);
+      const bufferOptionStoreFactory = new BufferOptionStoreFactory(vim);
+      return new BufferContainer(
+        vim,
+        bufferRepository,
+        bufferOptionStoreFactory,
+        type
+      );
     },
   };
 

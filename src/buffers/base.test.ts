@@ -4,6 +4,7 @@ import { BaseBuffer } from "./base";
 import { CtrlbBufferType } from "./type";
 import { Direction } from "../direction";
 import { EventRegisterer } from "./event";
+import { BufferOptionStore } from "./option";
 
 describe("BaseBuffer", () => {
   let buffer: Example;
@@ -13,7 +14,11 @@ describe("BaseBuffer", () => {
   let unload: jest.Mock;
   let command: jest.Mock;
   let unsubscribe: jest.Mock;
+
+  let getOptionStore: jest.Mock;
+  let set: jest.Mock;
   let setFileType: jest.Mock;
+  let adjust: jest.Mock;
 
   beforeEach(() => {
     command = jest.fn();
@@ -31,6 +36,16 @@ describe("BaseBuffer", () => {
     const BufferClass = jest.fn<Buffer>(() => ({}));
     const vimBuffer = new BufferClass();
 
+    set = jest.fn();
+    setFileType = jest.fn();
+    adjust = jest.fn();
+    const BufferOptionStoreClass = jest.fn<BufferOptionStore>(() => ({
+      set: set,
+      setFileType: setFileType,
+      adjust: adjust,
+    }));
+    const bufferOptionStore = new BufferOptionStoreClass();
+
     isInitialized = jest
       .fn()
       .mockReturnValueOnce(false)
@@ -38,13 +53,13 @@ describe("BaseBuffer", () => {
     openByDirection = jest.fn().mockReturnValue(vimBuffer);
     get = jest.fn().mockReturnValue(vimBuffer);
     unload = jest.fn().mockReturnValue(vimBuffer);
-    setFileType = jest.fn();
+    getOptionStore = jest.fn().mockReturnValue(bufferOptionStore);
     const BufferContainerClass = jest.fn<BufferContainer>(() => ({
       isInitialized: isInitialized,
       openByDirection: openByDirection,
       get: get,
       unload: unload,
-      setFileType: setFileType,
+      getOptionStore: getOptionStore,
     }));
     const bufferContainer = new BufferContainerClass(vim);
 

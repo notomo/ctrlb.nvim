@@ -1,5 +1,5 @@
 import { BaseBuffer } from "./base";
-import { Neovim, Buffer } from "neovim";
+import { Neovim } from "neovim";
 import { CtrlbBufferType } from "./type";
 import { BufferContainer } from "./container";
 import { ListBuffer } from "./list";
@@ -22,6 +22,13 @@ export class HistoryListItem {
 export class HistoryList extends BaseBuffer {
   public static readonly type = CtrlbBufferType.historyList;
 
+  protected readonly options = {
+    buftype: "nofile",
+    buflisted: true,
+    swapfile: false,
+    modifiable: true,
+  };
+
   constructor(
     protected readonly vim: Neovim,
     protected readonly bufferContainer: BufferContainer,
@@ -37,12 +44,7 @@ export class HistoryList extends BaseBuffer {
       this.debug(await this.listBuffer.getCurrent());
   }
 
-  protected async setup(buffer: Buffer): Promise<void> {
-    await buffer.setOption("buftype", "nofile");
-    await buffer.setOption("swapfile", false);
-    await buffer.setOption("buflisted", true);
-    await buffer.setOption("modifiable", true);
-
+  protected async setup(): Promise<void> {
     await this.vim.command(
       "highlight default link CtrlbHistoryListUrl Underlined"
     );
