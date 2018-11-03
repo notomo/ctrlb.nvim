@@ -1,18 +1,24 @@
 import { Neovim, Buffer } from "neovim";
+import { BufferOptionStore, BufferOptionStoreFactory } from "./option";
+import { Direction } from "../direction";
+import { BufferRepository } from "../repository/buffer";
 
 export class BufferContainer {
   protected buffer: Buffer | null;
-  protected readonly fileType: string;
   protected readonly bufferPath: string;
 
-  constructor(protected readonly vim: Neovim, type: string) {
+  constructor(
+    protected readonly vim: Neovim,
+    protected readonly bufferRepository: BufferRepository,
+    protected readonly bufferOptionStoreFactory: BufferOptionStoreFactory,
+    public readonly type: string
+  ) {
     this.buffer = null;
-    this.fileType = "ctrlb-" + type;
     this.bufferPath = "ctrlb://" + type;
   }
 
   public async get(): Promise<Buffer> {
-    if (this._isInitialized(this.buffer)) {
+    if (this.buffer !== null) {
       return this.buffer;
     }
     await this.vim.command("badd " + this.bufferPath);
@@ -27,51 +33,36 @@ export class BufferContainer {
     throw new Error("buffer not found: " + bufferNumber);
   }
 
-  public async setFileType() {
-    if (this._isInitialized(this.buffer)) {
-      await this.buffer.setOption("filetype", this.fileType);
-      await this.vim.command("silent doautocmd FileType " + this.fileType);
-    }
-  }
-
-  protected _isInitialized(buffer: Buffer | null): buffer is Buffer {
-    return buffer !== null;
-  }
-
-  public isInitialized(): boolean {
-    return this._isInitialized(this.buffer);
-  }
-
   public async unload(): Promise<void> {
-    if (!this._isInitialized(this.buffer)) {
+    if (this.buffer === null) {
       return;
     }
-    await this.vim.command("bwipeout " + this.buffer.id);
+    await this.bufferRepository.delete(this.buffer.id);
     this.buffer = null;
     return;
   }
 
-  public async verticalOpen(): Promise<Buffer> {
+  public async openByDirection(direction: Direction): Promise<Buffer> {
     const buffer = await this.get();
-    await this.vim.command("rightbelow vsplit #" + buffer.id);
-    return buffer;
+    const id = buffer.id;
+    switch (direction) {
+      case Direction.VERTICAL:
+        await this.bufferRepository.verticalOpen(id);
+        return buffer;
+      case Direction.HORIZONTAL:
+        await this.bufferRepository.horizontalOpen(id);
+        return buffer;
+      case Direction.NOTHING:
+        await this.bufferRepository.open(id);
+        return buffer;
+      case Direction.TAB:
+        await this.bufferRepository.tabOpen(id);
+        return buffer;
+    }
   }
 
-  public async horizontalOpen(): Promise<Buffer> {
+  public async getOptionStore(): Promise<BufferOptionStore> {
     const buffer = await this.get();
-    await this.vim.command("rightbelow split #" + buffer.id);
-    return buffer;
-  }
-
-  public async tabOpen(): Promise<Buffer> {
-    const buffer = await this.get();
-    await this.vim.command("tabedit #" + buffer.id);
-    return buffer;
-  }
-
-  public async open(): Promise<Buffer> {
-    const buffer = await this.get();
-    await this.vim.command("buffer " + buffer.id);
-    return buffer;
+    return this.bufferOptionStoreFactory.create(buffer);
   }
 }

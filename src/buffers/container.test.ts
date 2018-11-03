@@ -1,11 +1,25 @@
 import { BufferContainer } from "./container";
+import { BufferOptionStoreFactory } from "./option";
+import { Direction } from "../direction";
 import { Neovim } from "neovim";
+import { BufferRepository } from "../repository/buffer";
 
 describe("BufferContainer", () => {
   let bufferContainer: BufferContainer;
   let command: jest.Mock;
   let call: jest.Mock;
   let buffers: jest.Mock;
+
+  let bufferRepository: BufferRepository;
+  let open: jest.Mock;
+  let tabOpen: jest.Mock;
+  let verticalOpen: jest.Mock;
+  let horizontalOpen: jest.Mock;
+  let deleteBuffer: jest.Mock;
+
+  let bufferOptionStoreFactory: BufferOptionStoreFactory;
+  let create: jest.Mock;
+
   const bufferNumber = 1;
 
   beforeEach(() => {
@@ -31,21 +45,42 @@ describe("BufferContainer", () => {
     }));
     const vim = new NeovimClass();
 
-    bufferContainer = new BufferContainer(vim, "type");
-  });
+    open = jest.fn();
+    tabOpen = jest.fn();
+    verticalOpen = jest.fn();
+    horizontalOpen = jest.fn();
+    deleteBuffer = jest.fn();
+    const BufferRepositoryClass = jest.fn<BufferRepository>(() => ({
+      open: open,
+      tabOpen: tabOpen,
+      verticalOpen: verticalOpen,
+      horizontalOpen: horizontalOpen,
+      delete: deleteBuffer,
+    }));
+    bufferRepository = new BufferRepositoryClass();
 
-  it("isInitialized returns false if get is not called", () => {
-    const result = bufferContainer.isInitialized();
-    expect(result).toBe(false);
+    create = jest.fn();
+    const BufferOptionStoreFactoryClass = jest.fn<BufferOptionStoreFactory>(
+      () => ({
+        create: create,
+      })
+    );
+    bufferOptionStoreFactory = new BufferOptionStoreFactoryClass();
+
+    bufferContainer = new BufferContainer(
+      vim,
+      bufferRepository,
+      bufferOptionStoreFactory,
+      "type"
+    );
   });
 
   it("get", async () => {
-    await bufferContainer.get();
+    const buffer = await bufferContainer.get();
+    expect(buffer.id).toEqual(bufferNumber);
 
-    const result = bufferContainer.isInitialized();
-    expect(result).toBe(true);
-
-    await bufferContainer.get();
+    const theSameBuffer = await bufferContainer.get();
+    expect(theSameBuffer.id).toEqual(buffer.id);
   });
 
   it("get throws error if buffer is not found", async () => {
@@ -61,31 +96,52 @@ describe("BufferContainer", () => {
     }));
     const vim = new NeovimClass();
 
-    const bufferContainer = new BufferContainer(vim, "type");
+    const bufferContainer = new BufferContainer(
+      vim,
+      bufferRepository,
+      bufferOptionStoreFactory,
+      "type"
+    );
 
     expect(bufferContainer.get()).rejects.toThrowError(/buffer not found: 1/);
   });
 
-  it("open", async () => {
-    await bufferContainer.open();
-    await bufferContainer.verticalOpen();
-    await bufferContainer.horizontalOpen();
-    await bufferContainer.tabOpen();
+  it(`open by NOTHING direction"`, async () => {
+    await bufferContainer.openByDirection(Direction.NOTHING);
+    expect(open).toHaveBeenCalled();
+  });
+
+  it(`open by TAB direction"`, async () => {
+    await bufferContainer.openByDirection(Direction.TAB);
+    expect(tabOpen).toHaveBeenCalled();
+  });
+
+  it(`open by VERTICAL direction"`, async () => {
+    await bufferContainer.openByDirection(Direction.VERTICAL);
+    expect(verticalOpen).toHaveBeenCalled();
+  });
+
+  it(`open by HORIZONTAL direction"`, async () => {
+    await bufferContainer.openByDirection(Direction.HORIZONTAL);
+    expect(horizontalOpen).toHaveBeenCalled();
   });
 
   it("unload does nothing if buffer is not initialized", async () => {
     await bufferContainer.unload();
 
-    expect(command).not.toHaveBeenCalled();
+    expect(deleteBuffer).not.toHaveBeenCalled();
   });
 
   it("unload", async () => {
     await bufferContainer.get();
     await bufferContainer.unload();
 
-    expect(command).toHaveBeenCalled();
+    expect(deleteBuffer).toHaveBeenCalled();
+  });
 
-    const result = bufferContainer.isInitialized();
-    expect(result).toBe(false);
+  it("getOptionStore", async () => {
+    await bufferContainer.getOptionStore();
+
+    expect(create).toHaveBeenCalled();
   });
 });

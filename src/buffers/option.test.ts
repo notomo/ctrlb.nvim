@@ -1,0 +1,83 @@
+import { Neovim, Buffer } from "neovim";
+import { BufferOptionStore, BufferOptionStoreFactory } from "./option";
+
+describe("BufferOptionStore", () => {
+  let command: jest.Mock;
+  let setOption: jest.Mock;
+  let bufferOptionStore: BufferOptionStore;
+
+  beforeEach(() => {
+    command = jest.fn();
+    const NeovimClass = jest.fn<Neovim>(() => ({
+      command: command,
+    }));
+    const vim = new NeovimClass();
+
+    setOption = jest.fn();
+    const BufferClass = jest.fn<Buffer>(() => ({
+      setOption: setOption,
+    }));
+    const buffer = new BufferClass();
+
+    bufferOptionStore = new BufferOptionStore(vim, buffer);
+  });
+
+  it("set", async () => {
+    await bufferOptionStore.set({
+      buftype: "nofile",
+      swapfile: false,
+      modifiable: true,
+      buflisted: true,
+    });
+
+    expect(setOption).toHaveBeenCalledWith("buftype", "nofile");
+    expect(setOption).toHaveBeenCalledWith("swapfile", false);
+    expect(setOption).toHaveBeenCalledWith("modifiable", true);
+    expect(setOption).toHaveBeenCalledWith("buflisted", true);
+  });
+
+  it("set does nothing", async () => {
+    await bufferOptionStore.set({});
+
+    expect(setOption).not.toHaveBeenCalled();
+    expect(setOption).not.toHaveBeenCalled();
+    expect(setOption).not.toHaveBeenCalled();
+    expect(setOption).not.toHaveBeenCalled();
+  });
+
+  it("setFileType", async () => {
+    const fileType = "ctrlb-type";
+
+    await bufferOptionStore.setFileType(fileType);
+
+    expect(setOption).toHaveBeenCalledWith("filetype", fileType);
+  });
+
+  it("adjust does nothing", async () => {
+    await bufferOptionStore.adjust();
+
+    expect(setOption).not.toHaveBeenCalled();
+  });
+
+  it("adjust", async () => {
+    await bufferOptionStore.set({ buflisted: true });
+    await bufferOptionStore.adjust();
+
+    expect(setOption).toHaveBeenCalledWith("buflisted", true);
+  });
+});
+
+describe("BufferOptionStoreFactory", () => {
+  it("create", () => {
+    const NeovimClass = jest.fn<Neovim>(() => ({}));
+    const vim = new NeovimClass();
+
+    const BufferClass = jest.fn<Buffer>(() => ({}));
+    const buffer = new BufferClass();
+
+    const bufferOptionStoreFactory = new BufferOptionStoreFactory(vim);
+    const bufferOptionStore = bufferOptionStoreFactory.create(buffer);
+
+    expect(typeof bufferOptionStore.set).toEqual("function");
+  });
+});

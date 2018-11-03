@@ -4,19 +4,21 @@ import { BaseBuffer } from "./base";
 import { CtrlbBufferType } from "./type";
 import { Direction } from "../direction";
 import { EventRegisterer } from "./event";
+import { BufferOptionStore } from "./option";
 
 describe("BaseBuffer", () => {
   let buffer: Example;
   let isInitialized: jest.Mock;
-  let open: jest.Mock;
+  let openByDirection: jest.Mock;
   let get: jest.Mock;
-  let verticalOpen: jest.Mock;
-  let horizontalOpen: jest.Mock;
-  let tabOpen: jest.Mock;
   let unload: jest.Mock;
   let command: jest.Mock;
   let unsubscribe: jest.Mock;
+
+  let getOptionStore: jest.Mock;
+  let set: jest.Mock;
   let setFileType: jest.Mock;
+  let adjust: jest.Mock;
 
   beforeEach(() => {
     command = jest.fn();
@@ -34,26 +36,30 @@ describe("BaseBuffer", () => {
     const BufferClass = jest.fn<Buffer>(() => ({}));
     const vimBuffer = new BufferClass();
 
+    set = jest.fn();
+    setFileType = jest.fn();
+    adjust = jest.fn();
+    const BufferOptionStoreClass = jest.fn<BufferOptionStore>(() => ({
+      set: set,
+      setFileType: setFileType,
+      adjust: adjust,
+    }));
+    const bufferOptionStore = new BufferOptionStoreClass();
+
     isInitialized = jest
       .fn()
       .mockReturnValueOnce(false)
       .mockReturnValueOnce(true);
-    open = jest.fn().mockReturnValue(vimBuffer);
+    openByDirection = jest.fn().mockReturnValue(vimBuffer);
     get = jest.fn().mockReturnValue(vimBuffer);
-    verticalOpen = jest.fn().mockReturnValue(vimBuffer);
-    horizontalOpen = jest.fn().mockReturnValue(vimBuffer);
-    tabOpen = jest.fn().mockReturnValue(vimBuffer);
     unload = jest.fn().mockReturnValue(vimBuffer);
-    setFileType = jest.fn();
+    getOptionStore = jest.fn().mockReturnValue(bufferOptionStore);
     const BufferContainerClass = jest.fn<BufferContainer>(() => ({
       isInitialized: isInitialized,
-      open: open,
+      openByDirection: openByDirection,
       get: get,
-      verticalOpen: verticalOpen,
-      horizontalOpen: horizontalOpen,
-      tabOpen: tabOpen,
       unload: unload,
-      setFileType: setFileType,
+      getOptionStore: getOptionStore,
     }));
     const bufferContainer = new BufferContainerClass(vim);
 
@@ -63,22 +69,7 @@ describe("BaseBuffer", () => {
   it("open", async () => {
     await buffer.open(Direction.NOTHING);
     await buffer.open(Direction.NOTHING);
-    expect(open).toHaveBeenCalledTimes(2);
-  });
-
-  it("verticalOpen", async () => {
-    await buffer.open(Direction.HORIZONTAL);
-    expect(verticalOpen).toHaveBeenCalledTimes(1);
-  });
-
-  it("horizontalOpen", async () => {
-    await buffer.open(Direction.VERTICAL);
-    expect(horizontalOpen).toHaveBeenCalledTimes(1);
-  });
-
-  it("tabOpen", async () => {
-    await buffer.open(Direction.TAB);
-    expect(tabOpen).toHaveBeenCalledTimes(1);
+    expect(openByDirection).toHaveBeenCalledTimes(2);
   });
 
   it("doAction", async () => {
