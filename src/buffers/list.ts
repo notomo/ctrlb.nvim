@@ -26,6 +26,8 @@ export class ListBuffer<Model> {
     const buffer = await this.bufferContainer.get();
     await buffer.insert(item.toString(), 0);
     this.items.unshift(item);
+    // FIXME: workaround for corrupted display
+    await this.vim.command("redraw");
   }
 
   public async set(items: Item<Model>[]) {
