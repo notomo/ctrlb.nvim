@@ -4,4 +4,5 @@ export enum CtrlbBufferType {
   empty = "empty",
   bookmarkTree = "bookmarkTree",
   historyList = "historyList",
+  downloadList = "downloadList",
 }

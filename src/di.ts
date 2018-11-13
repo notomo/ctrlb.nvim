@@ -16,6 +16,7 @@ import { BookmarkRepository, Bookmark } from "./repository/bookmark";
 import { TabRepository, Tab } from "./repository/tab";
 import { EventRepository } from "./repository/event";
 import { HistoryRepository, History } from "./repository/history";
+import { DownloadRepository, Download } from "./repository/download";
 import { BufferRepository } from "./repository/buffer";
 import { Execute } from "./complete/execute";
 import { Open } from "./complete/open";
@@ -29,6 +30,7 @@ import { BookmarkTree } from "./buffers/bookmarkTree";
 import { CurrentTab } from "./buffers/currentTab";
 import { Empty } from "./buffers/empty";
 import { HistoryList } from "./buffers/historyList";
+import { DownloadList } from "./buffers/downloadList";
 import { EventRegisterer } from "./buffers/event";
 
 export class Di {
@@ -60,6 +62,10 @@ export class Di {
     HistoryRepository: (vim: Neovim) => {
       const requester = Di.get("Requester", vim);
       return new HistoryRepository(requester);
+    },
+    DownloadRepository: (vim: Neovim) => {
+      const requester = Di.get("Requester", vim);
+      return new DownloadRepository(requester);
     },
     TabRepository: (vim: Neovim) => {
       const requester = Di.get("Requester", vim);
@@ -153,6 +159,24 @@ export class Di {
         tabRepository
       );
     },
+    DownloadList: (vim: Neovim) => {
+      const eventRegisterer = Di.get("EventRegisterer", vim, false);
+      const downloadRepository = Di.get("DownloadRepository", vim);
+      const bufferContainer = Di.get(
+        "BufferContainer",
+        vim,
+        false,
+        DownloadList.type
+      );
+      const listBuffer = new ListBuffer<Download>(vim, bufferContainer);
+      return new DownloadList(
+        vim,
+        bufferContainer,
+        listBuffer,
+        eventRegisterer,
+        downloadRepository
+      );
+    },
     EventRegisterer: (vim: Neovim) => {
       const eventRepository = Di.get("EventRepository", vim);
       return new EventRegisterer(eventRepository);
@@ -181,6 +205,7 @@ export class Di {
     TabRepository: null,
     EventRepository: null,
     HistoryRepository: null,
+    DownloadRepository: null,
     BufferRepository: null,
     EventRegisterer: null,
     Ctrl: null,
@@ -188,6 +213,7 @@ export class Di {
     CurrentTab: null,
     Empty: null,
     HistoryList: null,
+    DownloadList: null,
     BufferContainer: null,
   };
 
@@ -209,12 +235,18 @@ export class Di {
     cacheable: false
   ): HistoryList;
   public static get(
+    cls: "DownloadList",
+    vim: Neovim,
+    cacheable: false
+  ): DownloadList;
+  public static get(
     cls: "EventRegisterer",
     vim: Neovim,
     cacheable: false
   ): EventRegisterer;
   public static get(cls: "BufferRepository", vim: Neovim): BufferRepository;
   public static get(cls: "HistoryRepository", vim: Neovim): HistoryRepository;
+  public static get(cls: "DownloadRepository", vim: Neovim): DownloadRepository;
   public static get(cls: "EventRepository", vim: Neovim): EventRepository;
   public static get(cls: "TabRepository", vim: Neovim): TabRepository;
   public static get(cls: "BookmarkRepository", vim: Neovim): BookmarkRepository;
@@ -274,6 +306,7 @@ interface Deps {
   TabRepository: { (vim: Neovim, ...args: any[]): TabRepository };
   EventRepository: { (vim: Neovim, ...args: any[]): EventRepository };
   HistoryRepository: { (vim: Neovim, ...args: any[]): HistoryRepository };
+  DownloadRepository: { (vim: Neovim, ...args: any[]): DownloadRepository };
   BufferRepository: { (vim: Neovim, ...args: any[]): BufferRepository };
   EventRegisterer: { (vim: Neovim, ...args: any[]): EventRegisterer };
   Ctrl: { (vim: Neovim, ...args: any[]): Ctrl };
@@ -281,6 +314,7 @@ interface Deps {
   CurrentTab: { (vim: Neovim, ...args: any[]): CurrentTab };
   Empty: { (vim: Neovim, ...args: any[]): Empty };
   HistoryList: { (vim: Neovim, ...args: any[]): HistoryList };
+  DownloadList: { (vim: Neovim, ...args: any[]): DownloadList };
   BufferContainer: { (vim: Neovim, ...args: any[]): BufferContainer };
 }
 
