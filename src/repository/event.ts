@@ -6,17 +6,15 @@ export class EventRepository {
 
   public async subscribe(eventName: string): Promise<ChildProcess> {
     return this.requester.executeAsync({
-      actionGroupName: "event",
-      actionName: "subscribe",
-      args: { eventName: eventName },
+      method: "event/subscribe",
+      params: { eventName: eventName },
     });
   }
 
   public async unsubscribe(eventName: string): Promise<ChildProcess> {
     return this.requester.executeAsync({
-      actionGroupName: "event",
-      actionName: "unsubscribe",
-      args: { eventName: eventName },
+      method: "event/unsubscribe",
+      params: { eventName: eventName },
     });
   }
 }

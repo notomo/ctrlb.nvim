@@ -11,9 +11,8 @@ export class DownloadRepository {
 
   public async search(): Promise<Download[]> {
     return this.requester.execute<Download[]>({
-      actionGroupName: "download",
-      actionName: "search",
-      args: {},
+      method: "download/search",
+      params: {},
     });
   }
 

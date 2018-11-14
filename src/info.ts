@@ -2,15 +2,13 @@ import { readFileSync } from "fs";
 import { CtrlbBufferType } from "./buffers/type";
 
 export interface ActionInfo {
-  actionGroupName: string;
-  actionName: string;
-  args?: ActionArgs;
+  method: string;
+  params?: ActionArgs;
 }
 
 export class ArgParser {
   public parse(arg: string): ActionInfo {
-    let actionGroupName = "";
-    let actionName = "";
+    let method = "";
     let actionArgs: ActionArgs = {};
 
     for (const value of arg.split(" ")) {
@@ -19,9 +17,7 @@ export class ArgParser {
           throw new Error("Not found actionName.");
         }
 
-        const names = value.split(":");
-        actionGroupName = names[0];
-        actionName = names[1];
+        method = value.replace(":", "/");
         continue;
       }
 
@@ -38,9 +34,8 @@ export class ArgParser {
       actionArgs[argKey] = argValue;
     }
     return {
-      actionGroupName: actionGroupName,
-      actionName: actionName,
-      args: actionArgs,
+      method: method,
+      params: actionArgs,
     };
   }
 

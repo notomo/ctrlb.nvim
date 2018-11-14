@@ -14,25 +14,22 @@ export class BookmarkRepository {
 
   public async getTree(id: string | null): Promise<Bookmark[]> {
     return this.requester.execute<Bookmark[]>({
-      actionGroupName: "bookmark",
-      actionName: "getTree",
-      args: { id: id },
+      method: "bookmark/getTree",
+      params: { id: id },
     });
   }
 
   public async open(id: string | null): Promise<ChildProcess> {
     return this.requester.executeAsync({
-      actionGroupName: "bookmark",
-      actionName: "open",
-      args: { id: id },
+      method: "bookmark/open",
+      params: { id: id },
     });
   }
 
   public async tabOpen(id: string | null): Promise<ChildProcess> {
     return this.requester.executeAsync({
-      actionGroupName: "bookmark",
-      actionName: "tabOpen",
-      args: { id: id },
+      method: "bookmark/tabOpen",
+      params: { id: id },
     });
   }
 }

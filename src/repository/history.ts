@@ -11,9 +11,8 @@ export class HistoryRepository {
 
   public async search(): Promise<History[]> {
     return this.requester.execute<History[]>({
-      actionGroupName: "history",
-      actionName: "search",
-      args: {},
+      method: "history/search",
+      params: {},
     });
   }
 
