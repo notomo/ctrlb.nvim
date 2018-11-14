@@ -36,7 +36,7 @@ export class TabRepository {
     return this.requester.receiveAsyncOnEvent<Tab>(
       // TODO: receive only
       // ["tabActivated", "tabCreated", "tabRemoved", "tabUpdated", "windowActivated", "windowCreated", "windowRemoved"]
-      { option: { eventName: true } },
+      { body: { eventName: true } },
       {},
       callback
     );

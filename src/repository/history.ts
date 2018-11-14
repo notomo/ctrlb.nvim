@@ -20,7 +20,7 @@ export class HistoryRepository {
   public onCreated(callback: { (history: History): void }): ChildProcess {
     return this.requester.receiveAsyncOnEvent<History>(
       {},
-      { option: { eventName: "historyCreated" } },
+      { body: { eventName: "historyCreated" } },
       callback
     );
   }

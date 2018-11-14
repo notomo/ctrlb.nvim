@@ -20,7 +20,7 @@ export class DownloadRepository {
   public onCreated(callback: { (download: Download): void }): ChildProcess {
     return this.requester.receiveAsyncOnEvent<Download>(
       {},
-      { option: { eventName: "downloadCreated" } },
+      { body: { eventName: "downloadCreated" } },
       callback
     );
   }
