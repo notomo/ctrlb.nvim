@@ -15,8 +15,7 @@ describe("ApiInfoRepository", () => {
     apiInfoRepository.get();
 
     expect(execute).toHaveBeenCalledWith({
-      actionGroupName: "apiInfo",
-      actionName: "get",
+      method: "apiInfo/get",
     });
   });
 });

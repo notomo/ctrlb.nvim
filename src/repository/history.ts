@@ -11,16 +11,15 @@ export class HistoryRepository {
 
   public async search(): Promise<History[]> {
     return this.requester.execute<History[]>({
-      actionGroupName: "history",
-      actionName: "search",
-      args: {},
+      method: "history/search",
+      params: {},
     });
   }
 
   public onCreated(callback: { (history: History): void }): ChildProcess {
     return this.requester.receiveAsyncOnEvent<History>(
       {},
-      { option: { eventName: "historyCreated" } },
+      { body: { eventName: "historyCreated" } },
       callback
     );
   }

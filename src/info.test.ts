@@ -4,38 +4,34 @@ describe("ArgParser", () => {
   [
     {
       arg: "scroll:up",
-      expected: { actionGroupName: "scroll", actionName: "up", args: {} },
+      expected: { method: "scroll/up", params: {} },
     },
     {
       arg: "tab:get -id=1",
       expected: {
-        actionGroupName: "tab",
-        actionName: "get",
-        args: { id: 1 },
+        method: "tab/get",
+        params: { id: 1 },
       },
     },
     {
       arg: "tab:open -url=https://example.com/?test=1",
       expected: {
-        actionGroupName: "tab",
-        actionName: "open",
-        args: { url: "https://example.com/?test=1" },
+        method: "tab/open",
+        params: { url: "https://example.com/?test=1" },
       },
     },
     {
       arg: "zoom:set -zoomFactor=1.5",
       expected: {
-        actionGroupName: "zoom",
-        actionName: "set",
-        args: { zoomFactor: 1.5 },
+        method: "zoom/set",
+        params: { zoomFactor: 1.5 },
       },
     },
     {
       arg: "tab:create -pinned",
       expected: {
-        actionGroupName: "tab",
-        actionName: "create",
-        args: { pinned: true },
+        method: "tab/create",
+        params: { pinned: true },
       },
     },
   ].forEach(data => {

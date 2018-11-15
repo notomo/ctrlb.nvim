@@ -28,8 +28,10 @@ export class Requester {
       { timeout: 4000 }
     );
 
-    const stdout: { body: T } = JSON.parse(result.stdout.trim().split("\n")[0]);
-    return stdout.body;
+    const stdout: { body: { data: T } } = JSON.parse(
+      result.stdout.trim().split("\n")[0]
+    );
+    return stdout.body.data;
   }
 
   public receiveAsyncOnEvent<T>(
@@ -47,8 +49,10 @@ export class Requester {
 
     p.stdout.setEncoding("utf-8");
     p.stdout.on("data", data => {
-      const stdout: { body: T } = JSON.parse(data.trim().split("\n")[0]);
-      eventCallback(stdout.body);
+      const stdout: { body: { data: T } } = JSON.parse(
+        data.trim().split("\n")[0]
+      );
+      eventCallback(stdout.body.data);
     });
 
     return p;

@@ -11,24 +11,21 @@ export class TabRepository {
 
   public async getCurrent(): Promise<Tab> {
     return this.requester.execute<Tab>({
-      actionGroupName: "tab",
-      actionName: "getCurrent",
+      method: "tab/getCurrent",
     });
   }
 
   public async open(url: string): Promise<ChildProcess> {
     return this.requester.executeAsync({
-      actionGroupName: "tab",
-      actionName: "open",
-      args: { url: url },
+      method: "tab/open",
+      params: { url: url },
     });
   }
 
   public async tabOpen(url: string): Promise<ChildProcess> {
     return this.requester.executeAsync({
-      actionGroupName: "tab",
-      actionName: "tabOpen",
-      args: { url: url },
+      method: "tab/tabOpen",
+      params: { url: url },
     });
   }
 
@@ -36,7 +33,7 @@ export class TabRepository {
     return this.requester.receiveAsyncOnEvent<Tab>(
       // TODO: receive only
       // ["tabActivated", "tabCreated", "tabRemoved", "tabUpdated", "windowActivated", "windowCreated", "windowRemoved"]
-      { option: { eventName: true } },
+      { body: { eventName: true } },
       {},
       callback
     );

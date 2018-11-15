@@ -14,8 +14,7 @@ export class ApiInfoRepository {
 
   public get(): Promise<ApiInfo> {
     return this.requester.execute<ApiInfo>({
-      actionGroupName: "apiInfo",
-      actionName: "get",
+      method: "apiInfo/get",
     });
   }
 }
