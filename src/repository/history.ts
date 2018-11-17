@@ -20,6 +20,7 @@ export class HistoryRepository {
     return this.requester.receiveAsyncOnEvent<History>(
       {},
       { body: { eventName: "historyCreated" } },
+      {},
       callback
     );
   }

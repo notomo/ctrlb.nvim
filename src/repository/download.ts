@@ -20,6 +20,7 @@ export class DownloadRepository {
     return this.requester.receiveAsyncOnEvent<Download>(
       {},
       { body: { eventName: "downloadCreated" } },
+      {},
       callback
     );
   }

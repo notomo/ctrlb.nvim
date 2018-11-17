@@ -37,6 +37,7 @@ export class Requester {
   public receiveAsyncOnEvent<T>(
     keyFilter: any,
     filter: any,
+    regexFilter: any,
     eventCallback: { (arg: T): any }
   ): ChildProcess {
     const p = spawn("wsxhub", [
@@ -44,6 +45,8 @@ export class Requester {
       JSON.stringify(keyFilter),
       "--filter",
       JSON.stringify(filter),
+      "--regex",
+      JSON.stringify(regexFilter),
       "receive",
     ]);
 

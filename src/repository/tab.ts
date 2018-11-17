@@ -31,10 +31,14 @@ export class TabRepository {
 
   public onChanged(callback: { (tab: Tab): void }): ChildProcess {
     return this.requester.receiveAsyncOnEvent<Tab>(
-      // TODO: receive only
-      // ["tabActivated", "tabCreated", "tabRemoved", "tabUpdated", "windowActivated", "windowCreated", "windowRemoved"]
-      { body: { eventName: true } },
       {},
+      {},
+      {
+        body: {
+          eventName:
+            "tabActivated|tabCreated|tabRemoved|tabUpdated|windowActivated|windowCreated|windowRemoved",
+        },
+      },
       callback
     );
   }
