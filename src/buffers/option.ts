@@ -5,6 +5,7 @@ export type Options = {
   swapfile?: boolean;
   modifiable?: boolean;
   buflisted?: boolean;
+  undolevels?: number;
 };
 
 export class BufferOptionStore {
@@ -29,6 +30,9 @@ export class BufferOptionStore {
     if (options.buflisted !== undefined) {
       this.buflisted = options.buflisted;
       promises.push(this.buffer.setOption("buflisted", options.buflisted));
+    }
+    if (options.undolevels !== undefined) {
+      promises.push(this.buffer.setOption("undolevels", options.undolevels));
     }
 
     await Promise.all(promises);

@@ -28,12 +28,14 @@ describe("BufferOptionStore", () => {
       swapfile: false,
       modifiable: true,
       buflisted: true,
+      undolevels: -1,
     });
 
     expect(setOption).toHaveBeenCalledWith("buftype", "nofile");
     expect(setOption).toHaveBeenCalledWith("swapfile", false);
     expect(setOption).toHaveBeenCalledWith("modifiable", true);
     expect(setOption).toHaveBeenCalledWith("buflisted", true);
+    expect(setOption).toHaveBeenCalledWith("undolevels", -1);
   });
 
   it("set does nothing", async () => {

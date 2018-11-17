@@ -27,6 +27,7 @@ export class HistoryList extends BaseBuffer {
     buflisted: true,
     swapfile: false,
     modifiable: true,
+    undolevels: -1,
   };
 
   constructor(

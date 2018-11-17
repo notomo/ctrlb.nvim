@@ -36,6 +36,7 @@ export class BookmarkTree extends BaseBuffer {
     buftype: "nofile",
     swapfile: false,
     modifiable: true,
+    undolevels: -1,
   };
 
   constructor(
