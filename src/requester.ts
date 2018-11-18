@@ -2,23 +2,40 @@ import { spawn, ChildProcess, execFile } from "child_process";
 import { ActionInfo } from "./info";
 import { promisify } from "util";
 import { Logger, getLogger } from "./logger";
+import { Reporter } from "./reporter";
 const promisifyExecFile = promisify(execFile);
 
 export class Requester {
   protected readonly logger: Logger;
 
-  constructor() {
+  constructor(protected readonly reporter: Reporter) {
     this.logger = getLogger("requester");
   }
 
   public async executeAsync(info: ActionInfo): Promise<ChildProcess> {
-    return spawn("wsxhub", [
+    const p = spawn("wsxhub", [
       "--timeout",
       "3",
       "send",
       "--json",
       JSON.stringify(info),
     ]);
+
+    p.stdout.setEncoding("utf-8");
+    p.stdout.on("data", data => {
+      const stdout = JSON.parse(data.trim().split("\n")[0]);
+
+      if (!("error" in stdout)) {
+        return;
+      }
+      const error = {
+        name: stdout.error.data.name,
+        message: stdout.error.message,
+      };
+      this.reporter.error(error);
+    });
+
+    return p;
   }
 
   public async execute<T>(info: ActionInfo): Promise<T> {

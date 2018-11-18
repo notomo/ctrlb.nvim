@@ -43,10 +43,11 @@ export class Di {
       return new Ctrlb(requester, argParser, layoutParser, buffers, completer);
     },
     Requester: (vim: Neovim) => {
-      return new Requester();
+      const reporter = Di.get("Reporter", vim, false, "requester");
+      return new Requester(reporter);
     },
-    Reporter: (vim: Neovim) => {
-      const logger = getLogger("index");
+    Reporter: (vim: Neovim, name: string) => {
+      const logger = getLogger(name);
       return new Reporter(vim, logger);
     },
     Completer: (vim: Neovim) => {
@@ -258,7 +259,12 @@ export class Di {
   public static get(cls: "Execute", vim: Neovim): Execute;
   public static get(cls: "Open", vim: Neovim): Open;
   public static get(cls: "Completer", vim: Neovim): Completer;
-  public static get(cls: "Reporter", vim: Neovim): Reporter;
+  public static get(
+    cls: "Reporter",
+    vim: Neovim,
+    cacheable: false,
+    name: string
+  ): Reporter;
   public static get(cls: "Requester", vim: Neovim): Requester;
   public static get(cls: "Ctrlb", vim: Neovim): Ctrlb;
   public static get(

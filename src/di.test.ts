@@ -7,10 +7,10 @@ describe("Di", () => {
     const vim = new NeovimClass();
 
     Di.get("Ctrlb", vim);
-    Di.get("Reporter", vim);
+    Di.get("Requester", vim);
     Di.clear();
     Di.get("Ctrlb", vim);
-    Di.get("Reporter", vim);
+    Di.get("Requester", vim);
     Di.clear();
   });
 });

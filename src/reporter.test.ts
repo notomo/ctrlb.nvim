@@ -42,7 +42,7 @@ describe("Reporter", () => {
     await reporter.error(e);
 
     expect(error).toHaveBeenCalledWith(e);
-    expect(errWrite).toHaveBeenCalledWith("[ctrlb]" + errorMessage);
+    expect(errWrite).toHaveBeenCalledWith("[ctrlb]" + errorMessage + "\n");
   });
 
   it("error report the stack trace if argument is Error has a stack", async () => {
@@ -55,7 +55,7 @@ describe("Reporter", () => {
     await reporter.error(e);
 
     expect(error).toHaveBeenCalledWith(e);
-    expect(errWrite).toHaveBeenCalledWith("[ctrlb]" + stack);
+    expect(errWrite).toHaveBeenCalledWith("[ctrlb]" + stack + "\n");
   });
 
   it("error report vim errWrite's error if vim errWrite throw error", async () => {
