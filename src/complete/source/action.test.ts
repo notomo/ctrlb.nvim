@@ -6,9 +6,7 @@ describe("Action", () => {
   let action: Action;
 
   beforeEach(() => {
-    get = jest.fn().mockReturnValue({
-      actionGroups: [{ name: "tab", actions: [{ name: "next" }] }],
-    });
+    get = jest.fn().mockReturnValue([{ name: "tab/next" }]);
     const ApiInfoRepositoryClass = jest.fn<ApiInfoRepository>(() => ({
       get: get,
     }));
@@ -17,13 +15,8 @@ describe("Action", () => {
     action = new Action(apiInfoRepository);
   });
 
-  it("get returns empty array if actionGroupName is invalid", async () => {
-    const result = await action.get("");
-    expect(result).toEqual([]);
-  });
-
   it("get", async () => {
     const result = await action.get("tab");
-    expect(result).toEqual(["next"]);
+    expect(result).toEqual(["tab/next"]);
   });
 });

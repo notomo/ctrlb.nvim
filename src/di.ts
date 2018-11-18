@@ -8,7 +8,6 @@ import { Neovim } from "neovim";
 import { getLogger } from "./logger";
 import { Reporter } from "./reporter";
 import { BufferType } from "./complete/source/bufferType";
-import { ActionGroup } from "./complete/source/actionGroup";
 import { Action } from "./complete/source/action";
 import { ActionArgKey } from "./complete/source/actionArgKey";
 import { ApiInfoRepository } from "./repository/apiInfo";
@@ -88,10 +87,9 @@ export class Di {
     },
     Execute: (vim: Neovim) => {
       const apiInfoRepository = Di.get("ApiInfoRepository", vim);
-      const actionGroup = new ActionGroup(apiInfoRepository);
       const action = new Action(apiInfoRepository);
       const actionArgKey = new ActionArgKey();
-      return new Execute(actionGroup, action, actionArgKey);
+      return new Execute(action, actionArgKey);
     },
     Ctrl: (vim: Neovim) => {
       const eventRegisterer = Di.get("EventRegisterer", vim, false);
