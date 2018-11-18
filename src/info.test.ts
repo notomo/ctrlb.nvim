@@ -45,7 +45,6 @@ describe("ArgParser", () => {
   });
 
   [
-    { arg: "tab", expected: "Not found actionName." },
     { arg: "tab/create -", expected: "Arg key must not be empty." },
     { arg: "tab/create -=", expected: "Arg key must not be empty." },
   ].forEach(data => {

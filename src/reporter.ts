@@ -13,12 +13,13 @@ export class Reporter {
     }
     this.logger.error(error);
 
-    const message = (error.stack !== undefined ? error.stack : error.message)
-      .split("\n")
-      .map(line => {
-        return "[ctrlb]" + line;
-      })
-      .join("\n");
+    const message =
+      (error.stack !== undefined ? error.stack : error.message)
+        .split("\n")
+        .map(line => {
+          return "[ctrlb]" + line;
+        })
+        .join("\n") + "\n";
 
     await this.nvim.errWrite(message).catch(e => this.logger.error(e));
   }

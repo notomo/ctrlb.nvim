@@ -10,7 +10,7 @@ export class CtrlbPlugin {
   constructor(protected readonly plugin: NvimPlugin) {
     const vim = plugin.nvim;
     this.ctrlb = Di.get("Ctrlb", vim);
-    this.reporter = Di.get("Reporter", vim);
+    this.reporter = Di.get("Reporter", vim, false, "index");
 
     plugin.setOptions({ dev: false, alwaysInit: false });
 
