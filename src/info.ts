@@ -7,17 +7,19 @@ export interface ActionInfo {
 }
 
 export class ArgParser {
+  protected readonly separator = "/";
+
   public parse(arg: string): ActionInfo {
     let method = "";
     let actionArgs: ActionArgs = {};
 
     for (const value of arg.split(" ")) {
       if (!value.startsWith("-")) {
-        if (!value.includes(":")) {
+        if (!value.includes(this.separator)) {
           throw new Error("Not found actionName.");
         }
 
-        method = value.replace(":", "/");
+        method = value;
         continue;
       }
 
