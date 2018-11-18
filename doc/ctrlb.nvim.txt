@@ -8,17 +8,17 @@ License: MIT License (See LICENSE)
 EXAMPLES                                                *ctrlb.nvim-examples*
 >
         " reload the active tab
-        nnoremap RL :<C-u>Ctrlb tab:reload<CR>
+        nnoremap RL :<C-u>Ctrlb tab/reload<CR>
 
         " ctrlb-ctrlb buffer mappings
         autocmd MyAuGroup FileType ctrlb-ctrl call s:ctrl_settings()
         function! s:ctrl_settings()
-            nnoremap <buffer> l :<C-u>Ctrlb tab:next<CR>
-            nnoremap <buffer> h :<C-u>Ctrlb tab:previous<CR>
-            nnoremap <buffer> gg :<C-u>Ctrlb scroll:toTop<CR>
-            nnoremap <buffer> G :<C-u>Ctrlb scroll:toBottom<CR>
-            nnoremap <buffer> k :<C-u>Ctrlb scroll:up<CR>
-            nnoremap <buffer> j :<C-u>Ctrlb scroll:down<CR>
+            nnoremap <buffer> l :<C-u>Ctrlb tab/next<CR>
+            nnoremap <buffer> h :<C-u>Ctrlb tab/previous<CR>
+            nnoremap <buffer> gg :<C-u>Ctrlb scroll/toTop<CR>
+            nnoremap <buffer> G :<C-u>Ctrlb scroll/toBottom<CR>
+            nnoremap <buffer> k :<C-u>Ctrlb scroll/up<CR>
+            nnoremap <buffer> j :<C-u>Ctrlb scroll/down<CR>
         endfunction
 <
 ==============================================================================

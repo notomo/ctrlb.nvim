@@ -35,6 +35,6 @@ build = 'npm run setup'
 ## Usage
 
 ```
-:Ctrlb tab:reload
-:Ctrlb tab:open -url=https://github.com/notomo/ctrlb.nvim
+:Ctrlb tab/reload
+:Ctrlb tab/open -url=https://github.com/notomo/ctrlb.nvim
 ```
