@@ -38,8 +38,8 @@ export abstract class BaseBuffer {
       await this.bufferOptionStore.setFileType(
         "ctrlb-" + this.bufferContainer.type
       );
-      await this.bufferOptionStore.set(this.options);
       await this.setup();
+      await this.bufferOptionStore.set(this.options);
     }
   }
 

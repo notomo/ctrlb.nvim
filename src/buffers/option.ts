@@ -4,6 +4,7 @@ export type Options = {
   buftype?: string;
   swapfile?: boolean;
   modifiable?: boolean;
+  modified?: boolean;
   buflisted?: boolean;
   undolevels?: number;
 };
@@ -26,6 +27,9 @@ export class BufferOptionStore {
     }
     if (options.modifiable !== undefined) {
       promises.push(this.buffer.setOption("modifiable", options.modifiable));
+    }
+    if (options.modified !== undefined) {
+      promises.push(this.buffer.setOption("modified", options.modified));
     }
     if (options.buflisted !== undefined) {
       this.buflisted = options.buflisted;
