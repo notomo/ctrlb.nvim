@@ -22,10 +22,11 @@ export class CurrentTab extends BaseBuffer {
   public static readonly type = CtrlbBufferType.currentTab;
 
   protected readonly options = {
-    buftype: "nofile",
+    buftype: "acwrite",
     swapfile: false,
     buflisted: true,
     modifiable: true,
+    modified: false,
   };
 
   constructor(
@@ -38,6 +39,7 @@ export class CurrentTab extends BaseBuffer {
     super(vim, bufferContainer, eventRegisterer);
     this.actions["debug"] = async () =>
       this.debug(await this.itemBuffer.getCurrent());
+    this.actions["save"] = async () => this.save();
   }
 
   protected async setup(): Promise<void> {
@@ -51,6 +53,13 @@ export class CurrentTab extends BaseBuffer {
       "windowActivated",
       "windowCreated",
       "windowRemoved"
+    );
+
+    const bufferId = (await this.bufferContainer.get()).id;
+    await this.vim.command(
+      `autocmd BufWriteCmd <buffer=${bufferId}> call ctrlb#do_action(${
+        CurrentTab.type
+      }, "save")`
     );
 
     await this.update();
@@ -69,5 +78,23 @@ export class CurrentTab extends BaseBuffer {
 
     const item = new CurrentTabItem(tab);
     await this.itemBuffer.set(item);
+
+    if (this.bufferOptionStore !== null) {
+      await this.bufferOptionStore.set({ modified: false });
+    }
+  }
+
+  protected async save() {
+    const buffer = await this.bufferContainer.get();
+    const lines = await buffer.lines;
+    if (lines.length <= 1) {
+      return;
+    }
+
+    await this.tabRepository.open(lines[1]);
+
+    if (this.bufferOptionStore !== null) {
+      await this.bufferOptionStore.set({ modified: false });
+    }
   }
 }
