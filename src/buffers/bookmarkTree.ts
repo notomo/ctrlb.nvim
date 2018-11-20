@@ -108,9 +108,15 @@ export class BookmarkTree extends BaseBuffer {
   }
 
   protected async openTree(id: string | null) {
+    if (this.bufferOptionStore !== null) {
+      await this.bufferOptionStore.set({ modifiable: true });
+    }
     const items = (await this.bookmarkRepository.getTree(id)).map(bookmark => {
       return new BookmarkTreeItem(bookmark);
     });
     await this.treeBuffer.set(items, id);
+    if (this.bufferOptionStore !== null) {
+      await this.bufferOptionStore.set({ modifiable: false });
+    }
   }
 }

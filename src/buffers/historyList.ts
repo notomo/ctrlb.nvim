@@ -26,7 +26,7 @@ export class HistoryList extends BaseBuffer {
     buftype: "nofile",
     buflisted: true,
     swapfile: false,
-    modifiable: true,
+    modifiable: false,
     undolevels: -1,
   };
 
@@ -63,8 +63,14 @@ export class HistoryList extends BaseBuffer {
   }
 
   protected async update(history: History) {
+    if (this.bufferOptionStore !== null) {
+      await this.bufferOptionStore.set({ modifiable: true });
+    }
     const item = new HistoryListItem(history);
     await this.listBuffer.prepend(item);
+    if (this.bufferOptionStore !== null) {
+      await this.bufferOptionStore.set({ modifiable: false });
+    }
   }
 
   public async openHistory() {
