@@ -73,11 +73,11 @@ describe("BaseBuffer", () => {
   });
 
   it("doAction", async () => {
-    await buffer.doAction("actionName");
+    await buffer.doAction("actionName", 1, 1);
   });
 
   it("doAction throws error if actionName is invalid", () => {
-    expect(buffer.doAction("invalidActionName")).rejects.toEqual(
+    expect(buffer.doAction("invalidActionName", 1, 1)).rejects.toEqual(
       new Error("Invalid actionName: invalidActionName")
     );
   });

@@ -45,9 +45,9 @@ export class CtrlbPlugin {
     await this.ctrlb.openLayout(args[0]).catch(e => this.reporter.error(e));
   }
 
-  public async doAction(args: string[]): Promise<void> {
+  public async doAction(args: any[]): Promise<void> {
     await this.ctrlb
-      .doAction(args[0], args[1])
+      .doAction(args[0], args[1], args[2], args[3])
       .catch(e => this.reporter.error(e));
   }
 

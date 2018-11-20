@@ -14,6 +14,7 @@ describe("BookmarkTree", () => {
   let bookmarkTree: BookmarkTree;
 
   let getCurrent: jest.Mock;
+  let getRangeModels: jest.Mock;
   let getParent: jest.Mock;
   let tabOpen: jest.Mock;
   let open: jest.Mock;
@@ -32,10 +33,12 @@ describe("BookmarkTree", () => {
     bufferContainer = new BufferContainerClass();
 
     getCurrent = jest.fn().mockReturnValue(null);
+    getRangeModels = jest.fn().mockReturnValue([]);
     getParent = jest.fn().mockReturnValue(null);
     set = jest.fn();
     const TreeBufferClass = jest.fn<TreeBuffer<Bookmark>>(() => ({
       getCurrent: getCurrent,
+      getRangeModels: getRangeModels,
       getParent: getParent,
       set: set,
     }));
@@ -78,16 +81,16 @@ describe("BookmarkTree", () => {
   });
 
   it("tabOpenBookmark does nothing", async () => {
-    await bookmarkTree.tabOpenBookmark();
+    await bookmarkTree.tabOpenBookmark(1, 1);
 
     expect(tabOpen).not.toHaveBeenCalled();
   });
 
   it("tabOpenBookmark", async () => {
-    getCurrent = jest.fn().mockReturnValue(bookmark);
+    getRangeModels = jest.fn().mockReturnValue([bookmark]);
 
     const TreeBufferClass = jest.fn<TreeBuffer<Bookmark>>(() => ({
-      getCurrent: getCurrent,
+      getRangeModels: getRangeModels,
     }));
     treeBuffer = new TreeBufferClass();
 
@@ -99,7 +102,7 @@ describe("BookmarkTree", () => {
       bookmarkRepository
     );
 
-    await bookmarkTree.tabOpenBookmark();
+    await bookmarkTree.tabOpenBookmark(1, 1);
 
     expect(tabOpen).toHaveBeenCalledWith(id);
   });
