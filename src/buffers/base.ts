@@ -6,7 +6,9 @@ import { CtrlbBufferType } from "./type";
 import { EventRegisterer } from "./event";
 import { BufferOptionStore, Options } from "./option";
 
-export type Actions = { [index: string]: { (): Promise<void> } };
+export type Actions = {
+  [index: string]: { (firstLine: number, lastLine: number): Promise<void> };
+};
 
 export abstract class BaseBuffer {
   public static readonly type: CtrlbBufferType = CtrlbBufferType.empty;
@@ -50,12 +52,16 @@ export abstract class BaseBuffer {
 
   protected async setup(): Promise<void> {}
 
-  public async doAction(actionName: string): Promise<void> {
+  public async doAction(
+    actionName: string,
+    firstLine: number,
+    lastLine: number
+  ): Promise<void> {
     if (!(actionName in this.actions)) {
       throw new Error("Invalid actionName: " + actionName);
     }
     const action = this.actions[actionName];
-    await action();
+    await action(firstLine, lastLine);
   }
 
   protected async debug(stringSource: {} | null) {

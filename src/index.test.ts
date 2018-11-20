@@ -145,8 +145,10 @@ describe("CtrlbPlugin", () => {
   it("doAction", async () => {
     const arg1 = "";
     const arg2 = "";
-    await ctrlbPlugin.doAction([arg1, arg2]);
-    expect(doAction).toHaveBeenCalledWith(arg1, arg2);
+    const arg3 = 1;
+    const arg4 = 2;
+    await ctrlbPlugin.doAction([arg1, arg2, arg3, arg4]);
+    expect(doAction).toHaveBeenCalledWith(arg1, arg2, arg3, arg4);
   });
 
   it("doAction reports error on error", async () => {
@@ -164,7 +166,9 @@ describe("CtrlbPlugin", () => {
 
     const arg1 = "";
     const arg2 = "";
-    await ctrlbPlugin.doAction([arg1, arg2]);
+    const arg3 = 1;
+    const arg4 = 2;
+    await ctrlbPlugin.doAction([arg1, arg2, arg3, arg4]);
     expect(error).toHaveBeenCalled();
   });
 

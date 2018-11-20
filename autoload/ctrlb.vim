@@ -11,8 +11,8 @@ function! ctrlb#open_layout(json_file_path) abort
     return _ctrlb_open_layout(a:json_file_path)
 endfunction
 
-function! ctrlb#do_action(buffer_type, action_name) abort
-    return _ctrlb_do_action(a:buffer_type, a:action_name)
+function! ctrlb#do_action(buffer_type, action_name) range abort
+    return _ctrlb_do_action(a:buffer_type, a:action_name, a:firstline, a:lastline)
 endfunction
 
 function! ctrlb#clear_all() abort

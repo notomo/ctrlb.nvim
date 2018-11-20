@@ -48,7 +48,8 @@ export class BookmarkTree extends BaseBuffer {
   ) {
     super(vim, bufferContainer, eventRegisterer);
     this.actions["open"] = () => this.openBookmark();
-    this.actions["tabOpen"] = () => this.tabOpenBookmark();
+    this.actions["tabOpen"] = (firstLine: number, lastLine: number) =>
+      this.tabOpenBookmark(firstLine, lastLine);
     this.actions["openParent"] = () => this.openParent();
     this.actions["debug"] = async () =>
       this.debug(await this.treeBuffer.getCurrent());
@@ -98,13 +99,15 @@ export class BookmarkTree extends BaseBuffer {
     await this.openTree(id);
   }
 
-  public async tabOpenBookmark() {
-    const bookmark = await this.treeBuffer.getCurrent();
-    if (bookmark === null || bookmark.url === undefined) {
-      return;
-    }
+  public async tabOpenBookmark(firstLine: number, lastLine: number) {
+    const bookmarks = await this.treeBuffer.getRangeModels(firstLine, lastLine);
+    for (const bookmark of bookmarks) {
+      if (bookmark === null || bookmark.url === undefined) {
+        continue;
+      }
 
-    await this.bookmarkRepository.tabOpen(bookmark.id);
+      await this.bookmarkRepository.tabOpen(bookmark.id);
+    }
   }
 
   protected async openTree(id: string | null) {

@@ -34,12 +34,17 @@ export class Ctrlb {
     await layoutItem.openLayout();
   }
 
-  public async doAction(bufferType: string, actionName: string): Promise<void> {
+  public async doAction(
+    bufferType: string,
+    actionName: string,
+    firstLine: number,
+    lastLine: number
+  ): Promise<void> {
     if (!this.argParser.isBufferType(bufferType)) {
       throw new Error("Inavalid bufferType: " + bufferType);
     }
     const buffer = this.buffers.get(bufferType);
-    await buffer.doAction(actionName);
+    await buffer.doAction(actionName, firstLine, lastLine);
   }
 
   public async clearAll(): Promise<void> {

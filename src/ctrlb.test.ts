@@ -129,7 +129,7 @@ describe("Ctrlb", () => {
 
   it("doAction", async () => {
     const bufferType = "bufferType";
-    await ctrlb.doAction(bufferType, "actionName");
+    await ctrlb.doAction(bufferType, "actionName", 1, 1);
   });
 
   it("doAction throws error if bufferType is invalid", () => {
@@ -141,7 +141,7 @@ describe("Ctrlb", () => {
     const argParser = new ArgParserClass();
     ctrlb = new Ctrlb(requester, argParser, layoutParser, buffers, completer);
 
-    expect(ctrlb.doAction(bufferType, "actionName")).rejects.toEqual(
+    expect(ctrlb.doAction(bufferType, "actionName", 1, 1)).rejects.toEqual(
       new Error("Inavalid bufferType: " + bufferType)
     );
   });
