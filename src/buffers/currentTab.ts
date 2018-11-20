@@ -57,9 +57,9 @@ export class CurrentTab extends BaseBuffer {
 
     const bufferId = (await this.bufferContainer.get()).id;
     await this.vim.command(
-      `autocmd BufWriteCmd <buffer=${bufferId}> call ctrlb#do_action(${
+      `autocmd BufWriteCmd <buffer=${bufferId}> call ctrlb#do_action("${
         CurrentTab.type
-      }, "save")`
+      }", "save")`
     );
 
     await this.update();
