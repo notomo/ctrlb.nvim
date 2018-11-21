@@ -16,6 +16,7 @@ describe("HistoryList", () => {
   let historyList: HistoryList;
 
   let getCurrent: jest.Mock;
+  let getRangeModels: jest.Mock;
   let open: jest.Mock;
   let tabOpen: jest.Mock;
 
@@ -27,8 +28,10 @@ describe("HistoryList", () => {
     bufferContainer = new BufferContainerClass();
 
     getCurrent = jest.fn().mockReturnValue(null);
+    getRangeModels = jest.fn().mockReturnValue([]);
     const TreeBufferClass = jest.fn<ListBuffer<History>>(() => ({
       getCurrent: getCurrent,
+      getRangeModels: getRangeModels,
     }));
     listBuffer = new TreeBufferClass();
 
@@ -113,7 +116,7 @@ describe("HistoryList", () => {
   });
 
   it("tabOpenHistory does nothing when the current item is null", async () => {
-    await historyList.tabOpenHistory();
+    await historyList.tabOpenHistory(1, 1);
 
     expect(tabOpen).not.toHaveBeenCalled();
   });
@@ -122,9 +125,9 @@ describe("HistoryList", () => {
     const history = {
       title: "title",
     };
-    getCurrent = jest.fn().mockReturnValue(history);
+    getRangeModels = jest.fn().mockReturnValue([history]);
     const TreeBufferClass = jest.fn<ListBuffer<History>>(() => ({
-      getCurrent: getCurrent,
+      getRangeModels: getRangeModels,
     }));
     listBuffer = new TreeBufferClass();
 
@@ -137,7 +140,7 @@ describe("HistoryList", () => {
       tabRepository
     );
 
-    await historyList.tabOpenHistory();
+    await historyList.tabOpenHistory(1, 1);
 
     expect(tabOpen).not.toHaveBeenCalled();
   });
@@ -148,9 +151,9 @@ describe("HistoryList", () => {
       title: "title",
       url: url,
     };
-    getCurrent = jest.fn().mockReturnValue(history);
+    getRangeModels = jest.fn().mockReturnValue([history]);
     const TreeBufferClass = jest.fn<ListBuffer<History>>(() => ({
-      getCurrent: getCurrent,
+      getRangeModels: getRangeModels,
     }));
     listBuffer = new TreeBufferClass();
 
@@ -163,7 +166,7 @@ describe("HistoryList", () => {
       tabRepository
     );
 
-    await historyList.tabOpenHistory();
+    await historyList.tabOpenHistory(1, 1);
 
     expect(tabOpen).toHaveBeenCalledWith(url);
   });

@@ -39,7 +39,8 @@ export class HistoryList extends BaseBuffer {
     protected readonly tabRepository: TabRepository
   ) {
     super(vim, bufferContainer, eventRegisterer);
-    this.actions["tabOpen"] = () => this.tabOpenHistory();
+    this.actions["tabOpen"] = (firstLine: number, lastLine: number) =>
+      this.tabOpenHistory(firstLine, lastLine);
     this.actions["open"] = () => this.openHistory();
     this.actions["debug"] = async () =>
       this.debug(await this.listBuffer.getCurrent());
@@ -82,12 +83,14 @@ export class HistoryList extends BaseBuffer {
     await this.tabRepository.open(history.url);
   }
 
-  public async tabOpenHistory() {
-    const history = await this.listBuffer.getCurrent();
-    if (history === null || history.url === undefined) {
-      return;
-    }
+  public async tabOpenHistory(firstLine: number, lastLine: number) {
+    const histories = await this.listBuffer.getRangeModels(firstLine, lastLine);
+    for (const history of histories) {
+      if (history === null || history.url === undefined) {
+        return;
+      }
 
-    await this.tabRepository.tabOpen(history.url);
+      await this.tabRepository.tabOpen(history.url);
+    }
   }
 }

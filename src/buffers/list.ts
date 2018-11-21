@@ -14,12 +14,32 @@ export class ListBuffer<Model> {
     protected readonly bufferContainer: BufferContainer
   ) {}
 
-  public async getCurrent(): Promise<Model | null> {
-    const index = (await this.vim.call("line", ".")) - 1;
+  public async getModel(lineNumber: number): Promise<Model | null> {
+    const index = lineNumber - 1;
     if (index in this.items) {
       return this.items[index].value;
     }
     return null;
+  }
+
+  public async getCurrent(): Promise<Model | null> {
+    const lineNumber = await this.vim.call("line", ".");
+    return this.getModel(lineNumber);
+  }
+
+  public async getRangeModels(
+    firstLine: number,
+    lastLine: number
+  ): Promise<Model[]> {
+    const models: Model[] = [];
+    for (const i of [...Array(lastLine - firstLine + 1).keys()]) {
+      const lineNubmer = i + firstLine;
+      const model = await this.getModel(lineNubmer);
+      if (model !== null) {
+        models.push(model);
+      }
+    }
+    return models;
   }
 
   public async prepend(item: Item<Model>) {
