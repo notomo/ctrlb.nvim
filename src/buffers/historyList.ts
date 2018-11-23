@@ -98,7 +98,7 @@ export class HistoryList extends BaseBuffer {
   public async remove(firstLine: number, lastLine: number) {
     const histories = await this.listBuffer.getRangeModels(firstLine, lastLine);
     for (const history of histories) {
-      if (history === null || history.url === undefined) {
+      if (history.url === undefined) {
         return;
       }
 
@@ -111,7 +111,7 @@ export class HistoryList extends BaseBuffer {
   public async tabOpenHistory(firstLine: number, lastLine: number) {
     const histories = await this.listBuffer.getRangeModels(firstLine, lastLine);
     for (const history of histories) {
-      if (history === null || history.url === undefined) {
+      if (history.url === undefined) {
         return;
       }
 
