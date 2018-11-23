@@ -41,6 +41,8 @@ export class HistoryList extends BaseBuffer {
     super(vim, bufferContainer, eventRegisterer);
     this.actions["tabOpen"] = (firstLine: number, lastLine: number) =>
       this.tabOpenHistory(firstLine, lastLine);
+    this.actions["remove"] = (firstLine: number, lastLine: number) =>
+      this.remove(firstLine, lastLine);
     this.actions["open"] = () => this.openHistory();
     this.actions["debug"] = async () =>
       this.debug(await this.listBuffer.getCurrent());
@@ -57,10 +59,7 @@ export class HistoryList extends BaseBuffer {
     const p = this.historyRepository.onCreated(history => this.update(history));
     this.eventRegisterer.subscribe(p, "historyCreated");
 
-    const items = (await this.historyRepository.search()).map(history => {
-      return new HistoryListItem(history);
-    });
-    await this.listBuffer.set(items);
+    await this.set();
   }
 
   protected async update(history: History) {
@@ -83,10 +82,36 @@ export class HistoryList extends BaseBuffer {
     await this.tabRepository.open(history.url);
   }
 
+  protected async set() {
+    const items = (await this.historyRepository.search()).map(history => {
+      return new HistoryListItem(history);
+    });
+    if (this.bufferOptionStore !== null) {
+      await this.bufferOptionStore.set({ modifiable: true });
+    }
+    await this.listBuffer.set(items);
+    if (this.bufferOptionStore !== null) {
+      await this.bufferOptionStore.set({ modifiable: false });
+    }
+  }
+
+  public async remove(firstLine: number, lastLine: number) {
+    const histories = await this.listBuffer.getRangeModels(firstLine, lastLine);
+    for (const history of histories) {
+      if (history.url === undefined) {
+        return;
+      }
+
+      await this.historyRepository.remove(history.url);
+    }
+
+    await this.set();
+  }
+
   public async tabOpenHistory(firstLine: number, lastLine: number) {
     const histories = await this.listBuffer.getRangeModels(firstLine, lastLine);
     for (const history of histories) {
-      if (history === null || history.url === undefined) {
+      if (history.url === undefined) {
         return;
       }
 

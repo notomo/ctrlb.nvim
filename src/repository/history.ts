@@ -16,6 +16,13 @@ export class HistoryRepository {
     });
   }
 
+  public async remove(url: string): Promise<ChildProcess> {
+    return this.requester.executeAsync({
+      method: "history/remove",
+      params: { url: url },
+    });
+  }
+
   public onCreated(callback: { (history: History): void }): ChildProcess {
     return this.requester.receiveAsyncOnEvent<History>(
       {},
