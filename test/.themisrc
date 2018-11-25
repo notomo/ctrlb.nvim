@@ -1,0 +1,14 @@
+call themis#option('recursive', 1)
+
+runtime! plugin/rplugin.vim
+
+function! CtrlbTestBefore() abort
+    let s:root = getcwd()
+    return s:root
+endfunction
+
+function! CtrlbTestAfterEach() abort
+    %bwipeout!
+    CtrlbClearAll
+    execute 'cd ' . s:root
+endfunction

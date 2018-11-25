@@ -197,7 +197,7 @@ describe("CtrlbPlugin", () => {
   it("complete", async () => {
     const arg1 = "";
     const arg2 = "";
-    const arg3 = "";
+    const arg3 = 1;
     await ctrlbPlugin.complete([arg1, arg2, arg3]);
     expect(complete).toHaveBeenCalledWith(arg1, arg2, arg3);
   });
@@ -217,7 +217,7 @@ describe("CtrlbPlugin", () => {
 
     const arg1 = "";
     const arg2 = "";
-    const arg3 = "";
+    const arg3 = 1;
     await ctrlbPlugin.complete([arg1, arg2, arg3]);
     expect(error).toHaveBeenCalled();
   });

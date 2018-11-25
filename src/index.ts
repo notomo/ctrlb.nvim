@@ -33,30 +33,28 @@ export class CtrlbPlugin {
     });
   }
 
-  public executeAsync(args: string[]): void {
-    this.ctrlb.requestAsync(args[0]).catch(e => this.reporter.error(e));
+  public executeAsync(args: [string]): void {
+    this.ctrlb.requestAsync(...args).catch(e => this.reporter.error(e));
   }
 
-  public async open(args: string[]): Promise<void> {
-    await this.ctrlb.open(args[0]).catch(e => this.reporter.error(e));
+  public async open(args: [string]): Promise<void> {
+    await this.ctrlb.open(...args).catch(e => this.reporter.error(e));
   }
 
-  public async openLayout(args: string[]): Promise<void> {
-    await this.ctrlb.openLayout(args[0]).catch(e => this.reporter.error(e));
+  public async openLayout(args: [string]): Promise<void> {
+    await this.ctrlb.openLayout(...args).catch(e => this.reporter.error(e));
   }
 
-  public async doAction(args: any[]): Promise<void> {
-    await this.ctrlb
-      .doAction(args[0], args[1], args[2], args[3])
-      .catch(e => this.reporter.error(e));
+  public async doAction(args: [string, string, number, number]): Promise<void> {
+    await this.ctrlb.doAction(...args).catch(e => this.reporter.error(e));
   }
 
   public async clearAll(): Promise<void> {
     await this.ctrlb.clearAll().catch(e => this.reporter.error(e));
   }
 
-  public async complete(args: any[]): Promise<string[]> {
-    return await this.ctrlb.complete(args[0], args[1], args[2]).catch(e => {
+  public async complete(args: [string, string, number]): Promise<string[]> {
+    return await this.ctrlb.complete(...args).catch(e => {
       this.reporter.error(e);
       return [];
     });
