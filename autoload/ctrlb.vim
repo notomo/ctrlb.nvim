@@ -24,15 +24,3 @@ function! ctrlb#_complete(current_arg, line, cursor_position) abort
     let candidates = _ctrlb_complete(a:current_arg, a:line, a:cursor_position)
     return join(candidates, "\n")
 endfunction
-
-let s:custom = {
-    \ 'executable_path': 'wsxhub',
-\ }
-
-function! ctrlb#custom(name, value) abort
-    let s:custom[a:name] = a:value
-endfunction
-
-function! ctrlb#get_custom() abort
-    return s:custom
-endfunction
