@@ -13,6 +13,7 @@ install:
     - chmod u+x ~/neovim/bin/nvim
     - npm ci
     - npm install -g codecov
+    - npm install -g neovim
     - git clone --depth 1 https://github.com/thinca/vim-themis vim-themis
 
 env:
