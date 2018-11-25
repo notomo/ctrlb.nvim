@@ -8,7 +8,8 @@ function! ctrlb#open(buffer_type) abort
 endfunction
 
 function! ctrlb#open_layout(json_file_path) abort
-    return _ctrlb_open_layout(a:json_file_path)
+    let absolute_file_path = fnamemodify(a:json_file_path, ':p')
+    return _ctrlb_open_layout(absolute_file_path)
 endfunction
 
 function! ctrlb#do_action(buffer_type, action_name) range abort
