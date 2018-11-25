@@ -8,7 +8,8 @@ function! ctrlb#open(buffer_type) abort
 endfunction
 
 function! ctrlb#open_layout(json_file_path) abort
-    return _ctrlb_open_layout(a:json_file_path)
+    let absolute_file_path = fnamemodify(a:json_file_path, ':p')
+    return _ctrlb_open_layout(absolute_file_path)
 endfunction
 
 function! ctrlb#do_action(buffer_type, action_name) range abort
@@ -22,16 +23,4 @@ endfunction
 function! ctrlb#_complete(current_arg, line, cursor_position) abort
     let candidates = _ctrlb_complete(a:current_arg, a:line, a:cursor_position)
     return join(candidates, "\n")
-endfunction
-
-let s:custom = {
-    \ 'executable_path': 'wsxhub',
-\ }
-
-function! ctrlb#custom(name, value) abort
-    let s:custom[a:name] = a:value
-endfunction
-
-function! ctrlb#get_custom() abort
-    return s:custom
 endfunction
