@@ -6,7 +6,7 @@ describe("Action", () => {
   let action: Action;
 
   beforeEach(() => {
-    get = jest.fn().mockReturnValue([{ name: "tab/next" }]);
+    get = jest.fn().mockReturnValue([[{ name: "tab/next" }], null]);
     const ApiInfoRepositoryClass = jest.fn<ApiInfoRepository>(() => ({
       get: get,
     }));

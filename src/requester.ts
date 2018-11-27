@@ -3,6 +3,7 @@ import { ActionInfo } from "./info";
 import { promisify } from "util";
 import { Logger, getLogger } from "./logger";
 import { Reporter } from "./reporter";
+import { WithError } from "./error";
 const promisifyExecFile = promisify(execFile);
 
 export class Requester {
@@ -38,17 +39,28 @@ export class Requester {
     return p;
   }
 
-  public async execute<T>(info: ActionInfo): Promise<T> {
+  public async execute<T>(info: ActionInfo): Promise<WithError<T | null>> {
     const result = await promisifyExecFile(
       "wsxhub",
       ["--timeout", "3", "send", "--json", JSON.stringify(info)],
       { timeout: 4000 }
     );
 
-    const stdout: { body: { data: T } } = JSON.parse(
-      result.stdout.trim().split("\n")[0]
-    );
-    return stdout.body.data;
+    const stdout: {
+      body: { data: T };
+      error?: { data: { name: string }; message: string };
+    } = JSON.parse(result.stdout.trim().split("\n")[0]);
+
+    if (stdout.error !== undefined) {
+      const error = {
+        name: stdout.error.data.name,
+        message: stdout.error.message,
+      };
+      await this.reporter.error(error);
+      return [null, error];
+    }
+
+    return [stdout.body.data, null];
   }
 
   public receiveAsyncOnEvent<T>(

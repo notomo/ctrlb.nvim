@@ -59,7 +59,7 @@ export class HistoryList extends BaseBuffer {
     const p = this.historyRepository.onCreated(history => this.update(history));
     this.eventRegisterer.subscribe(p, "historyCreated");
 
-    await this.set();
+    this.set();
   }
 
   protected async update(history: History) {
@@ -83,9 +83,16 @@ export class HistoryList extends BaseBuffer {
   }
 
   protected async set() {
-    const items = (await this.historyRepository.search()).map(history => {
+    const [histories, error] = await this.historyRepository.search();
+
+    if (error !== null) {
+      return;
+    }
+
+    const items = histories.map(history => {
       return new HistoryListItem(history);
     });
+
     if (this.bufferOptionStore !== null) {
       await this.bufferOptionStore.set({ modifiable: true });
     }

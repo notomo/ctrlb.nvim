@@ -47,7 +47,13 @@ export class DownloadList extends BaseBuffer {
     );
     this.eventRegisterer.subscribe(p, "downloadCreated");
 
-    const items = (await this.downloadRepository.search()).map(download => {
+    const [downloads, error] = await this.downloadRepository.search();
+
+    if (error !== null) {
+      return;
+    }
+
+    const items = downloads.map(download => {
       return new DownloadListItem(download);
     });
     await this.listBuffer.set(items);

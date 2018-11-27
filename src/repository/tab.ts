@@ -1,5 +1,6 @@
 import { Requester } from "../requester";
 import { ChildProcess } from "child_process";
+import { WithError } from "../error";
 
 export type Tab = {
   title: string;
@@ -9,7 +10,7 @@ export type Tab = {
 export class TabRepository {
   constructor(protected readonly requester: Requester) {}
 
-  public async getCurrent(): Promise<Tab> {
+  public async getCurrent(): Promise<WithError<Tab | null>> {
     return this.requester.execute<Tab>({
       method: "tab/getCurrent",
     });
