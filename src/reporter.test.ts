@@ -31,10 +31,10 @@ describe("Reporter", () => {
     };
   });
 
-  it("error does not report if argument is not error", async () => {
+  it("error does not write if argument is not error", async () => {
     await reporter.error("");
 
-    expect(error).not.toHaveBeenCalled();
+    expect(error).toHaveBeenCalled();
     expect(errWrite).not.toHaveBeenCalled();
   });
 

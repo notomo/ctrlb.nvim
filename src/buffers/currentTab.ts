@@ -62,17 +62,12 @@ export class CurrentTab extends BaseBuffer {
       }", "save")`
     );
 
-    await this.update();
-  }
-
-  protected isTab(tab: any): tab is Tab {
-    return typeof tab.title === "string" && typeof tab.url === "string";
+    this.update();
   }
 
   protected async update() {
-    const tab = await this.tabRepository.getCurrent();
-
-    if (!this.isTab(tab)) {
+    const [tab, error] = await this.tabRepository.getCurrent();
+    if (error !== null || tab === null) {
       return;
     }
 

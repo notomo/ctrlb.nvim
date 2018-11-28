@@ -8,10 +8,10 @@ export class Reporter {
   ) {}
 
   public async error(error: unknown) {
+    this.logger.error(error);
     if (!this.isError(error)) {
       return;
     }
-    this.logger.error(error);
 
     const message =
       (error.stack !== undefined ? error.stack : error.message)

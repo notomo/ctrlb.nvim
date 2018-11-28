@@ -70,7 +70,7 @@ export class BookmarkTree extends BaseBuffer {
       "syntax match CtrlbBookmarkTreeUrl /[[:tab:]]\\zs.*$/"
     );
 
-    await this.openBookmark();
+    this.openBookmark();
   }
 
   public async openParent() {
@@ -111,12 +111,19 @@ export class BookmarkTree extends BaseBuffer {
   }
 
   protected async openTree(id: string | null) {
+    const [bookmarks, error] = await this.bookmarkRepository.getTree(id);
+
+    if (error !== null) {
+      return;
+    }
+
+    const items = bookmarks.map(bookmark => {
+      return new BookmarkTreeItem(bookmark);
+    });
+
     if (this.bufferOptionStore !== null) {
       await this.bufferOptionStore.set({ modifiable: true });
     }
-    const items = (await this.bookmarkRepository.getTree(id)).map(bookmark => {
-      return new BookmarkTreeItem(bookmark);
-    });
     await this.treeBuffer.set(items, id);
     if (this.bufferOptionStore !== null) {
       await this.bufferOptionStore.set({ modifiable: false });

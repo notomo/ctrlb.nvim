@@ -131,6 +131,7 @@ describe("CtrlbPlugin", () => {
 
     const CtrlbClass = jest.fn<Ctrlb>(() => ({
       openLayout: openLayout,
+      clearAll: clearAll,
     }));
     const ctrlb = new CtrlbClass();
     Di.set("Ctrlb", ctrlb);
@@ -140,6 +141,7 @@ describe("CtrlbPlugin", () => {
     const arg = "";
     await ctrlbPlugin.openLayout([arg]);
     expect(error).toHaveBeenCalled();
+    expect(clearAll).toHaveBeenCalled();
   });
 
   it("doAction", async () => {

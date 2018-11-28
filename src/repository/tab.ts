@@ -1,5 +1,6 @@
 import { Requester } from "../requester";
 import { ChildProcess } from "child_process";
+import { WithError, NullableError } from "../error";
 
 export type Tab = {
   title: string;
@@ -9,20 +10,20 @@ export type Tab = {
 export class TabRepository {
   constructor(protected readonly requester: Requester) {}
 
-  public async getCurrent(): Promise<Tab> {
+  public async getCurrent(): Promise<WithError<Tab | null>> {
     return this.requester.execute<Tab>({
       method: "tab/getCurrent",
     });
   }
 
-  public async open(url: string): Promise<ChildProcess> {
+  public async open(url: string): Promise<NullableError> {
     return this.requester.executeAsync({
       method: "tab/open",
       params: { url: url },
     });
   }
 
-  public async tabOpen(url: string): Promise<ChildProcess> {
+  public async tabOpen(url: string): Promise<NullableError> {
     return this.requester.executeAsync({
       method: "tab/tabOpen",
       params: { url: url },

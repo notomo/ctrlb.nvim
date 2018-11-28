@@ -1,5 +1,6 @@
 import { Requester } from "../requester";
 import { ChildProcess } from "child_process";
+import { WithError } from "../error";
 
 export type Download = {
   filename: string;
@@ -9,11 +10,17 @@ export type Download = {
 export class DownloadRepository {
   constructor(protected readonly requester: Requester) {}
 
-  public async search(): Promise<Download[]> {
-    return this.requester.execute<Download[]>({
+  public async search(): Promise<WithError<Download[]>> {
+    const [downloads, error] = await this.requester.execute<Download[]>({
       method: "download/search",
       params: {},
     });
+
+    if (downloads === null) {
+      return [[], error];
+    }
+
+    return [downloads, error];
   }
 
   public onCreated(callback: { (download: Download): void }): ChildProcess {

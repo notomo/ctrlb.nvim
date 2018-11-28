@@ -4,18 +4,20 @@ import { ApiInfoRepository } from "./apiInfo";
 describe("ApiInfoRepository", () => {
   let execute: jest.Mock;
 
-  it("get", () => {
-    execute = jest.fn();
+  it("get", async () => {
+    execute = jest.fn().mockReturnValue([[], null]);
     const RequesterClass = jest.fn<Requester>(() => ({
       execute: execute,
     }));
     const requester = new RequesterClass();
 
     const apiInfoRepository = new ApiInfoRepository(requester);
-    apiInfoRepository.get();
+    const result = await apiInfoRepository.get();
 
     expect(execute).toHaveBeenCalledWith({
       method: "apiInfo/get",
     });
+
+    expect(result).toEqual([[], null]);
   });
 });
