@@ -1,6 +1,5 @@
 import { Requester } from "../requester";
-import { ChildProcess } from "child_process";
-import { WithError } from "../error";
+import { WithError, NullableError } from "../error";
 
 export type Bookmark = {
   title: string;
@@ -26,14 +25,14 @@ export class BookmarkRepository {
     return [bookmarks, error];
   }
 
-  public async open(id: string | null): Promise<ChildProcess> {
+  public async open(id: string | null): Promise<NullableError> {
     return this.requester.executeAsync({
       method: "bookmark/open",
       params: { id: id },
     });
   }
 
-  public async tabOpen(id: string | null): Promise<ChildProcess> {
+  public async tabOpen(id: string | null): Promise<NullableError> {
     return this.requester.executeAsync({
       method: "bookmark/tabOpen",
       params: { id: id },

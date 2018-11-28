@@ -42,7 +42,10 @@ export class CtrlbPlugin {
   }
 
   public async openLayout(args: [string]): Promise<void> {
-    await this.ctrlb.openLayout(...args).catch(e => this.reporter.error(e));
+    await this.ctrlb.openLayout(...args).catch(e => {
+      this.clearAll();
+      this.reporter.error(e);
+    });
   }
 
   public async doAction(args: [string, string, number, number]): Promise<void> {

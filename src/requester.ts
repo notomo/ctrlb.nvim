@@ -3,7 +3,7 @@ import { ActionInfo } from "./info";
 import { promisify } from "util";
 import { Logger, getLogger } from "./logger";
 import { Reporter } from "./reporter";
-import { WithError } from "./error";
+import { WithError, NullableError } from "./error";
 const promisifyExecFile = promisify(execFile);
 
 export class Requester {
@@ -13,30 +13,39 @@ export class Requester {
     this.logger = getLogger("requester");
   }
 
-  public async executeAsync(info: ActionInfo): Promise<ChildProcess> {
-    const p = spawn("wsxhub", [
-      "--timeout",
-      "3",
-      "send",
-      "--json",
-      JSON.stringify(info),
-    ]);
+  public async executeAsync(info: ActionInfo): Promise<NullableError> {
+    const result = await promisifyExecFile(
+      "wsxhub",
+      ["--timeout", "3", "send", "--json", JSON.stringify(info)],
+      { timeout: 4000 }
+    ).catch(e => {
+      return e;
+    });
 
-    p.stdout.setEncoding("utf-8");
-    p.stdout.on("data", data => {
-      const stdout = JSON.parse(data.trim().split("\n")[0]);
+    if (result.name !== undefined) {
+      const error = {
+        name: result.name,
+        message: result.message,
+        stack: result.stack,
+      };
+      await this.reporter.error(error);
+      return error;
+    }
 
-      if (!("error" in stdout)) {
-        return;
-      }
+    const stdout: {
+      error?: { data: { name: string }; message: string };
+    } = JSON.parse(result.stdout.trim().split("\n")[0]);
+
+    if (stdout.error !== undefined) {
       const error = {
         name: stdout.error.data.name,
         message: stdout.error.message,
       };
-      this.reporter.error(error);
-    });
+      await this.reporter.error(error);
+      return error;
+    }
 
-    return p;
+    return null;
   }
 
   public async execute<T>(info: ActionInfo): Promise<WithError<T | null>> {
@@ -44,7 +53,19 @@ export class Requester {
       "wsxhub",
       ["--timeout", "3", "send", "--json", JSON.stringify(info)],
       { timeout: 4000 }
-    );
+    ).catch(e => {
+      return e;
+    });
+
+    if (result.name !== undefined) {
+      const error = {
+        name: result.name,
+        message: result.message,
+        stack: result.stack,
+      };
+      await this.reporter.error(error);
+      return [null, error];
+    }
 
     const stdout: {
       body: { data: T };

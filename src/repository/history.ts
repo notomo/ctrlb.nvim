@@ -1,6 +1,6 @@
 import { Requester } from "../requester";
 import { ChildProcess } from "child_process";
-import { WithError } from "../error";
+import { WithError, NullableError } from "../error";
 
 export type History = {
   title: string;
@@ -23,7 +23,7 @@ export class HistoryRepository {
     return [histories, error];
   }
 
-  public async remove(url: string): Promise<ChildProcess> {
+  public async remove(url: string): Promise<NullableError> {
     return this.requester.executeAsync({
       method: "history/remove",
       params: { url: url },

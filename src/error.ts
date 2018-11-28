@@ -1,1 +1,2 @@
-export type WithError<T> = [T, Error | null];
+export type WithError<T> = [T, NullableError];
+export type NullableError = Error | null;
