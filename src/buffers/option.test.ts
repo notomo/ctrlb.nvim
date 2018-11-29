@@ -27,6 +27,7 @@ describe("BufferOptionStore", () => {
       buftype: "nofile",
       swapfile: false,
       modifiable: true,
+      modified: false,
       buflisted: true,
       undolevels: -1,
     });
@@ -34,6 +35,7 @@ describe("BufferOptionStore", () => {
     expect(setOption).toHaveBeenCalledWith("buftype", "nofile");
     expect(setOption).toHaveBeenCalledWith("swapfile", false);
     expect(setOption).toHaveBeenCalledWith("modifiable", true);
+    expect(setOption).toHaveBeenCalledWith("modified", false);
     expect(setOption).toHaveBeenCalledWith("buflisted", true);
     expect(setOption).toHaveBeenCalledWith("undolevels", -1);
   });
@@ -41,9 +43,6 @@ describe("BufferOptionStore", () => {
   it("set does nothing", async () => {
     await bufferOptionStore.set({});
 
-    expect(setOption).not.toHaveBeenCalled();
-    expect(setOption).not.toHaveBeenCalled();
-    expect(setOption).not.toHaveBeenCalled();
     expect(setOption).not.toHaveBeenCalled();
   });
 
@@ -80,6 +79,9 @@ describe("BufferOptionStoreFactory", () => {
     const bufferOptionStoreFactory = new BufferOptionStoreFactory(vim);
     const bufferOptionStore = bufferOptionStoreFactory.create(buffer);
 
+    const sameBufferOptionStore = bufferOptionStoreFactory.create(buffer);
+
     expect(typeof bufferOptionStore.set).toEqual("function");
+    expect(bufferOptionStore).toBe(sameBufferOptionStore);
   });
 });

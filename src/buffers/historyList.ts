@@ -63,14 +63,8 @@ export class HistoryList extends BaseBuffer {
   }
 
   protected async update(history: History) {
-    if (this.bufferOptionStore !== null) {
-      await this.bufferOptionStore.set({ modifiable: true });
-    }
     const item = new HistoryListItem(history);
     await this.listBuffer.prepend(item);
-    if (this.bufferOptionStore !== null) {
-      await this.bufferOptionStore.set({ modifiable: false });
-    }
   }
 
   public async openHistory() {
@@ -93,13 +87,7 @@ export class HistoryList extends BaseBuffer {
       return new HistoryListItem(history);
     });
 
-    if (this.bufferOptionStore !== null) {
-      await this.bufferOptionStore.set({ modifiable: true });
-    }
     await this.listBuffer.set(items);
-    if (this.bufferOptionStore !== null) {
-      await this.bufferOptionStore.set({ modifiable: false });
-    }
   }
 
   public async remove(firstLine: number, lastLine: number) {
