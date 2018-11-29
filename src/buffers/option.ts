@@ -55,9 +55,19 @@ export class BufferOptionStore {
 }
 
 export class BufferOptionStoreFactory {
-  constructor(protected readonly vim: Neovim) {}
+  protected optionStore: BufferOptionStore | null;
+
+  constructor(protected readonly vim: Neovim) {
+    this.optionStore = null;
+  }
 
   public create(buffer: Buffer): BufferOptionStore {
-    return new BufferOptionStore(this.vim, buffer);
+    if (this.optionStore === null) {
+      const optionStore = new BufferOptionStore(this.vim, buffer);
+      this.optionStore = optionStore;
+      return optionStore;
+    }
+
+    return this.optionStore;
   }
 }

@@ -4,7 +4,7 @@ import { Logger, getLogger } from "../logger";
 import { BufferContainer } from "./container";
 import { CtrlbBufferType } from "./type";
 import { EventRegisterer } from "./event";
-import { BufferOptionStore, Options } from "./option";
+import { Options } from "./option";
 
 export type Actions = {
   [index: string]: { (firstLine: number, lastLine: number): Promise<void> };
@@ -14,8 +14,9 @@ export abstract class BaseBuffer {
   public static readonly type: CtrlbBufferType = CtrlbBufferType.empty;
   protected readonly logger: Logger;
   protected readonly actions: Actions = {};
-  protected bufferOptionStore: BufferOptionStore | null = null;
   protected readonly options: Options = {};
+
+  protected initialized: boolean = false;
 
   constructor(
     protected readonly vim: Neovim,
@@ -28,20 +29,19 @@ export abstract class BaseBuffer {
   public async open(direction: Direction): Promise<void> {
     await this.bufferContainer.openByDirection(direction);
 
-    if (this.bufferOptionStore !== null) {
-      await this.bufferOptionStore.adjust();
+    if (this.initialized) {
+      await (await this.bufferContainer.getOptionStore()).adjust();
     }
 
     await this.vim.command("silent doautocmd WinEnter");
     await this.vim.command("silent doautocmd BufWinEnter");
 
-    if (this.bufferOptionStore === null) {
-      this.bufferOptionStore = await this.bufferContainer.getOptionStore();
-      await this.bufferOptionStore.setFileType(
-        "ctrlb-" + this.bufferContainer.type
-      );
-      await this.bufferOptionStore.set(this.options);
+    if (!this.initialized) {
+      const bufferOptionStore = await this.bufferContainer.getOptionStore();
+      await bufferOptionStore.setFileType("ctrlb-" + this.bufferContainer.type);
+      await bufferOptionStore.set(this.options);
       await this.setup();
+      this.initialized = true;
     }
   }
 

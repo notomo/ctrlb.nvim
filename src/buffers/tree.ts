@@ -63,8 +63,15 @@ export class TreeBuffer<Model> {
     const lines = items.map(item => {
       return item.toString();
     });
+
+    const optionStore = await this.bufferContainer.getOptionStore();
+    await optionStore.set({ modifiable: true });
+
     await buffer.remove(0, this.items.length, false);
     await buffer.replace(lines, 0);
+
+    await optionStore.set({ modifiable: false });
+
     this.items = items;
 
     const lastBookmarkIndex = items.findIndex(item => {

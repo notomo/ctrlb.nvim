@@ -121,12 +121,6 @@ export class BookmarkTree extends BaseBuffer {
       return new BookmarkTreeItem(bookmark);
     });
 
-    if (this.bufferOptionStore !== null) {
-      await this.bufferOptionStore.set({ modifiable: true });
-    }
     await this.treeBuffer.set(items, id);
-    if (this.bufferOptionStore !== null) {
-      await this.bufferOptionStore.set({ modifiable: false });
-    }
   }
 }

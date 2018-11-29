@@ -44,7 +44,14 @@ export class ListBuffer<Model> {
 
   public async prepend(item: Item<Model>) {
     const buffer = await this.bufferContainer.get();
+
+    const optionStore = await this.bufferContainer.getOptionStore();
+    await optionStore.set({ modifiable: true });
+
     await buffer.insert(item.toString(), 0);
+
+    await optionStore.set({ modifiable: false });
+
     this.items.unshift(item);
     // FIXME: workaround for corrupted display
     await this.vim.command("redraw!");
@@ -55,7 +62,14 @@ export class ListBuffer<Model> {
     const lines = items.map(item => {
       return item.toString();
     });
+
+    const optionStore = await this.bufferContainer.getOptionStore();
+    await optionStore.set({ modifiable: true });
+
     await buffer.replace(lines, 0);
+
+    await optionStore.set({ modifiable: false });
+
     this.items = items;
   }
 }

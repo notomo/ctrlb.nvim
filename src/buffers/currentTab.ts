@@ -74,9 +74,8 @@ export class CurrentTab extends BaseBuffer {
     const item = new CurrentTabItem(tab);
     await this.itemBuffer.set(item);
 
-    if (this.bufferOptionStore !== null) {
-      await this.bufferOptionStore.set({ modified: false });
-    }
+    const optionStore = await this.bufferContainer.getOptionStore();
+    await optionStore.set({ modified: false });
   }
 
   protected async save() {
@@ -88,8 +87,7 @@ export class CurrentTab extends BaseBuffer {
 
     await this.tabRepository.open(lines[1]);
 
-    if (this.bufferOptionStore !== null) {
-      await this.bufferOptionStore.set({ modified: false });
-    }
+    const optionStore = await this.bufferContainer.getOptionStore();
+    await optionStore.set({ modified: false });
   }
 }
