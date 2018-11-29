@@ -16,6 +16,18 @@ export class TabRepository {
     });
   }
 
+  public async getList(): Promise<WithError<Tab[]>> {
+    const [tabs, error] = await this.requester.execute<Tab[]>({
+      method: "tab/list",
+    });
+
+    if (tabs === null) {
+      return [[], error];
+    }
+
+    return [tabs, null];
+  }
+
   public async open(url: string): Promise<NullableError> {
     return this.requester.executeAsync({
       method: "tab/open",
