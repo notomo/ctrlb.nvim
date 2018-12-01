@@ -91,26 +91,18 @@ export class HistoryList extends BaseBuffer {
   }
 
   public async remove(firstLine: number, lastLine: number) {
-    const histories = await this.listBuffer.getRangeModels(firstLine, lastLine);
-    for (const history of histories) {
-      if (history.url === undefined) {
-        return;
-      }
-
-      await this.historyRepository.remove(history.url);
-    }
+    (await this.listBuffer.getRangeModels(firstLine, lastLine))
+      .map(history => history.url)
+      .filter((url): url is string => url !== undefined)
+      .map(url => this.historyRepository.remove(url));
 
     await this.set();
   }
 
   public async tabOpenHistory(firstLine: number, lastLine: number) {
-    const histories = await this.listBuffer.getRangeModels(firstLine, lastLine);
-    for (const history of histories) {
-      if (history.url === undefined) {
-        return;
-      }
-
-      await this.tabRepository.tabOpen(history.url);
-    }
+    (await this.listBuffer.getRangeModels(firstLine, lastLine))
+      .map(history => history.url)
+      .filter((url): url is string => url !== undefined)
+      .map(url => this.tabRepository.tabOpen(url));
   }
 }

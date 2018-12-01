@@ -29,6 +29,7 @@ import { BookmarkTree } from "./buffers/bookmarkTree";
 import { CurrentTab } from "./buffers/currentTab";
 import { Empty } from "./buffers/empty";
 import { HistoryList } from "./buffers/historyList";
+import { TabList } from "./buffers/tabList";
 import { DownloadList } from "./buffers/downloadList";
 import { EventRegisterer } from "./buffers/event";
 
@@ -158,6 +159,24 @@ export class Di {
         tabRepository
       );
     },
+    TabList: (vim: Neovim) => {
+      const eventRegisterer = Di.get("EventRegisterer", vim, false);
+      const tabRepository = Di.get("TabRepository", vim);
+      const bufferContainer = Di.get(
+        "BufferContainer",
+        vim,
+        false,
+        TabList.type
+      );
+      const listBuffer = new ListBuffer<Tab>(vim, bufferContainer);
+      return new TabList(
+        vim,
+        bufferContainer,
+        listBuffer,
+        eventRegisterer,
+        tabRepository
+      );
+    },
     DownloadList: (vim: Neovim) => {
       const eventRegisterer = Di.get("EventRegisterer", vim, false);
       const downloadRepository = Di.get("DownloadRepository", vim);
@@ -212,6 +231,7 @@ export class Di {
     CurrentTab: null,
     Empty: null,
     HistoryList: null,
+    TabList: null,
     DownloadList: null,
     BufferContainer: null,
   };
@@ -233,6 +253,7 @@ export class Di {
     vim: Neovim,
     cacheable: false
   ): HistoryList;
+  public static get(cls: "TabList", vim: Neovim, cacheable: false): TabList;
   public static get(
     cls: "DownloadList",
     vim: Neovim,
@@ -318,6 +339,7 @@ interface Deps {
   CurrentTab: { (vim: Neovim, ...args: any[]): CurrentTab };
   Empty: { (vim: Neovim, ...args: any[]): Empty };
   HistoryList: { (vim: Neovim, ...args: any[]): HistoryList };
+  TabList: { (vim: Neovim, ...args: any[]): TabList };
   DownloadList: { (vim: Neovim, ...args: any[]): DownloadList };
   BufferContainer: { (vim: Neovim, ...args: any[]): BufferContainer };
 }

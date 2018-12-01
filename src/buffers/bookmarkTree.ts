@@ -100,14 +100,10 @@ export class BookmarkTree extends BaseBuffer {
   }
 
   public async tabOpenBookmark(firstLine: number, lastLine: number) {
-    const bookmarks = await this.treeBuffer.getRangeModels(firstLine, lastLine);
-    for (const bookmark of bookmarks) {
-      if (bookmark === null || bookmark.url === undefined) {
-        continue;
-      }
-
-      await this.bookmarkRepository.tabOpen(bookmark.id);
-    }
+    (await this.treeBuffer.getRangeModels(firstLine, lastLine))
+      .map(bookmark => bookmark.id)
+      .filter((id): id is string => id !== undefined)
+      .map(id => this.bookmarkRepository.tabOpen(id));
   }
 
   protected async openTree(id: string | null) {

@@ -6,6 +6,7 @@ import { CurrentTab } from "./currentTab";
 import { Empty } from "./empty";
 import { HistoryList } from "./historyList";
 import { DownloadList } from "./downloadList";
+import { TabList } from "./tabList";
 import { CtrlbBufferType } from "./type";
 import { Di } from "../di";
 
@@ -17,6 +18,7 @@ type CtrlbBuffers = {
   [BT.bookmarkTree]: BookmarkTree;
   [BT.historyList]: HistoryList;
   [BT.downloadList]: DownloadList;
+  [BT.tabList]: TabList;
 } & { [P in CtrlbBufferType]: BaseBuffer };
 
 export class Buffers {
@@ -30,6 +32,7 @@ export class Buffers {
       [BT.bookmarkTree]: Di.get("BookmarkTree", this.vim, false),
       [BT.historyList]: Di.get("HistoryList", this.vim, false),
       [BT.downloadList]: Di.get("DownloadList", this.vim, false),
+      [BT.tabList]: Di.get("TabList", this.vim, false),
     };
   }
 
@@ -48,5 +51,6 @@ export class Buffers {
     this.buffers[BT.bookmarkTree] = Di.get("BookmarkTree", this.vim, false);
     this.buffers[BT.historyList] = Di.get("HistoryList", this.vim, false);
     this.buffers[BT.downloadList] = Di.get("DownloadList", this.vim, false);
+    this.buffers[BT.tabList] = Di.get("TabList", this.vim, false);
   }
 }
