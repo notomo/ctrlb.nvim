@@ -6,7 +6,7 @@ import { BufferContainer } from "./container";
 import { ItemBuffer } from "./item";
 import { EventRegisterer } from "./event";
 
-class CurrentTabItem {
+export class CurrentTabItem {
   constructor(protected readonly tab: Tab) {}
 
   public toStrings(): string[] {
