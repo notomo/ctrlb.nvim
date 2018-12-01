@@ -36,6 +36,13 @@ export class TabRepository {
     });
   }
 
+  public async duplicate(id: number): Promise<NullableError> {
+    return this.requester.executeAsync({
+      method: "tab/duplicate",
+      params: { id: id },
+    });
+  }
+
   public async reload(id: number): Promise<NullableError> {
     return this.requester.executeAsync({
       method: "tab/reload",

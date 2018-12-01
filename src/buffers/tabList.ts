@@ -50,6 +50,8 @@ export class TabList extends BaseBuffer {
       this.reload(firstLine, lastLine);
     this.actions["close"] = (firstLine: number, lastLine: number) =>
       this.close(firstLine, lastLine);
+    this.actions["duplicate"] = (firstLine: number, lastLine: number) =>
+      this.duplicate(firstLine, lastLine);
   }
 
   protected async setup(): Promise<void> {
@@ -103,6 +105,13 @@ export class TabList extends BaseBuffer {
       .map(tab => tab.id)
       .filter((id): id is number => id !== undefined)
       .map(id => this.tabRepository.close(id));
+  }
+
+  public async duplicate(firstLine: number, lastLine: number) {
+    (await this.listBuffer.getRangeModels(firstLine, lastLine))
+      .map(tab => tab.id)
+      .filter((id): id is number => id !== undefined)
+      .map(id => this.tabRepository.duplicate(id));
   }
 
   public async reload(firstLine: number, lastLine: number) {
