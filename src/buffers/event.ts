@@ -25,7 +25,7 @@ export class EventRegisterer {
       });
     this.receivers.length = 0;
 
-    Object.keys(this.subscribedEvents).map(eventName => {
+    this.subscribedEvents.map(eventName => {
       this.eventRepository.unsubscribe(eventName);
     });
     this.subscribedEvents.length = 0;
