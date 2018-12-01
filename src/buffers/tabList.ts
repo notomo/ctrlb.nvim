@@ -101,44 +101,47 @@ export class TabList extends BaseBuffer {
   }
 
   public async close(firstLine: number, lastLine: number) {
-    (await this.listBuffer.getRangeModels(firstLine, lastLine))
-      .map(tab => tab.id)
-      .filter((id): id is number => id !== undefined)
-      .map(id => this.tabRepository.close(id));
+    (await this.getIds(firstLine, lastLine)).map(id =>
+      this.tabRepository.close(id)
+    );
   }
 
   public async duplicate(firstLine: number, lastLine: number) {
-    (await this.listBuffer.getRangeModels(firstLine, lastLine))
-      .map(tab => tab.id)
-      .filter((id): id is number => id !== undefined)
-      .map(id => this.tabRepository.duplicate(id));
+    (await this.getIds(firstLine, lastLine)).map(id =>
+      this.tabRepository.duplicate(id)
+    );
   }
 
   public async reload(firstLine: number, lastLine: number) {
-    (await this.listBuffer.getRangeModels(firstLine, lastLine))
-      .map(tab => tab.id)
-      .filter((id): id is number => id !== undefined)
-      .map(id => this.tabRepository.reload(id));
+    (await this.getIds(firstLine, lastLine)).map(id =>
+      this.tabRepository.reload(id)
+    );
   }
 
   public async zoomUp(firstLine: number, lastLine: number) {
-    (await this.listBuffer.getRangeModels(firstLine, lastLine))
-      .map(tab => tab.id)
-      .filter((id): id is number => id !== undefined)
-      .map(id => this.tabRepository.zoomUp(id));
+    (await this.getIds(firstLine, lastLine)).map(id =>
+      this.tabRepository.zoomUp(id)
+    );
   }
 
   public async zoomDown(firstLine: number, lastLine: number) {
-    (await this.listBuffer.getRangeModels(firstLine, lastLine))
-      .map(tab => tab.id)
-      .filter((id): id is number => id !== undefined)
-      .map(id => this.tabRepository.zoomDown(id));
+    (await this.getIds(firstLine, lastLine)).map(id =>
+      this.tabRepository.zoomDown(id)
+    );
   }
 
   public async zoomReset(firstLine: number, lastLine: number) {
-    (await this.listBuffer.getRangeModels(firstLine, lastLine))
+    (await this.getIds(firstLine, lastLine)).map(id =>
+      this.tabRepository.zoomReset(id)
+    );
+  }
+
+  protected async getIds(
+    firstLine: number,
+    lastLine: number
+  ): Promise<number[]> {
+    return (await this.listBuffer.getRangeModels(firstLine, lastLine))
       .map(tab => tab.id)
-      .filter((id): id is number => id !== undefined)
-      .map(id => this.tabRepository.zoomReset(id));
+      .filter((id): id is number => id !== undefined);
   }
 }
