@@ -66,10 +66,29 @@ export class ListBuffer<Model> {
     const optionStore = await this.bufferContainer.getOptionStore();
     await optionStore.set({ modifiable: true });
 
+    const currentWindow = await this.vim.window;
+    const currentWindowBufferId = await currentWindow.buffer.id;
+    const cursor = await currentWindow.cursor;
+
+    await buffer.remove(0, this.items.length, false);
     await buffer.replace(lines, 0);
 
     await optionStore.set({ modifiable: false });
 
     this.items = items;
+
+    // FIXME: workaround for corrupted display
+    await this.vim.command("redraw!");
+
+    if (buffer.id !== currentWindowBufferId) {
+      return;
+    }
+
+    const newLength = await buffer.length;
+    if (newLength < cursor[0]) {
+      await (currentWindow.cursor = [newLength, cursor[1]]);
+      return;
+    }
+    await (currentWindow.cursor = cursor);
   }
 }
