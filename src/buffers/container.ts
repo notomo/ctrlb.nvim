@@ -85,4 +85,13 @@ export class BufferContainer {
       `call ctrlb#do_action("${this.type}", "${actionName}")`
     );
   }
+
+  public async defineEnableHighlightAction(actionName: string) {
+    const bufferId = (await this.get()).id;
+    await this.autocmdRepository.defineToBuffer(
+      "BufWinEnter",
+      bufferId,
+      `call ctrlb#do_action("${this.type}", "${actionName}")`
+    );
+  }
 }

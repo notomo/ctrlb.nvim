@@ -47,19 +47,28 @@ export class HistoryList extends BaseBuffer {
     this.actions["debug"] = async () =>
       this.debug(await this.listBuffer.getCurrent());
     this.actions["read"] = () => this.read();
+    this.actions["highlight"] = () => this.highlight();
   }
 
   protected async setup(): Promise<void> {
     await this.vim.command(
       "highlight default link CtrlbHistoryListUrl Underlined"
     );
+    await this.highlight();
 
     const p = this.historyRepository.onCreated(history => this.update(history));
     this.eventRegisterer.subscribe(p, "historyCreated");
 
     await this.bufferContainer.defineReadAction("read");
+    await this.bufferContainer.defineEnableHighlightAction("highlight");
 
     this.read();
+  }
+
+  protected async highlight() {
+    await this.vim.command(
+      "syntax match CtrlbHistoryListUrl /[[:tab:]]\\zs.*$/"
+    );
   }
 
   protected async update(history: History) {
@@ -77,10 +86,6 @@ export class HistoryList extends BaseBuffer {
   }
 
   protected async read() {
-    await this.vim.command(
-      "syntax match CtrlbHistoryListUrl /[[:tab:]]\\zs.*$/"
-    );
-
     const [histories, error] = await this.historyRepository.search();
 
     if (error !== null) {
