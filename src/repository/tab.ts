@@ -102,7 +102,8 @@ export class TabRepository {
             "tabActivated|tabCreated|tabRemoved|tabUpdated|windowActivated|windowCreated|windowRemoved",
         },
       },
-      callback
+      callback,
+      50
     );
   }
 }
