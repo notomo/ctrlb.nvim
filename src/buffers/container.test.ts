@@ -176,4 +176,14 @@ describe("BufferContainer", () => {
       'call ctrlb#do_action("type", "write")'
     );
   });
+
+  it("defineEnableHighlightAction", async () => {
+    await bufferContainer.defineEnableHighlightAction("highlight");
+
+    expect(defineToBuffer).toHaveBeenCalledWith(
+      "BufWinEnter",
+      bufferNumber,
+      'call ctrlb#do_action("type", "highlight")'
+    );
+  });
 });

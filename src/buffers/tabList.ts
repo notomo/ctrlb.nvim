@@ -53,10 +53,12 @@ export class TabList extends BaseBuffer {
     this.actions["duplicate"] = (firstLine: number, lastLine: number) =>
       this.duplicate(firstLine, lastLine);
     this.actions["read"] = () => this.read();
+    this.actions["highlight"] = () => this.highlight();
   }
 
   protected async setup(): Promise<void> {
     await this.vim.command("highlight default link CtrlbTabListUrl Underlined");
+    await this.highlight();
 
     const p = this.tabRepository.onChanged(data => this.read());
     this.eventRegisterer.subscribe(
@@ -71,13 +73,16 @@ export class TabList extends BaseBuffer {
     );
 
     await this.bufferContainer.defineReadAction("read");
+    await this.bufferContainer.defineEnableHighlightAction("highlight");
 
     this.read();
   }
 
-  protected async read() {
+  protected async highlight() {
     await this.vim.command("syntax match CtrlbTabListUrl /[[:tab:]]\\zs.*$/");
+  }
 
+  protected async read() {
     const [tabs, error] = await this.tabRepository.getListAll();
 
     if (error !== null) {
