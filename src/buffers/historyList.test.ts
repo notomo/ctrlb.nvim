@@ -3,6 +3,7 @@ import { Neovim } from "neovim";
 import { BufferContainer } from "./container";
 import { HistoryList, HistoryListItem } from "./historyList";
 import { HistoryRepository, History } from "../repository/history";
+import { HighlightRepository } from "../repository/highlight";
 import { TabRepository } from "../repository/tab";
 import { EventRegisterer } from "./event";
 
@@ -12,6 +13,7 @@ describe("HistoryList", () => {
   let listBuffer: ListBuffer<History>;
   let eventRegisterer: EventRegisterer;
   let historyRepository: HistoryRepository;
+  let highlightRepository: HighlightRepository;
   let tabRepository: TabRepository;
   let historyList: HistoryList;
 
@@ -41,6 +43,9 @@ describe("HistoryList", () => {
     const HistoryRepositoryClass = jest.fn<HistoryRepository>(() => ({}));
     historyRepository = new HistoryRepositoryClass();
 
+    const HighlightRepositoryClass = jest.fn<HighlightRepository>(() => ({}));
+    highlightRepository = new HighlightRepositoryClass();
+
     open = jest.fn();
     tabOpen = jest.fn();
     const TabRepositoryClass = jest.fn<TabRepository>(() => ({
@@ -54,6 +59,7 @@ describe("HistoryList", () => {
       bufferContainer,
       listBuffer,
       eventRegisterer,
+      highlightRepository,
       historyRepository,
       tabRepository
     );
@@ -80,6 +86,7 @@ describe("HistoryList", () => {
       bufferContainer,
       listBuffer,
       eventRegisterer,
+      highlightRepository,
       historyRepository,
       tabRepository
     );
@@ -106,6 +113,7 @@ describe("HistoryList", () => {
       bufferContainer,
       listBuffer,
       eventRegisterer,
+      highlightRepository,
       historyRepository,
       tabRepository
     );
@@ -136,6 +144,7 @@ describe("HistoryList", () => {
       bufferContainer,
       listBuffer,
       eventRegisterer,
+      highlightRepository,
       historyRepository,
       tabRepository
     );
@@ -162,6 +171,7 @@ describe("HistoryList", () => {
       bufferContainer,
       listBuffer,
       eventRegisterer,
+      highlightRepository,
       historyRepository,
       tabRepository
     );
