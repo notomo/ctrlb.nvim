@@ -3,6 +3,7 @@ import { Neovim } from "neovim";
 import { CtrlbBufferType } from "./type";
 import { BufferContainer } from "./container";
 import { ListBuffer } from "./list";
+import { HighlightRepository } from "../repository/highlight";
 import { HistoryRepository, History } from "../repository/history";
 import { TabRepository } from "../repository/tab";
 import { EventRegisterer } from "./event";
@@ -35,6 +36,7 @@ export class HistoryList extends BaseBuffer {
     protected readonly bufferContainer: BufferContainer,
     protected readonly listBuffer: ListBuffer<History>,
     protected readonly eventRegisterer: EventRegisterer,
+    protected readonly highlightRepository: HighlightRepository,
     protected readonly historyRepository: HistoryRepository,
     protected readonly tabRepository: TabRepository
   ) {
@@ -51,9 +53,7 @@ export class HistoryList extends BaseBuffer {
   }
 
   protected async setup(): Promise<void> {
-    await this.vim.command(
-      "highlight default link CtrlbHistoryListUrl Underlined"
-    );
+    await this.highlightRepository.link("CtrlbHistoryListUrl", "Underlined");
     await this.highlight();
 
     const p = this.historyRepository.onCreated(history => this.update(history));
@@ -66,8 +66,9 @@ export class HistoryList extends BaseBuffer {
   }
 
   protected async highlight() {
-    await this.vim.command(
-      "syntax match CtrlbHistoryListUrl /[[:tab:]]\\zs.*$/"
+    await this.highlightRepository.match(
+      "CtrlbHistoryListUrl",
+      "[[:tab:]]\\zs.*$"
     );
   }
 

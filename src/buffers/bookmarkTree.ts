@@ -3,6 +3,7 @@ import { Neovim } from "neovim";
 import { CtrlbBufferType } from "./type";
 import { BufferContainer } from "./container";
 import { TreeBuffer } from "./tree";
+import { HighlightRepository } from "../repository/highlight";
 import { BookmarkRepository, Bookmark } from "../repository/bookmark";
 import { EventRegisterer } from "./event";
 
@@ -44,6 +45,7 @@ export class BookmarkTree extends BaseBuffer {
     protected readonly bufferContainer: BufferContainer,
     protected readonly treeBuffer: TreeBuffer<Bookmark>,
     protected readonly eventRegisterer: EventRegisterer,
+    protected readonly highlightRepository: HighlightRepository,
     protected readonly bookmarkRepository: BookmarkRepository
   ) {
     super(vim, bufferContainer, eventRegisterer);
@@ -58,12 +60,10 @@ export class BookmarkTree extends BaseBuffer {
   }
 
   protected async setup(): Promise<void> {
-    await this.vim.command(
-      "highlight default link CtrlbBookmarkTreeDirectory String"
-    );
-    await this.vim.command(
-      "highlight default link CtrlbBookmarkTreeUrl Underlined"
-    );
+    await Promise.all([
+      this.highlightRepository.link("CtrlbBookmarkTreeDirectory", "String"),
+      this.highlightRepository.link("CtrlbBookmarkTreeUrl", "Underlined"),
+    ]);
     await this.highlight();
 
     await this.bufferContainer.defineReadAction("read");
@@ -73,12 +73,16 @@ export class BookmarkTree extends BaseBuffer {
   }
 
   protected async highlight() {
-    await this.vim.command(
-      "syntax match CtrlbBookmarkTreeDirectory /^[^[:tab:]]*\\/$/"
-    );
-    await this.vim.command(
-      "syntax match CtrlbBookmarkTreeUrl /[[:tab:]]\\zs.*$/"
-    );
+    await Promise.all([
+      this.highlightRepository.match(
+        "CtrlbBookmarkTreeDirectory",
+        "^[^[:tab:]]*\\/$"
+      ),
+      this.highlightRepository.match(
+        "CtrlbBookmarkTreeUrl",
+        "[[:tab:]]\\zs.*$"
+      ),
+    ]);
   }
 
   public async read() {

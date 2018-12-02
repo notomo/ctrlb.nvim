@@ -3,6 +3,7 @@ import { Neovim } from "neovim";
 import { BufferContainer } from "./container";
 import { TabList, TabListItem } from "./tabList";
 import { TabRepository, Tab } from "../repository/tab";
+import { HighlightRepository } from "../repository/highlight";
 import { EventRegisterer } from "./event";
 
 describe("TabList", () => {
@@ -10,6 +11,7 @@ describe("TabList", () => {
   let bufferContainer: BufferContainer;
   let listBuffer: ListBuffer<Tab>;
   let eventRegisterer: EventRegisterer;
+  let highlightRepository: HighlightRepository;
   let tabRepository: TabRepository;
   let tabList: TabList;
 
@@ -47,6 +49,9 @@ describe("TabList", () => {
     const EventRegistererClass = jest.fn<EventRegisterer>(() => ({}));
     eventRegisterer = new EventRegistererClass();
 
+    const HighlightRepositoryClass = jest.fn<HighlightRepository>(() => ({}));
+    highlightRepository = new HighlightRepositoryClass();
+
     open = jest.fn();
     tabOpen = jest.fn();
     close = jest.fn();
@@ -74,6 +79,7 @@ describe("TabList", () => {
       bufferContainer,
       listBuffer,
       eventRegisterer,
+      highlightRepository,
       tabRepository
     );
   });
@@ -96,6 +102,7 @@ describe("TabList", () => {
       bufferContainer,
       listBuffer,
       eventRegisterer,
+      highlightRepository,
       tabRepository
     );
 
@@ -116,6 +123,7 @@ describe("TabList", () => {
       bufferContainer,
       listBuffer,
       eventRegisterer,
+      highlightRepository,
       tabRepository
     );
 

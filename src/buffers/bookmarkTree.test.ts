@@ -3,6 +3,7 @@ import { TreeBuffer } from "./tree";
 import { Neovim } from "neovim";
 import { BufferContainer } from "./container";
 import { EventRegisterer } from "./event";
+import { HighlightRepository } from "../repository/highlight";
 import { BookmarkRepository, Bookmark } from "../repository/bookmark";
 
 describe("BookmarkTree", () => {
@@ -10,6 +11,7 @@ describe("BookmarkTree", () => {
   let bufferContainer: BufferContainer;
   let treeBuffer: TreeBuffer<Bookmark>;
   let eventRegisterer: EventRegisterer;
+  let highlightRepository: HighlightRepository;
   let bookmarkRepository: BookmarkRepository;
   let bookmarkTree: BookmarkTree;
 
@@ -59,11 +61,15 @@ describe("BookmarkTree", () => {
     }));
     bookmarkRepository = new BookmarkRepositoryClass();
 
+    const HighlightRepositoryClass = jest.fn<HighlightRepository>(() => ({}));
+    highlightRepository = new HighlightRepositoryClass();
+
     bookmarkTree = new BookmarkTree(
       vim,
       bufferContainer,
       treeBuffer,
       eventRegisterer,
+      highlightRepository,
       bookmarkRepository
     );
 
@@ -99,6 +105,7 @@ describe("BookmarkTree", () => {
       bufferContainer,
       treeBuffer,
       eventRegisterer,
+      highlightRepository,
       bookmarkRepository
     );
 
@@ -126,6 +133,7 @@ describe("BookmarkTree", () => {
       bufferContainer,
       treeBuffer,
       eventRegisterer,
+      highlightRepository,
       bookmarkRepository
     );
 
@@ -148,6 +156,7 @@ describe("BookmarkTree", () => {
       bufferContainer,
       treeBuffer,
       eventRegisterer,
+      highlightRepository,
       bookmarkRepository
     );
 
@@ -177,6 +186,7 @@ describe("BookmarkTree", () => {
       bufferContainer,
       treeBuffer,
       eventRegisterer,
+      highlightRepository,
       bookmarkRepository
     );
 
