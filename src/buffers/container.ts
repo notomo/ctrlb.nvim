@@ -2,6 +2,7 @@ import { Neovim, Buffer } from "neovim";
 import { BufferOptionStore, BufferOptionStoreFactory } from "./option";
 import { Direction } from "../direction";
 import { BufferRepository } from "../repository/buffer";
+import { AutocmdRepository } from "../repository/autocmd";
 
 export class BufferContainer {
   protected buffer: Buffer | null;
@@ -10,6 +11,7 @@ export class BufferContainer {
   constructor(
     protected readonly vim: Neovim,
     protected readonly bufferRepository: BufferRepository,
+    protected readonly autocmdRepository: AutocmdRepository,
     protected readonly bufferOptionStoreFactory: BufferOptionStoreFactory,
     public readonly type: string
   ) {
@@ -64,5 +66,23 @@ export class BufferContainer {
   public async getOptionStore(): Promise<BufferOptionStore> {
     const buffer = await this.get();
     return this.bufferOptionStoreFactory.create(buffer);
+  }
+
+  public async defineReadAction(actionName: string) {
+    const bufferId = (await this.get()).id;
+    await this.autocmdRepository.defineToBuffer(
+      "BufReadCmd",
+      bufferId,
+      `call ctrlb#do_action("${this.type}", "${actionName}")`
+    );
+  }
+
+  public async defineWriteAction(actionName: string) {
+    const bufferId = (await this.get()).id;
+    await this.autocmdRepository.defineToBuffer(
+      "BufWriteCmd",
+      bufferId,
+      `call ctrlb#do_action("${this.type}", "${actionName}")`
+    );
   }
 }

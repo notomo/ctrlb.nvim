@@ -46,20 +46,20 @@ export class HistoryList extends BaseBuffer {
     this.actions["open"] = () => this.openHistory();
     this.actions["debug"] = async () =>
       this.debug(await this.listBuffer.getCurrent());
+    this.actions["read"] = () => this.read();
   }
 
   protected async setup(): Promise<void> {
     await this.vim.command(
       "highlight default link CtrlbHistoryListUrl Underlined"
     );
-    await this.vim.command(
-      "syntax match CtrlbHistoryListUrl /[[:tab:]]\\zs.*$/"
-    );
 
     const p = this.historyRepository.onCreated(history => this.update(history));
     this.eventRegisterer.subscribe(p, "historyCreated");
 
-    this.set();
+    await this.bufferContainer.defineReadAction("read");
+
+    this.read();
   }
 
   protected async update(history: History) {
@@ -76,7 +76,11 @@ export class HistoryList extends BaseBuffer {
     await this.tabRepository.open(history.url);
   }
 
-  protected async set() {
+  protected async read() {
+    await this.vim.command(
+      "syntax match CtrlbHistoryListUrl /[[:tab:]]\\zs.*$/"
+    );
+
     const [histories, error] = await this.historyRepository.search();
 
     if (error !== null) {
@@ -96,7 +100,7 @@ export class HistoryList extends BaseBuffer {
       .filter((url): url is string => url !== undefined)
       .map(url => this.historyRepository.remove(url));
 
-    await this.set();
+    await this.read();
   }
 
   public async tabOpenHistory(firstLine: number, lastLine: number) {

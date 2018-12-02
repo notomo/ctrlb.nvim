@@ -39,6 +39,7 @@ export class DownloadList extends BaseBuffer {
     super(vim, bufferContainer, eventRegisterer);
     this.actions["debug"] = async () =>
       this.debug(await this.listBuffer.getCurrent());
+    this.actions["read"] = () => this.read();
   }
 
   protected async setup(): Promise<void> {
@@ -47,6 +48,12 @@ export class DownloadList extends BaseBuffer {
     );
     this.eventRegisterer.subscribe(p, "downloadCreated");
 
+    await this.bufferContainer.defineReadAction("read");
+
+    this.read();
+  }
+
+  protected async read() {
     const [downloads, error] = await this.downloadRepository.search();
 
     if (error !== null) {

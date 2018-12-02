@@ -64,13 +64,13 @@ describe("CurrentTab", () => {
     );
   });
 
-  it("save does nothing when the buffer is empty", async () => {
-    await currentTab.doAction("save", 0, 0);
+  it("write does nothing when the buffer is empty", async () => {
+    await currentTab.doAction("write", 0, 0);
 
     expect(open).not.toHaveBeenCalled();
   });
 
-  it("save does nothing when the buffer is empty", async () => {
+  it("write does nothing when the buffer is empty", async () => {
     const BufferClass = jest.fn<Buffer>(() => ({
       lines: ["title", "url"],
     }));
@@ -92,7 +92,7 @@ describe("CurrentTab", () => {
       tabRepository
     );
 
-    await currentTab.doAction("save", 0, 0);
+    await currentTab.doAction("write", 0, 0);
 
     expect(open).toHaveBeenCalledWith("url");
   });

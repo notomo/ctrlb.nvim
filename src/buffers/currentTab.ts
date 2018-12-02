@@ -39,11 +39,12 @@ export class CurrentTab extends BaseBuffer {
     super(vim, bufferContainer, eventRegisterer);
     this.actions["debug"] = async () =>
       this.debug(await this.itemBuffer.getCurrent());
-    this.actions["save"] = async () => this.save();
+    this.actions["write"] = async () => this.write();
+    this.actions["read"] = () => this.read();
   }
 
   protected async setup(): Promise<void> {
-    const p = this.tabRepository.onChanged(data => this.update());
+    const p = this.tabRepository.onChanged(data => this.read());
     this.eventRegisterer.subscribe(
       p,
       "tabActivated",
@@ -55,17 +56,15 @@ export class CurrentTab extends BaseBuffer {
       "windowRemoved"
     );
 
-    const bufferId = (await this.bufferContainer.get()).id;
-    await this.vim.command(
-      `autocmd BufWriteCmd <buffer=${bufferId}> call ctrlb#do_action("${
-        CurrentTab.type
-      }", "save")`
-    );
+    await Promise.all([
+      this.bufferContainer.defineWriteAction("write"),
+      this.bufferContainer.defineReadAction("read"),
+    ]);
 
-    this.update();
+    this.read();
   }
 
-  protected async update() {
+  protected async read() {
     const [tab, error] = await this.tabRepository.getCurrent();
     if (error !== null || tab === null) {
       return;
@@ -78,7 +77,7 @@ export class CurrentTab extends BaseBuffer {
     await optionStore.set({ modified: false });
   }
 
-  protected async save() {
+  protected async write() {
     const buffer = await this.bufferContainer.get();
     const lines = await buffer.lines;
     if (lines.length <= 1) {
