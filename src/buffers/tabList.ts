@@ -11,7 +11,10 @@ export class TabListItem {
   constructor(protected readonly tab: Tab) {}
 
   public toString(): string {
-    return this.tab.title + "\t" + this.tab.url;
+    if (this.tab.active) {
+      return "|" + this.tab.title + "\t" + this.tab.url;
+    }
+    return " " + this.tab.title + "\t" + this.tab.url;
   }
 
   public get value(): Tab {
@@ -60,6 +63,7 @@ export class TabList extends BaseBuffer {
 
   protected async setup(): Promise<void> {
     await this.highlightRepository.link("CtrlbTabListUrl", "Underlined");
+    await this.highlightRepository.link("CtrlbTabListActive", "Title");
     await this.highlight();
 
     const p = this.tabRepository.onChanged(data => this.read());
@@ -81,6 +85,9 @@ export class TabList extends BaseBuffer {
   }
 
   protected async highlight() {
+    await this.highlightRepository.match("CtrlbTabListActive", "^|.*", [
+      "CtrlbTabListUrl",
+    ]);
     await this.highlightRepository.match("CtrlbTabListUrl", "[[:tab:]]\\zs.*$");
   }
 

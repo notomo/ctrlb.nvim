@@ -88,7 +88,8 @@ export class Requester {
     keyFilter: any,
     filter: any,
     regexFilter: any,
-    eventCallback: { (arg: T): any }
+    eventCallback: { (arg: T): any },
+    debounceInterval: number = 0
   ): ChildProcess {
     const p = spawn("wsxhub", [
       "--key",
@@ -98,6 +99,8 @@ export class Requester {
       "--regex",
       JSON.stringify(regexFilter),
       "receive",
+      "--debounce",
+      debounceInterval.toString(),
     ]);
 
     p.stdout.setEncoding("utf-8");

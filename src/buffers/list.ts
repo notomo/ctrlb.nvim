@@ -1,5 +1,6 @@
 import { Neovim } from "neovim";
 import { BufferContainer } from "./container";
+import { getLogger, Logger } from "../logger";
 
 interface Item<Model> {
   toString(): string;
@@ -9,10 +10,14 @@ interface Item<Model> {
 export class ListBuffer<Model> {
   protected items: Item<Model>[] = [];
 
+  protected readonly logger: Logger;
+
   constructor(
     protected readonly vim: Neovim,
     protected readonly bufferContainer: BufferContainer
-  ) {}
+  ) {
+    this.logger = getLogger("buffers.list");
+  }
 
   public async getModel(lineNumber: number): Promise<Model | null> {
     const index = lineNumber - 1;
@@ -70,17 +75,16 @@ export class ListBuffer<Model> {
     const currentWindowBufferId = await currentWindow.buffer.id;
     const cursor = await currentWindow.cursor;
 
-    await buffer.remove(0, this.items.length, false);
+    await buffer.remove(0, this.items.length - 1, false);
     await buffer.replace(lines, 0);
 
     await optionStore.set({ modifiable: false });
 
     this.items = items;
 
-    // FIXME: workaround for corrupted display
-    await this.vim.command("redraw!");
-
     if (buffer.id !== currentWindowBufferId) {
+      // FIXME: workaround for corrupted display
+      await this.vim.command("redraw!");
       return;
     }
 

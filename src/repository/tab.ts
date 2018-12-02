@@ -6,6 +6,7 @@ export type Tab = {
   id?: number;
   title: string;
   url: string;
+  active: boolean;
 };
 
 export class TabRepository {
@@ -102,7 +103,8 @@ export class TabRepository {
             "tabActivated|tabCreated|tabRemoved|tabUpdated|windowActivated|windowCreated|windowRemoved",
         },
       },
-      callback
+      callback,
+      50
     );
   }
 }
