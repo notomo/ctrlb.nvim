@@ -31,6 +31,10 @@ export class TreeBuffer<Model> {
     return this.getModel(lineNumber);
   }
 
+  public getCurrentNodeId(): string | null {
+    return this.lastNodeId;
+  }
+
   public async getRangeModels(
     firstLine: number,
     lastLine: number

@@ -3,6 +3,7 @@ import { BufferOptionStoreFactory } from "./option";
 import { Direction } from "../direction";
 import { Neovim } from "neovim";
 import { BufferRepository } from "../repository/buffer";
+import { AutocmdRepository } from "../repository/autocmd";
 
 describe("BufferContainer", () => {
   let bufferContainer: BufferContainer;
@@ -16,6 +17,9 @@ describe("BufferContainer", () => {
   let verticalOpen: jest.Mock;
   let horizontalOpen: jest.Mock;
   let deleteBuffer: jest.Mock;
+
+  let autocmdRepository: AutocmdRepository;
+  let defineToBuffer: jest.Mock;
 
   let bufferOptionStoreFactory: BufferOptionStoreFactory;
   let create: jest.Mock;
@@ -59,6 +63,12 @@ describe("BufferContainer", () => {
     }));
     bufferRepository = new BufferRepositoryClass();
 
+    defineToBuffer = jest.fn();
+    const AutocmdRepositoryClass = jest.fn<AutocmdRepository>(() => ({
+      defineToBuffer: defineToBuffer,
+    }));
+    autocmdRepository = new AutocmdRepositoryClass();
+
     create = jest.fn();
     const BufferOptionStoreFactoryClass = jest.fn<BufferOptionStoreFactory>(
       () => ({
@@ -70,6 +80,7 @@ describe("BufferContainer", () => {
     bufferContainer = new BufferContainer(
       vim,
       bufferRepository,
+      autocmdRepository,
       bufferOptionStoreFactory,
       "type"
     );
@@ -99,6 +110,7 @@ describe("BufferContainer", () => {
     const bufferContainer = new BufferContainer(
       vim,
       bufferRepository,
+      autocmdRepository,
       bufferOptionStoreFactory,
       "type"
     );
@@ -143,5 +155,25 @@ describe("BufferContainer", () => {
     await bufferContainer.getOptionStore();
 
     expect(create).toHaveBeenCalled();
+  });
+
+  it("defineReadAction", async () => {
+    await bufferContainer.defineReadAction("read");
+
+    expect(defineToBuffer).toHaveBeenCalledWith(
+      "BufReadCmd",
+      bufferNumber,
+      'call ctrlb#do_action("type", "read")'
+    );
+  });
+
+  it("defineWriteAction", async () => {
+    await bufferContainer.defineWriteAction("write");
+
+    expect(defineToBuffer).toHaveBeenCalledWith(
+      "BufWriteCmd",
+      bufferNumber,
+      'call ctrlb#do_action("type", "write")'
+    );
   });
 });

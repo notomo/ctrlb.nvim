@@ -17,6 +17,7 @@ import { EventRepository } from "./repository/event";
 import { HistoryRepository, History } from "./repository/history";
 import { DownloadRepository, Download } from "./repository/download";
 import { BufferRepository } from "./repository/buffer";
+import { AutocmdRepository } from "./repository/autocmd";
 import { Execute } from "./complete/execute";
 import { Open } from "./complete/open";
 import { BufferContainer } from "./buffers/container";
@@ -82,6 +83,9 @@ export class Di {
     },
     BufferRepository: (vim: Neovim) => {
       return new BufferRepository(vim);
+    },
+    AutocmdRepository: (vim: Neovim) => {
+      return new AutocmdRepository(vim);
     },
     Open: (vim: Neovim) => {
       const bufferType = new BufferType();
@@ -201,10 +205,12 @@ export class Di {
     },
     BufferContainer: (vim: Neovim, type: string) => {
       const bufferRepository = Di.get("BufferRepository", vim);
+      const autocmdRepository = Di.get("AutocmdRepository", vim);
       const bufferOptionStoreFactory = new BufferOptionStoreFactory(vim);
       return new BufferContainer(
         vim,
         bufferRepository,
+        autocmdRepository,
         bufferOptionStoreFactory,
         type
       );
@@ -225,6 +231,7 @@ export class Di {
     HistoryRepository: null,
     DownloadRepository: null,
     BufferRepository: null,
+    AutocmdRepository: null,
     EventRegisterer: null,
     Ctrl: null,
     BookmarkTree: null,
@@ -265,6 +272,7 @@ export class Di {
     cacheable: false
   ): EventRegisterer;
   public static get(cls: "BufferRepository", vim: Neovim): BufferRepository;
+  public static get(cls: "AutocmdRepository", vim: Neovim): AutocmdRepository;
   public static get(cls: "HistoryRepository", vim: Neovim): HistoryRepository;
   public static get(cls: "DownloadRepository", vim: Neovim): DownloadRepository;
   public static get(cls: "EventRepository", vim: Neovim): EventRepository;
@@ -333,6 +341,7 @@ interface Deps {
   HistoryRepository: { (vim: Neovim, ...args: any[]): HistoryRepository };
   DownloadRepository: { (vim: Neovim, ...args: any[]): DownloadRepository };
   BufferRepository: { (vim: Neovim, ...args: any[]): BufferRepository };
+  AutocmdRepository: { (vim: Neovim, ...args: any[]): AutocmdRepository };
   EventRegisterer: { (vim: Neovim, ...args: any[]): EventRegisterer };
   Ctrl: { (vim: Neovim, ...args: any[]): Ctrl };
   BookmarkTree: { (vim: Neovim, ...args: any[]): BookmarkTree };

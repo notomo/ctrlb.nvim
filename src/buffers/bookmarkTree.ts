@@ -53,24 +53,33 @@ export class BookmarkTree extends BaseBuffer {
     this.actions["openParent"] = () => this.openParent();
     this.actions["debug"] = async () =>
       this.debug(await this.treeBuffer.getCurrent());
+    this.actions["read"] = () => this.read();
   }
 
   protected async setup(): Promise<void> {
     await this.vim.command(
       "highlight default link CtrlbBookmarkTreeDirectory String"
     );
-    await this.vim.command(
-      "syntax match CtrlbBookmarkTreeDirectory /^[^[:tab:]]*\\/$/"
-    );
 
     await this.vim.command(
       "highlight default link CtrlbBookmarkTreeUrl Underlined"
+    );
+
+    await this.bufferContainer.defineReadAction("read");
+
+    this.read();
+  }
+
+  public async read() {
+    await this.vim.command(
+      "syntax match CtrlbBookmarkTreeDirectory /^[^[:tab:]]*\\/$/"
     );
     await this.vim.command(
       "syntax match CtrlbBookmarkTreeUrl /[[:tab:]]\\zs.*$/"
     );
 
-    this.openBookmark();
+    const id = await this.treeBuffer.getCurrentNodeId();
+    await this.openTree(id);
   }
 
   public async openParent() {
