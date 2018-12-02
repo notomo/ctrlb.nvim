@@ -6,6 +6,7 @@ export type Tab = {
   id?: number;
   title: string;
   url: string;
+  active: boolean;
 };
 
 export class TabRepository {

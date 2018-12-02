@@ -33,4 +33,15 @@ describe("HighlightRepository", () => {
     await highlightRepository.match(name, pattern);
     expect(command).toHaveBeenCalledWith(`syntax match ${name} /${pattern}/`);
   });
+
+  it("match with contains", async () => {
+    const name = "name";
+    const pattern = "pattern";
+    const contains = ["contain1", "contain2"];
+
+    await highlightRepository.match(name, pattern, contains);
+    expect(command).toHaveBeenCalledWith(
+      `syntax match ${name} /${pattern}/ contains=contain1,contain2`
+    );
+  });
 });

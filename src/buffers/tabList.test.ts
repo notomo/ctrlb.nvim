@@ -190,7 +190,20 @@ describe("TabListItem", () => {
   });
 
   it("toString", () => {
-    expect("title\turl").toEqual(item.toString());
+    expect(" title\turl").toEqual(item.toString());
+  });
+
+  it("toString with an active tab", () => {
+    const TabClass = jest.fn<Tab>(() => ({
+      title: "title",
+      url: "url",
+      active: true,
+    }));
+    Tab = new TabClass();
+
+    item = new TabListItem(Tab);
+
+    expect("|title\turl").toEqual(item.toString());
   });
 
   it("value", () => {
