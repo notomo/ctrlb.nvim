@@ -3,15 +3,10 @@ import { ChildProcess } from "child_process";
 
 export class EventRegisterer {
   protected readonly receivers: ChildProcess[] = [];
-  protected readonly subscribedEvents: string[] = [];
 
   constructor(protected readonly eventRepository: EventRepository) {}
 
-  public async subscribe(process: ChildProcess, ...eventNames: string[]) {
-    for (const eventName of eventNames) {
-      this.eventRepository.subscribe(eventName);
-      this.subscribedEvents.push(eventName);
-    }
+  public async subscribe(process: ChildProcess) {
     this.receivers.push(process);
   }
 
@@ -24,10 +19,5 @@ export class EventRegisterer {
         p.kill();
       });
     this.receivers.length = 0;
-
-    this.subscribedEvents.map(eventName => {
-      this.eventRepository.unsubscribe(eventName);
-    });
-    this.subscribedEvents.length = 0;
   }
 }

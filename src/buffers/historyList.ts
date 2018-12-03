@@ -57,7 +57,7 @@ export class HistoryList extends BaseBuffer {
     await this.highlight();
 
     const p = this.historyRepository.onCreated(history => this.update(history));
-    this.eventRegisterer.subscribe(p, "historyCreated");
+    this.eventRegisterer.subscribe(p);
 
     await this.bufferContainer.defineReadAction("read");
     await this.bufferContainer.defineEnableHighlightAction("highlight");
