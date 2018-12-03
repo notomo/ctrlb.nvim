@@ -67,16 +67,7 @@ export class TabList extends BaseBuffer {
     await this.highlight();
 
     const p = this.tabRepository.onChanged(data => this.read());
-    this.eventRegisterer.subscribe(
-      p,
-      "tabActivated",
-      "tabCreated",
-      "tabRemoved",
-      "tabUpdated",
-      "windowActivated",
-      "windowCreated",
-      "windowRemoved"
-    );
+    this.eventRegisterer.subscribe(p);
 
     await this.bufferContainer.defineReadAction("read");
     await this.bufferContainer.defineEnableHighlightAction("highlight");

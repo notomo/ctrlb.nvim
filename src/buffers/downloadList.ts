@@ -46,7 +46,7 @@ export class DownloadList extends BaseBuffer {
     const p = this.downloadRepository.onCreated(download =>
       this.update(download)
     );
-    this.eventRegisterer.subscribe(p, "downloadCreated");
+    this.eventRegisterer.subscribe(p);
 
     await this.bufferContainer.defineReadAction("read");
 

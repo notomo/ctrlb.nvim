@@ -45,16 +45,7 @@ export class CurrentTab extends BaseBuffer {
 
   protected async setup(): Promise<void> {
     const p = this.tabRepository.onChanged(data => this.read());
-    this.eventRegisterer.subscribe(
-      p,
-      "tabActivated",
-      "tabCreated",
-      "tabRemoved",
-      "tabUpdated",
-      "windowActivated",
-      "windowCreated",
-      "windowRemoved"
-    );
+    this.eventRegisterer.subscribe(p);
 
     await Promise.all([
       this.bufferContainer.defineWriteAction("write"),
