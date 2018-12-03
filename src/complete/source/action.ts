@@ -3,7 +3,7 @@ import { ApiInfoRepository } from "../../repository/apiInfo";
 export class Action {
   constructor(protected readonly apiInfoRepository: ApiInfoRepository) {}
 
-  public async get(actionName: string): Promise<string[]> {
+  public async get(actionName: string): Promise<ReadonlyArray<string>> {
     const [apiInfos, error] = await this.apiInfoRepository.get();
 
     if (error !== null) {

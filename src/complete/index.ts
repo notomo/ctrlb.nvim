@@ -4,7 +4,7 @@ import { Execute } from "./execute";
 import { Logger, getLogger } from "../logger";
 
 export class Completer {
-  protected readonly commands: Command[];
+  protected readonly commands: ReadonlyArray<Command>;
   protected readonly logger: Logger;
 
   constructor(openCommand: Open, executeCommand: Execute) {
@@ -17,7 +17,7 @@ export class Completer {
     currentArg: string,
     line: string,
     cursorPosition: number
-  ): Promise<string[]> {
+  ): Promise<ReadonlyArray<string>> {
     const parsed = this.parseLine(line);
     for (const command of this.commands) {
       if (command.match(parsed.commandName)) {
@@ -28,7 +28,9 @@ export class Completer {
     return [];
   }
 
-  protected parseLine(line: string): { commandName: string; args: string[] } {
+  protected parseLine(
+    line: string
+  ): { commandName: string; args: ReadonlyArray<string> } {
     const splitted = line.split(/(?<!\\)[ ]+/);
     return {
       commandName: splitted[0],

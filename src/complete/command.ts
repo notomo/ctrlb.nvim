@@ -14,6 +14,6 @@ export abstract class Command {
 
   public abstract findCandidates(
     currentArg: string,
-    args: string[]
-  ): Promise<string[]>;
+    args: ReadonlyArray<string>
+  ): Promise<ReadonlyArray<string>>;
 }

@@ -18,7 +18,7 @@ export class TabRepository {
     });
   }
 
-  public async getListAll(): Promise<WithError<Tab[]>> {
+  public async getListAll(): Promise<WithError<ReadonlyArray<Tab>>> {
     const [tabs, error] = await this.requester.execute<Tab[]>({
       method: "tab/listAll",
     });

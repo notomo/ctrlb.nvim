@@ -10,7 +10,7 @@ export type History = {
 export class HistoryRepository {
   constructor(protected readonly requester: Requester) {}
 
-  public async search(): Promise<WithError<History[]>> {
+  public async search(): Promise<WithError<ReadonlyArray<History>>> {
     const [histories, error] = await this.requester.execute<History[]>({
       method: "history/search",
       params: {},

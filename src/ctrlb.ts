@@ -55,7 +55,7 @@ export class Ctrlb {
     currentArg: string,
     line: string,
     cursorPosition: number
-  ): Promise<string[]> {
+  ): Promise<ReadonlyArray<string>> {
     return this.completer.complete(currentArg, line, cursorPosition);
   }
 }

@@ -23,7 +23,7 @@ export class BufferRepository {
     await this.vim.command("bwipeout " + id);
   }
 
-  public async getBufferIdsOnCurrentTab(): Promise<number[]> {
+  public async getBufferIdsOnCurrentTab(): Promise<ReadonlyArray<number>> {
     return await this.vim.call("tabpagebuflist");
   }
 }

@@ -10,7 +10,7 @@ export class HighlightRepository {
   public async match(
     name: string,
     pattern: string,
-    contains: string[] = []
+    contains: ReadonlyArray<string> = []
   ): Promise<void> {
     if (contains.length === 0) {
       await this.vim.command(`syntax match ${name} /${pattern}/`);

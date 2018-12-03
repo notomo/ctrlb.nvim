@@ -12,7 +12,9 @@ export type Bookmark = {
 export class BookmarkRepository {
   constructor(protected readonly requester: Requester) {}
 
-  public async getTree(id: string | null): Promise<WithError<Bookmark[]>> {
+  public async getTree(
+    id: string | null
+  ): Promise<WithError<ReadonlyArray<Bookmark>>> {
     const [bookmarks, error] = await this.requester.execute<Bookmark[]>({
       method: "bookmark/getTree",
       params: { id: id },

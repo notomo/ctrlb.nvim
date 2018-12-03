@@ -56,7 +56,9 @@ export class CtrlbPlugin {
     await this.ctrlb.clearAll().catch(e => this.reporter.error(e));
   }
 
-  public async complete(args: [string, string, number]): Promise<string[]> {
+  public async complete(
+    args: [string, string, number]
+  ): Promise<ReadonlyArray<string>> {
     return await this.ctrlb.complete(...args).catch(e => {
       this.reporter.error(e);
       return [];
