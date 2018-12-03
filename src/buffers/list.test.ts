@@ -17,6 +17,7 @@ describe("ListBuffer", () => {
 
   let get: jest.Mock;
   let getOptionStore: jest.Mock;
+  let isDisplayed: jest.Mock;
 
   let call: jest.Mock;
   let command: jest.Mock;
@@ -48,9 +49,11 @@ describe("ListBuffer", () => {
 
     get = jest.fn().mockReturnValue(buffer);
     getOptionStore = jest.fn().mockReturnValue(bufferOptionStore);
+    isDisplayed = jest.fn().mockReturnValue(true);
     const BufferContainerClass = jest.fn<BufferContainer>(() => ({
       get: get,
       getOptionStore: getOptionStore,
+      isDisplayed: isDisplayed,
     }));
     const bufferContainer = new BufferContainerClass();
 
