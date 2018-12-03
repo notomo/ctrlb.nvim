@@ -22,4 +22,8 @@ export class BufferRepository {
   public async delete(id: number): Promise<void> {
     await this.vim.command("bwipeout " + id);
   }
+
+  public async getBufferIdsOnCurrentTab(): Promise<number[]> {
+    return await this.vim.call("tabpagebuflist");
+  }
 }

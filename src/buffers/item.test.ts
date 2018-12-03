@@ -14,6 +14,8 @@ describe("ItemBuffer", () => {
   let itemBuffer: ItemBuffer<string>;
 
   let get: jest.Mock;
+  let isDisplayed: jest.Mock;
+
   let replace: jest.Mock;
 
   beforeEach(() => {
@@ -27,8 +29,10 @@ describe("ItemBuffer", () => {
     const buffer = new BufferClass();
 
     get = jest.fn().mockReturnValue(buffer);
+    isDisplayed = jest.fn().mockReturnValue(true);
     const BufferContainerClass = jest.fn<BufferContainer>(() => ({
       get: get,
+      isDisplayed: isDisplayed,
     }));
     const bufferContainer = new BufferContainerClass();
 

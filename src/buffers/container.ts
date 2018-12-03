@@ -3,10 +3,13 @@ import { BufferOptionStore, BufferOptionStoreFactory } from "./option";
 import { Direction } from "../direction";
 import { BufferRepository } from "../repository/buffer";
 import { AutocmdRepository } from "../repository/autocmd";
+import { getLogger, Logger } from "../logger";
 
 export class BufferContainer {
   protected buffer: Buffer | null;
   protected readonly bufferPath: string;
+
+  protected readonly logger: Logger;
 
   constructor(
     protected readonly vim: Neovim,
@@ -17,6 +20,7 @@ export class BufferContainer {
   ) {
     this.buffer = null;
     this.bufferPath = "ctrlb://" + type;
+    this.logger = getLogger("buffers.container");
   }
 
   public async get(): Promise<Buffer> {
@@ -75,6 +79,11 @@ export class BufferContainer {
       bufferId,
       `call ctrlb#do_action("${this.type}", "${actionName}")`
     );
+    await this.autocmdRepository.defineToBuffer(
+      "BufEnter",
+      bufferId,
+      `call ctrlb#do_action("${this.type}", "${actionName}")`
+    );
   }
 
   public async defineWriteAction(actionName: string) {
@@ -93,5 +102,14 @@ export class BufferContainer {
       bufferId,
       `call ctrlb#do_action("${this.type}", "${actionName}")`
     );
+  }
+
+  public async isDisplayed(): Promise<boolean> {
+    const bufferId = (await this.get()).id;
+    const bufferIds = (await this.bufferRepository.getBufferIdsOnCurrentTab()).filter(
+      (id: number) => id === bufferId
+    );
+
+    return bufferIds.length !== 0;
   }
 }

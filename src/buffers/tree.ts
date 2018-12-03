@@ -63,6 +63,18 @@ export class TreeBuffer<Model> {
   }
 
   public async set(items: Item<Model>[], nodeId: string | null) {
+    const oldItemLength = this.items.length;
+    this.items = items;
+
+    const lastBookmarkIndex = items.findIndex(item => {
+      return this.lastNodeId === item.id;
+    });
+    this.lastNodeId = nodeId;
+
+    if (!(await this.bufferContainer.isDisplayed())) {
+      return;
+    }
+
     const buffer = await this.bufferContainer.get();
     const lines = items.map(item => {
       return item.toString();
@@ -71,19 +83,13 @@ export class TreeBuffer<Model> {
     const optionStore = await this.bufferContainer.getOptionStore();
     await optionStore.set({ modifiable: true });
 
-    await buffer.remove(0, this.items.length, false);
+    await buffer.remove(0, oldItemLength - 1, false);
     await buffer.replace(lines, 0);
 
     await optionStore.set({ modifiable: false });
 
-    this.items = items;
-
-    const lastBookmarkIndex = items.findIndex(item => {
-      return this.lastNodeId === item.id;
-    });
     if (lastBookmarkIndex !== -1) {
       this.vim.window.cursor = [lastBookmarkIndex + 1, 0];
     }
-    this.lastNodeId = nodeId;
   }
 }

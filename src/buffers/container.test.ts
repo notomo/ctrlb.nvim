@@ -17,6 +17,7 @@ describe("BufferContainer", () => {
   let verticalOpen: jest.Mock;
   let horizontalOpen: jest.Mock;
   let deleteBuffer: jest.Mock;
+  let getBufferIdsOnCurrentTab: jest.Mock;
 
   let autocmdRepository: AutocmdRepository;
   let defineToBuffer: jest.Mock;
@@ -54,12 +55,14 @@ describe("BufferContainer", () => {
     verticalOpen = jest.fn();
     horizontalOpen = jest.fn();
     deleteBuffer = jest.fn();
+    getBufferIdsOnCurrentTab = jest.fn().mockReturnValue([bufferNumber]);
     const BufferRepositoryClass = jest.fn<BufferRepository>(() => ({
       open: open,
       tabOpen: tabOpen,
       verticalOpen: verticalOpen,
       horizontalOpen: horizontalOpen,
       delete: deleteBuffer,
+      getBufferIdsOnCurrentTab: getBufferIdsOnCurrentTab,
     }));
     bufferRepository = new BufferRepositoryClass();
 
@@ -185,5 +188,11 @@ describe("BufferContainer", () => {
       bufferNumber,
       'call ctrlb#do_action("type", "highlight")'
     );
+  });
+
+  it("isDisplayed", async () => {
+    const result = await bufferContainer.isDisplayed();
+
+    expect(result).toEqual(true);
   });
 });

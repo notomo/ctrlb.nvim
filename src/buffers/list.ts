@@ -48,6 +48,12 @@ export class ListBuffer<Model> {
   }
 
   public async prepend(item: Item<Model>) {
+    this.items.unshift(item);
+
+    if (!(await this.bufferContainer.isDisplayed())) {
+      return;
+    }
+
     const buffer = await this.bufferContainer.get();
 
     const optionStore = await this.bufferContainer.getOptionStore();
@@ -56,13 +62,15 @@ export class ListBuffer<Model> {
     await buffer.insert(item.toString(), 0);
 
     await optionStore.set({ modifiable: false });
-
-    this.items.unshift(item);
-    // FIXME: workaround for corrupted display
-    await this.vim.command("redraw!");
   }
 
   public async set(items: Item<Model>[]) {
+    this.items = items;
+
+    if (!(await this.bufferContainer.isDisplayed())) {
+      return;
+    }
+
     const buffer = await this.bufferContainer.get();
     const lines = items.map(item => {
       return item.toString();
@@ -80,11 +88,7 @@ export class ListBuffer<Model> {
 
     await optionStore.set({ modifiable: false });
 
-    this.items = items;
-
     if (buffer.id !== currentWindowBufferId) {
-      // FIXME: workaround for corrupted display
-      await this.vim.command("redraw!");
       return;
     }
 
