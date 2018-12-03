@@ -38,7 +38,7 @@ export class TreeBuffer<Model> {
   public async getRangeModels(
     firstLine: number,
     lastLine: number
-  ): Promise<Model[]> {
+  ): Promise<ReadonlyArray<Model>> {
     const models: Model[] = [];
     for (const i of [...Array(lastLine - firstLine + 1).keys()]) {
       const lineNubmer = i + firstLine;

@@ -26,7 +26,7 @@ export class LayoutItem {
   protected readonly windowAndItems: { window: Window; item: Item }[];
   public readonly isActive = false;
   constructor(
-    protected readonly items: Item[],
+    protected readonly items: ReadonlyArray<Item>,
     protected readonly direction: Direction,
     public readonly sizeParcent: number | null,
     protected readonly vim: Neovim,
@@ -127,7 +127,7 @@ export class LayoutParser {
     }
 
     const validLength = json.items.length;
-    let sizeParcents: (number | null)[];
+    let sizeParcents: ReadonlyArray<number | null>;
     if (!this.hasSizeParcents(json)) {
       sizeParcents = Array(validLength).fill(null);
     } else {
@@ -175,7 +175,7 @@ export class LayoutParser {
   }
 
   protected isSizeParcents(
-    value: any[],
+    value: ReadonlyArray<any>,
     length: number
   ): value is (number | null)[] {
     if (value.every((v: any) => v === null)) {
@@ -194,10 +194,10 @@ export class LayoutParser {
   }
 
   protected parseLayoutItem(
-    items: any[],
+    items: ReadonlyArray<any>,
     direction: Direction,
     sizeParcent: number | null,
-    sizeParcents: (number | null)[]
+    sizeParcents: ReadonlyArray<number | null>
   ): LayoutItem {
     const parsedItems: Item[] = [];
 

@@ -14,8 +14,8 @@ export class Execute extends Command {
 
   public async findCandidates(
     currentArg: string,
-    args: string[]
-  ): Promise<string[]> {
+    args: ReadonlyArray<string>
+  ): Promise<ReadonlyArray<string>> {
     return await this.actionSource.get(currentArg);
   }
 }

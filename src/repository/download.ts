@@ -10,7 +10,7 @@ export type Download = {
 export class DownloadRepository {
   constructor(protected readonly requester: Requester) {}
 
-  public async search(): Promise<WithError<Download[]>> {
+  public async search(): Promise<WithError<ReadonlyArray<Download>>> {
     const [downloads, error] = await this.requester.execute<Download[]>({
       method: "download/search",
       params: {},

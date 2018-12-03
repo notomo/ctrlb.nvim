@@ -157,7 +157,7 @@ export class TabList extends BaseBuffer {
   protected async getIds(
     firstLine: number,
     lastLine: number
-  ): Promise<number[]> {
+  ): Promise<ReadonlyArray<number>> {
     return (await this.listBuffer.getRangeModels(firstLine, lastLine))
       .map(tab => tab.id)
       .filter((id): id is number => id !== undefined);

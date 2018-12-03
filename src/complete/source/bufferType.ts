@@ -1,7 +1,7 @@
 import { CtrlbBufferType } from "../../buffers/type";
 
 export class BufferType {
-  public get(): string[] {
+  public get(): ReadonlyArray<string> {
     return Object.keys(CtrlbBufferType);
   }
 }

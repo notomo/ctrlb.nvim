@@ -8,7 +8,7 @@ interface ApiInfo {
 export class ApiInfoRepository {
   constructor(protected readonly requester: Requester) {}
 
-  public async get(): Promise<WithError<ApiInfo[]>> {
+  public async get(): Promise<WithError<ReadonlyArray<ApiInfo>>> {
     const [apiInfos, error] = await this.requester.execute<ApiInfo[]>({
       method: "apiInfo/get",
     });
