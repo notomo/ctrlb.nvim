@@ -16,6 +16,28 @@ export class Execute extends Command {
     currentArg: string,
     args: ReadonlyArray<string>
   ): Promise<ReadonlyArray<string>> {
-    return await this.actionSource.get(currentArg);
+    const actionNames = args.filter(arg => !arg.startsWith("-"));
+
+    if (
+      actionNames.length === 0 ||
+      (!currentArg.startsWith("-") && currentArg.length !== 0)
+    ) {
+      return await this.actionSource.get(currentArg);
+    }
+
+    const actionName = actionNames[0];
+    const params = args
+      .filter(arg => {
+        return arg.startsWith("-") && arg.includes("=");
+      })
+      .map(arg => {
+        const equalIndex = arg.indexOf("=");
+        return arg.slice(0, equalIndex + 1);
+      });
+
+    const keys = await this.actionArgKeySource.get(actionName);
+    return keys.filter(key => {
+      return !params.includes(key);
+    });
   }
 }

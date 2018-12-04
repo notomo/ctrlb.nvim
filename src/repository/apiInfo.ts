@@ -3,6 +3,7 @@ import { WithError } from "../error";
 
 interface ApiInfo {
   name: string;
+  params: { name: string }[];
 }
 
 export class ApiInfoRepository {
