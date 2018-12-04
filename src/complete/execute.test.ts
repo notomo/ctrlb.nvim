@@ -5,7 +5,7 @@ import { ActionArgKey } from "./source/actionArgKey";
 describe("Execute", () => {
   let execute: Execute;
   let getActions: jest.Mock;
-  let getActionArgs: jest.Mock;
+  let getActionArgKeys: jest.Mock;
 
   beforeEach(() => {
     getActions = jest.fn().mockReturnValue(["name"]);
@@ -14,9 +14,9 @@ describe("Execute", () => {
     }));
     const action = new ActionClass();
 
-    getActionArgs = jest.fn();
+    getActionArgKeys = jest.fn().mockReturnValue(["-zoomFactor=", "-id="]);
     const ActionArgKeyClass = jest.fn<ActionArgKey>(() => ({
-      get: getActionArgs,
+      get: getActionArgKeys,
     }));
     const actionArgKey = new ActionArgKeyClass();
 
@@ -24,7 +24,14 @@ describe("Execute", () => {
   });
 
   it("findCandidates returns actions", async () => {
-    await execute.findCandidates("tab/", ["tab/"]);
-    expect(getActions).toHaveBeenCalled();
+    const result = await execute.findCandidates("tab/", ["tab/"]);
+
+    expect(result).toEqual(["name"]);
+  });
+
+  it("findCandidates returns parameters", async () => {
+    const result = await execute.findCandidates("", ["tab/zoom/set", "-id=1"]);
+
+    expect(result).toEqual(["-zoomFactor="]);
   });
 });

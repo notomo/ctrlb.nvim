@@ -98,7 +98,7 @@ export class Di {
     Execute: (vim: Neovim) => {
       const apiInfoRepository = Di.get("ApiInfoRepository", vim);
       const action = new Action(apiInfoRepository);
-      const actionArgKey = new ActionArgKey();
+      const actionArgKey = new ActionArgKey(apiInfoRepository);
       return new Execute(action, actionArgKey);
     },
     Ctrl: (vim: Neovim) => {
