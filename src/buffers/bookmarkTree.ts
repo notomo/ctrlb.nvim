@@ -57,6 +57,8 @@ export class BookmarkTree extends BaseBuffer {
       this.debug(await this.treeBuffer.getCurrent());
     this.actions["read"] = () => this.read();
     this.actions["highlight"] = () => this.highlight();
+    this.actions["remove"] = (firstLine: number, lastLine: number) =>
+      this.remove(firstLine, lastLine);
   }
 
   protected async setup(): Promise<void> {
@@ -121,6 +123,15 @@ export class BookmarkTree extends BaseBuffer {
       .map(bookmark => bookmark.id)
       .filter((id): id is string => id !== undefined)
       .map(id => this.bookmarkRepository.tabOpen(id));
+  }
+
+  public async remove(firstLine: number, lastLine: number) {
+    await (await this.treeBuffer.getRangeModels(firstLine, lastLine))
+      .map(bookmark => bookmark.id)
+      .filter((id): id is string => id !== undefined)
+      .map(id => this.bookmarkRepository.remove(id));
+
+    await this.read();
   }
 
   protected async openTree(id: string | null) {
