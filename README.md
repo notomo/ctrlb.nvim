@@ -1,5 +1,9 @@
 # ctrlb.nvim
 
+[![Build Status](https://travis-ci.org/notomo/ctrlb.nvim.svg?branch=master)](https://travis-ci.org/notomo/ctrlb.nvim)
+[![Build status](https://ci.appveyor.com/api/projects/status/hgtnmfc1uvoj65yf/branch/master?svg=true)](https://ci.appveyor.com/project/notomo/ctrlb-nvim/branch/master)
+[![codecov](https://codecov.io/gh/notomo/ctrlb.nvim/branch/master/graph/badge.svg)](https://codecov.io/gh/notomo/ctrlb.nvim)
+
 ctrlb.nvim is a [ctrlb](https://github.com/notomo/ctrlb) client plugin for Neovim.  
 This plugin can control web browsers without moving the focus from Neovim.
 
