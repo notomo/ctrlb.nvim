@@ -83,13 +83,23 @@ export class TreeBuffer<Model> {
     const optionStore = await this.bufferContainer.getOptionStore();
     await optionStore.set({ modifiable: true });
 
+    const currentWindow = await this.vim.window;
+    const cursor = await currentWindow.cursor;
+
     await buffer.remove(0, oldItemLength - 1, false);
     await buffer.replace(lines, 0);
 
     await optionStore.set({ modifiable: false });
 
     if (lastBookmarkIndex !== -1) {
-      this.vim.window.cursor = [lastBookmarkIndex + 1, 0];
+      await (currentWindow.cursor = [lastBookmarkIndex + 1, 0]);
+    } else {
+      const newLength = await buffer.length;
+      if (newLength < cursor[0]) {
+        await (currentWindow.cursor = [newLength, cursor[1]]);
+        return;
+      }
+      await (currentWindow.cursor = cursor);
     }
   }
 }

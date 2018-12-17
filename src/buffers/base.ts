@@ -54,8 +54,8 @@ export abstract class BaseBuffer {
 
   public async doAction(
     actionName: string,
-    firstLine: number,
-    lastLine: number
+    firstLine: number = 1,
+    lastLine: number = 1
   ): Promise<void> {
     if (!(actionName in this.actions)) {
       throw new Error("Invalid actionName: " + actionName);

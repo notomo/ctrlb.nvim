@@ -40,4 +40,11 @@ export class BookmarkRepository {
       params: { id: id },
     });
   }
+
+  public async remove(id: string): Promise<NullableError> {
+    return this.requester.executeAsync({
+      method: "bookmark/remove",
+      params: { id: id },
+    });
+  }
 }
