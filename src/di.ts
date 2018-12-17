@@ -64,7 +64,8 @@ export class Di {
     },
     HistoryRepository: (vim: Neovim) => {
       const requester = Di.get("Requester", vim);
-      return new HistoryRepository(requester);
+      const tabRepository = Di.get("TabRepository", vim);
+      return new HistoryRepository(requester, tabRepository);
     },
     DownloadRepository: (vim: Neovim) => {
       const requester = Di.get("Requester", vim);
@@ -153,7 +154,6 @@ export class Di {
       const eventRegisterer = Di.get("EventRegisterer", vim, false);
       const highlightRepository = Di.get("HighlightRepository", vim);
       const historyRepository = Di.get("HistoryRepository", vim);
-      const tabRepository = Di.get("TabRepository", vim);
       const bufferContainer = Di.get(
         "BufferContainer",
         vim,
@@ -167,8 +167,7 @@ export class Di {
         listBuffer,
         eventRegisterer,
         highlightRepository,
-        historyRepository,
-        tabRepository
+        historyRepository
       );
     },
     TabList: (vim: Neovim) => {

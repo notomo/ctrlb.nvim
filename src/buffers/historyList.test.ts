@@ -4,7 +4,6 @@ import { BufferContainer } from "./container";
 import { HistoryList, HistoryListItem } from "./historyList";
 import { HistoryRepository, History } from "../repository/history";
 import { HighlightRepository } from "../repository/highlight";
-import { TabRepository } from "../repository/tab";
 import { EventRegisterer } from "./event";
 
 describe("HistoryList", () => {
@@ -14,7 +13,6 @@ describe("HistoryList", () => {
   let eventRegisterer: EventRegisterer;
   let historyRepository: HistoryRepository;
   let highlightRepository: HighlightRepository;
-  let tabRepository: TabRepository;
   let historyList: HistoryList;
 
   let getCurrent: jest.Mock;
@@ -40,19 +38,16 @@ describe("HistoryList", () => {
     const EventRegistererClass = jest.fn<EventRegisterer>(() => ({}));
     eventRegisterer = new EventRegistererClass();
 
-    const HistoryRepositoryClass = jest.fn<HistoryRepository>(() => ({}));
+    open = jest.fn();
+    tabOpen = jest.fn();
+    const HistoryRepositoryClass = jest.fn<HistoryRepository>(() => ({
+      open: open,
+      tabOpen: tabOpen,
+    }));
     historyRepository = new HistoryRepositoryClass();
 
     const HighlightRepositoryClass = jest.fn<HighlightRepository>(() => ({}));
     highlightRepository = new HighlightRepositoryClass();
-
-    open = jest.fn();
-    tabOpen = jest.fn();
-    const TabRepositoryClass = jest.fn<TabRepository>(() => ({
-      open: open,
-      tabOpen: tabOpen,
-    }));
-    tabRepository = new TabRepositoryClass();
 
     historyList = new HistoryList(
       vim,
@@ -60,8 +55,7 @@ describe("HistoryList", () => {
       listBuffer,
       eventRegisterer,
       highlightRepository,
-      historyRepository,
-      tabRepository
+      historyRepository
     );
   });
 
@@ -87,8 +81,7 @@ describe("HistoryList", () => {
       listBuffer,
       eventRegisterer,
       highlightRepository,
-      historyRepository,
-      tabRepository
+      historyRepository
     );
 
     await historyList.openHistory();
@@ -114,8 +107,7 @@ describe("HistoryList", () => {
       listBuffer,
       eventRegisterer,
       highlightRepository,
-      historyRepository,
-      tabRepository
+      historyRepository
     );
 
     await historyList.openHistory();
@@ -145,8 +137,7 @@ describe("HistoryList", () => {
       listBuffer,
       eventRegisterer,
       highlightRepository,
-      historyRepository,
-      tabRepository
+      historyRepository
     );
 
     await historyList.tabOpenHistory(1, 1);
@@ -172,8 +163,7 @@ describe("HistoryList", () => {
       listBuffer,
       eventRegisterer,
       highlightRepository,
-      historyRepository,
-      tabRepository
+      historyRepository
     );
 
     await historyList.tabOpenHistory(1, 1);

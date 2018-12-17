@@ -5,7 +5,6 @@ import { BufferContainer } from "./container";
 import { ListBuffer } from "./list";
 import { HighlightRepository } from "../repository/highlight";
 import { HistoryRepository, History } from "../repository/history";
-import { TabRepository } from "../repository/tab";
 import { EventRegisterer } from "./event";
 
 export class HistoryListItem {
@@ -37,8 +36,7 @@ export class HistoryList extends BaseBuffer {
     protected readonly listBuffer: ListBuffer<History>,
     protected readonly eventRegisterer: EventRegisterer,
     protected readonly highlightRepository: HighlightRepository,
-    protected readonly historyRepository: HistoryRepository,
-    protected readonly tabRepository: TabRepository
+    protected readonly historyRepository: HistoryRepository
   ) {
     super(vim, bufferContainer, eventRegisterer);
     this.actions["tabOpen"] = (firstLine: number, lastLine: number) =>
@@ -83,7 +81,7 @@ export class HistoryList extends BaseBuffer {
       return;
     }
 
-    await this.tabRepository.open(history.url);
+    await this.historyRepository.open(history.url);
   }
 
   protected async read() {
@@ -113,6 +111,6 @@ export class HistoryList extends BaseBuffer {
     (await this.listBuffer.getRangeModels(firstLine, lastLine))
       .map(history => history.url)
       .filter((url): url is string => url !== undefined)
-      .map(url => this.tabRepository.tabOpen(url));
+      .map(url => this.historyRepository.tabOpen(url));
   }
 }
