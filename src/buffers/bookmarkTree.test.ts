@@ -22,6 +22,8 @@ describe("BookmarkTree", () => {
   let open: jest.Mock;
   let getTree: jest.Mock;
   let set: jest.Mock;
+  let getCurrentNodeId: jest.Mock;
+  let remove: jest.Mock;
 
   let bookmark: Bookmark;
   let id: string;
@@ -38,11 +40,13 @@ describe("BookmarkTree", () => {
     getRangeModels = jest.fn().mockReturnValue([]);
     getParent = jest.fn().mockReturnValue(null);
     set = jest.fn();
+    getCurrentNodeId = jest.fn().mockReturnValue(null);
     const TreeBufferClass = jest.fn<TreeBuffer<Bookmark>>(() => ({
       getCurrent: getCurrent,
       getRangeModels: getRangeModels,
       getParent: getParent,
       set: set,
+      getCurrentNodeId: getCurrentNodeId,
     }));
     treeBuffer = new TreeBufferClass();
 
@@ -54,10 +58,12 @@ describe("BookmarkTree", () => {
     getTree = jest.fn().mockImplementation(async () => {
       return [bookmark];
     });
+    remove = jest.fn();
     const BookmarkRepositoryClass = jest.fn<BookmarkRepository>(() => ({
       tabOpen: tabOpen,
       open: open,
       getTree: getTree,
+      remove: remove,
     }));
     bookmarkRepository = new BookmarkRepositoryClass();
 
@@ -87,7 +93,7 @@ describe("BookmarkTree", () => {
   });
 
   it("tabOpenBookmark does nothing", async () => {
-    await bookmarkTree.tabOpenBookmark(1, 1);
+    await bookmarkTree.doAction("tabOpen", 1, 1);
 
     expect(tabOpen).not.toHaveBeenCalled();
   });
@@ -109,13 +115,36 @@ describe("BookmarkTree", () => {
       bookmarkRepository
     );
 
-    await bookmarkTree.tabOpenBookmark(1, 1);
+    await bookmarkTree.doAction("tabOpen", 1, 1);
 
     expect(tabOpen).toHaveBeenCalledWith(id);
   });
 
+  it("remove", async () => {
+    getRangeModels = jest.fn().mockReturnValue([bookmark]);
+
+    const TreeBufferClass = jest.fn<TreeBuffer<Bookmark>>(() => ({
+      getRangeModels: getRangeModels,
+      getCurrentNodeId: getCurrentNodeId,
+    }));
+    treeBuffer = new TreeBufferClass();
+
+    bookmarkTree = new BookmarkTree(
+      vim,
+      bufferContainer,
+      treeBuffer,
+      eventRegisterer,
+      highlightRepository,
+      bookmarkRepository
+    );
+
+    await bookmarkTree.doAction("remove", 1, 1);
+
+    expect(remove).toHaveBeenCalledWith(id);
+  });
+
   it("openParent does nothing", async () => {
-    await bookmarkTree.openParent();
+    await bookmarkTree.doAction("openParent");
 
     expect(getTree).not.toHaveBeenCalled();
   });
@@ -137,7 +166,7 @@ describe("BookmarkTree", () => {
       bookmarkRepository
     );
 
-    await bookmarkTree.openBookmark();
+    await bookmarkTree.doAction("open");
 
     expect(open).toHaveBeenCalled();
   });
@@ -160,13 +189,13 @@ describe("BookmarkTree", () => {
       bookmarkRepository
     );
 
-    await bookmarkTree.openBookmark();
+    await bookmarkTree.doAction("open");
 
     expect(open).not.toHaveBeenCalled();
   });
 
   it("openBookmark opens a root directory", async () => {
-    await bookmarkTree.openBookmark();
+    await bookmarkTree.doAction("open");
 
     expect(open).not.toHaveBeenCalled();
     expect(getTree).toHaveBeenCalledWith(null);
@@ -190,7 +219,7 @@ describe("BookmarkTree", () => {
       bookmarkRepository
     );
 
-    await bookmarkTree.openParent();
+    await bookmarkTree.doAction("openParent");
 
     expect(getTree).toHaveBeenCalled();
   });
