@@ -1,6 +1,7 @@
 
 let s:default_config = {
     \ 'timeout': 2,
+    \ 'port': v:null,
 \ }
 let s:config = s:default_config
 

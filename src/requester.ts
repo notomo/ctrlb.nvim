@@ -19,9 +19,17 @@ export class Requester {
 
   public async executeAsync(info: ActionInfo): Promise<NullableError> {
     const timeout = await this.configRepository.getTimeout();
+    const port = await this.configRepository.getPort();
+    const portOption = port === null ? [] : ["--port", String(port)];
     const result = await promisifyExecFile(
       "wsxhub",
-      ["--timeout", String(timeout), "send", "--json", JSON.stringify(info)],
+      portOption.concat([
+        "--timeout",
+        String(timeout),
+        "send",
+        "--json",
+        JSON.stringify(info),
+      ]),
       { timeout: 4000 }
     ).catch(e => {
       return e;
@@ -55,9 +63,17 @@ export class Requester {
 
   public async execute<T>(info: ActionInfo): Promise<WithError<T | null>> {
     const timeout = await this.configRepository.getTimeout();
+    const port = await this.configRepository.getPort();
+    const portOption = port === null ? [] : ["--port", String(port)];
     const result = await promisifyExecFile(
       "wsxhub",
-      ["--timeout", String(timeout), "send", "--json", JSON.stringify(info)],
+      portOption.concat([
+        "--timeout",
+        String(timeout),
+        "send",
+        "--json",
+        JSON.stringify(info),
+      ]),
       { timeout: 4000 }
     ).catch(e => {
       return e;

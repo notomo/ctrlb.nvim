@@ -7,6 +7,10 @@ export class ConfigRepository {
     return (await this.get("timeout")) as number;
   }
 
+  public async getPort(): Promise<number | null> {
+    return (await this.get("port")) as number | null;
+  }
+
   protected async get(name: string) {
     return this.vim.call("ctrlb#config#get", name);
   }
