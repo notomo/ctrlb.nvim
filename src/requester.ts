@@ -30,7 +30,7 @@ export class Requester {
         "--json",
         JSON.stringify(info),
       ]),
-      { timeout: 4000 }
+      { timeout: (timeout + 1) * 1000 }
     ).catch(e => {
       return e;
     });
@@ -74,7 +74,7 @@ export class Requester {
         "--json",
         JSON.stringify(info),
       ]),
-      { timeout: 4000 }
+      { timeout: (timeout + 1) * 1000 }
     ).catch(e => {
       return e;
     });
