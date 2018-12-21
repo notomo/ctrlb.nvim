@@ -34,7 +34,9 @@ export class HistoryRepository {
     });
   }
 
-  public onCreated(callback: { (history: History): void }): ChildProcess {
+  public async onCreated(callback: {
+    (history: History): void;
+  }): Promise<ChildProcess> {
     return this.requester.receiveAsyncOnEvent<History>(
       {},
       { body: { eventName: "historyCreated" } },

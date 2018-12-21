@@ -93,7 +93,9 @@ export class TabRepository {
     });
   }
 
-  public onChanged(callback: { (tab: Tab): void }): ChildProcess {
+  public async onChanged(callback: {
+    (tab: Tab): void;
+  }): Promise<ChildProcess> {
     return this.requester.receiveAsyncOnEvent<Tab>(
       {},
       {},

@@ -23,7 +23,9 @@ export class DownloadRepository {
     return [downloads, error];
   }
 
-  public onCreated(callback: { (download: Download): void }): ChildProcess {
+  public async onCreated(callback: {
+    (download: Download): void;
+  }): Promise<ChildProcess> {
     return this.requester.receiveAsyncOnEvent<Download>(
       {},
       { body: { eventName: "downloadCreated" } },

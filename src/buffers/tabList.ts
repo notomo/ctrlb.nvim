@@ -66,7 +66,7 @@ export class TabList extends BaseBuffer {
     await this.highlightRepository.link("CtrlbTabListActive", "Title");
     await this.highlight();
 
-    const p = this.tabRepository.onChanged(data => this.read());
+    const p = await this.tabRepository.onChanged(data => this.read());
     this.eventRegisterer.subscribe(p);
 
     await this.bufferContainer.defineReadAction("read");

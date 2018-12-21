@@ -3,21 +3,34 @@ import { ActionInfo } from "./info";
 import { promisify } from "util";
 import { Logger, getLogger } from "./logger";
 import { Reporter } from "./reporter";
+import { ConfigRepository } from "./repository/config";
 import { WithError, NullableError } from "./error";
 const promisifyExecFile = promisify(execFile);
 
 export class Requester {
   protected readonly logger: Logger;
 
-  constructor(protected readonly reporter: Reporter) {
+  constructor(
+    protected readonly reporter: Reporter,
+    protected readonly configRepository: ConfigRepository
+  ) {
     this.logger = getLogger("requester");
   }
 
   public async executeAsync(info: ActionInfo): Promise<NullableError> {
+    const timeout = await this.configRepository.getTimeout();
+    const port = await this.configRepository.getPort();
+    const portOption = port === null ? [] : ["--port", String(port)];
     const result = await promisifyExecFile(
       "wsxhub",
-      ["--timeout", "3", "send", "--json", JSON.stringify(info)],
-      { timeout: 4000 }
+      portOption.concat([
+        "--timeout",
+        String(timeout),
+        "send",
+        "--json",
+        JSON.stringify(info),
+      ]),
+      { timeout: (timeout + 1) * 1000 }
     ).catch(e => {
       return e;
     });
@@ -49,10 +62,19 @@ export class Requester {
   }
 
   public async execute<T>(info: ActionInfo): Promise<WithError<T | null>> {
+    const timeout = await this.configRepository.getTimeout();
+    const port = await this.configRepository.getPort();
+    const portOption = port === null ? [] : ["--port", String(port)];
     const result = await promisifyExecFile(
       "wsxhub",
-      ["--timeout", "3", "send", "--json", JSON.stringify(info)],
-      { timeout: 4000 }
+      portOption.concat([
+        "--timeout",
+        String(timeout),
+        "send",
+        "--json",
+        JSON.stringify(info),
+      ]),
+      { timeout: (timeout + 1) * 1000 }
     ).catch(e => {
       return e;
     });
@@ -84,24 +106,29 @@ export class Requester {
     return [stdout.body.data, null];
   }
 
-  public receiveAsyncOnEvent<T>(
+  public async receiveAsyncOnEvent<T>(
     keyFilter: any,
     filter: any,
     regexFilter: any,
     eventCallback: { (arg: T): any },
     debounceInterval: number = 0
-  ): ChildProcess {
-    const p = spawn("wsxhub", [
-      "--key",
-      JSON.stringify(keyFilter),
-      "--filter",
-      JSON.stringify(filter),
-      "--regex",
-      JSON.stringify(regexFilter),
-      "receive",
-      "--debounce",
-      debounceInterval.toString(),
-    ]);
+  ): Promise<ChildProcess> {
+    const port = await this.configRepository.getPort();
+    const portOption = port === null ? [] : ["--port", String(port)];
+    const p = spawn(
+      "wsxhub",
+      portOption.concat([
+        "--key",
+        JSON.stringify(keyFilter),
+        "--filter",
+        JSON.stringify(filter),
+        "--regex",
+        JSON.stringify(regexFilter),
+        "receive",
+        "--debounce",
+        debounceInterval.toString(),
+      ])
+    );
 
     p.stdout.setEncoding("utf-8");
     p.stdout.on("data", data => {

@@ -44,7 +44,7 @@ export class CurrentTab extends BaseBuffer {
   }
 
   protected async setup(): Promise<void> {
-    const p = this.tabRepository.onChanged(data => this.read());
+    const p = await this.tabRepository.onChanged(data => this.read());
     this.eventRegisterer.subscribe(p);
 
     await Promise.all([

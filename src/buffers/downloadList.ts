@@ -43,7 +43,7 @@ export class DownloadList extends BaseBuffer {
   }
 
   protected async setup(): Promise<void> {
-    const p = this.downloadRepository.onCreated(download =>
+    const p = await this.downloadRepository.onCreated(download =>
       this.update(download)
     );
     this.eventRegisterer.subscribe(p);
