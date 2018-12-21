@@ -106,24 +106,29 @@ export class Requester {
     return [stdout.body.data, null];
   }
 
-  public receiveAsyncOnEvent<T>(
+  public async receiveAsyncOnEvent<T>(
     keyFilter: any,
     filter: any,
     regexFilter: any,
     eventCallback: { (arg: T): any },
     debounceInterval: number = 0
-  ): ChildProcess {
-    const p = spawn("wsxhub", [
-      "--key",
-      JSON.stringify(keyFilter),
-      "--filter",
-      JSON.stringify(filter),
-      "--regex",
-      JSON.stringify(regexFilter),
-      "receive",
-      "--debounce",
-      debounceInterval.toString(),
-    ]);
+  ): Promise<ChildProcess> {
+    const port = await this.configRepository.getPort();
+    const portOption = port === null ? [] : ["--port", String(port)];
+    const p = spawn(
+      "wsxhub",
+      portOption.concat([
+        "--key",
+        JSON.stringify(keyFilter),
+        "--filter",
+        JSON.stringify(filter),
+        "--regex",
+        JSON.stringify(regexFilter),
+        "receive",
+        "--debounce",
+        debounceInterval.toString(),
+      ])
+    );
 
     p.stdout.setEncoding("utf-8");
     p.stdout.on("data", data => {

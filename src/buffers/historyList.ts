@@ -54,7 +54,9 @@ export class HistoryList extends BaseBuffer {
     await this.highlightRepository.link("CtrlbHistoryListUrl", "Underlined");
     await this.highlight();
 
-    const p = this.historyRepository.onCreated(history => this.update(history));
+    const p = await this.historyRepository.onCreated(history =>
+      this.update(history)
+    );
     this.eventRegisterer.subscribe(p);
 
     await this.bufferContainer.defineReadAction("read");
