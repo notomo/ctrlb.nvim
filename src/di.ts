@@ -19,6 +19,7 @@ import { DownloadRepository, Download } from "./repository/download";
 import { BufferRepository } from "./repository/buffer";
 import { AutocmdRepository } from "./repository/autocmd";
 import { HighlightRepository } from "./repository/highlight";
+import { ConfigRepository } from "./repository/config";
 import { Execute } from "./complete/execute";
 import { Open } from "./complete/open";
 import { BufferContainer } from "./buffers/container";
@@ -47,7 +48,8 @@ export class Di {
     },
     Requester: (vim: Neovim) => {
       const reporter = Di.get("Reporter", vim, false, "requester");
-      return new Requester(reporter);
+      const configRepository = Di.get("ConfigRepository", vim);
+      return new Requester(reporter, configRepository);
     },
     Reporter: (vim: Neovim, name: string) => {
       const logger = getLogger(name);
@@ -91,6 +93,9 @@ export class Di {
     },
     HighlightRepository: (vim: Neovim) => {
       return new HighlightRepository(vim);
+    },
+    ConfigRepository: (vim: Neovim) => {
+      return new ConfigRepository(vim);
     },
     Open: (vim: Neovim) => {
       const bufferType = new BufferType();
@@ -242,6 +247,7 @@ export class Di {
     BufferRepository: null,
     AutocmdRepository: null,
     HighlightRepository: null,
+    ConfigRepository: null,
     EventRegisterer: null,
     Ctrl: null,
     BookmarkTree: null,
@@ -287,6 +293,7 @@ export class Di {
     cls: "HighlightRepository",
     vim: Neovim
   ): HighlightRepository;
+  public static get(cls: "ConfigRepository", vim: Neovim): ConfigRepository;
   public static get(cls: "HistoryRepository", vim: Neovim): HistoryRepository;
   public static get(cls: "DownloadRepository", vim: Neovim): DownloadRepository;
   public static get(cls: "EventRepository", vim: Neovim): EventRepository;
@@ -357,6 +364,7 @@ interface Deps {
   BufferRepository: { (vim: Neovim, ...args: any[]): BufferRepository };
   AutocmdRepository: { (vim: Neovim, ...args: any[]): AutocmdRepository };
   HighlightRepository: { (vim: Neovim, ...args: any[]): HighlightRepository };
+  ConfigRepository: { (vim: Neovim, ...args: any[]): ConfigRepository };
   EventRegisterer: { (vim: Neovim, ...args: any[]): EventRegisterer };
   Ctrl: { (vim: Neovim, ...args: any[]): Ctrl };
   BookmarkTree: { (vim: Neovim, ...args: any[]): BookmarkTree };

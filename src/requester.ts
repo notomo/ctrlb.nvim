@@ -3,20 +3,25 @@ import { ActionInfo } from "./info";
 import { promisify } from "util";
 import { Logger, getLogger } from "./logger";
 import { Reporter } from "./reporter";
+import { ConfigRepository } from "./repository/config";
 import { WithError, NullableError } from "./error";
 const promisifyExecFile = promisify(execFile);
 
 export class Requester {
   protected readonly logger: Logger;
 
-  constructor(protected readonly reporter: Reporter) {
+  constructor(
+    protected readonly reporter: Reporter,
+    protected readonly configRepository: ConfigRepository
+  ) {
     this.logger = getLogger("requester");
   }
 
   public async executeAsync(info: ActionInfo): Promise<NullableError> {
+    const timeout = await this.configRepository.getTimeout();
     const result = await promisifyExecFile(
       "wsxhub",
-      ["--timeout", "3", "send", "--json", JSON.stringify(info)],
+      ["--timeout", String(timeout), "send", "--json", JSON.stringify(info)],
       { timeout: 4000 }
     ).catch(e => {
       return e;
@@ -49,9 +54,10 @@ export class Requester {
   }
 
   public async execute<T>(info: ActionInfo): Promise<WithError<T | null>> {
+    const timeout = await this.configRepository.getTimeout();
     const result = await promisifyExecFile(
       "wsxhub",
-      ["--timeout", "3", "send", "--json", JSON.stringify(info)],
+      ["--timeout", String(timeout), "send", "--json", JSON.stringify(info)],
       { timeout: 4000 }
     ).catch(e => {
       return e;

@@ -10,5 +10,6 @@ endfunction
 function! CtrlbTestAfterEach() abort
     %bwipeout!
     CtrlbClearAll
+    call ctrlb#config#clear()
     execute 'cd ' . s:root
 endfunction
