@@ -20,6 +20,10 @@ EXAMPLES                                                *ctrlb.nvim-examples*
             nnoremap <buffer> k :<C-u>Ctrlb scroll/up<CR>
             nnoremap <buffer> j :<C-u>Ctrlb scroll/down<CR>
         endfunction
+
+        " config if you need
+        call ctrlb#config#set('timeout', 1)
+        call ctrlb#config#set('port', 8888)
 <
 ==============================================================================
 COMMANDS                                                *ctrlb.nvim-commands*
@@ -35,6 +39,30 @@ COMMANDS                                                *ctrlb.nvim-commands*
 
 :CtrlbClearAll                                               *:CtrlbClearAll*
         Clear all ctrlb buffers.
+
+==============================================================================
+FUNCTIONS                                                *ctrlb.nvim-functions*
+
+ctrlb#config#set({name}, {value})                          *ctrlb#config#set()*
+    Set config settings.
+
+    Arguments:
+      {name}: string (|ctrlb.nvim-config| key)
+      {value}: any (|ctrlb.nvim-config| value)
+
+ctrlb#config#clear()                                     *ctrlb#config#clear()*
+    Restore default config settings.
+
+==============================================================================
+CONFIG                                                      *ctrlb.nvim-config*
+
+timeout                                             *ctrlb.nvim-config-timeout*
+    Timeout seconds for ctrlb requests.
+    Default: 2
+
+port                                                   *ctrlb.nvim-config-port*
+    Port for wsxhub requests.
+    Default: v:null (used wsxhub default port.)
 
 ==============================================================================
 vim:tw=78:ts=8:sw=2:ft=help:et:norl:fen:fdl=0:
