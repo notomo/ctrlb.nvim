@@ -16,3 +16,12 @@ function! s:suite.config_set_and_get()
 
     call s:assert.equals(ctrlb#config#get('timeout'), timeout)
 endfunction
+
+function! s:suite.clear()
+    let default_timeout = ctrlb#config#get('timeout')
+    call ctrlb#config#set('timeout', 10)
+
+    call ctrlb#config#clear()
+
+    call s:assert.equals(ctrlb#config#get('timeout'), default_timeout)
+endfunction

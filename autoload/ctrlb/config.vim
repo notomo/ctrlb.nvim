@@ -3,7 +3,7 @@ let s:default_config = {
     \ 'timeout': 2,
     \ 'port': v:null,
 \ }
-let s:config = s:default_config
+let s:config = deepcopy(s:default_config)
 
 function! ctrlb#config#set(key, value) abort
     if !has_key(s:config, a:key)
@@ -20,5 +20,5 @@ function! ctrlb#config#get(key) abort
 endfunction
 
 function! ctrlb#config#clear() abort
-    let s:config = s:default_config
+    let s:config = deepcopy(s:default_config)
 endfunction
