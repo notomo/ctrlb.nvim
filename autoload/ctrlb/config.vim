@@ -5,10 +5,27 @@ let s:default_config = {
 \ }
 let s:config = deepcopy(s:default_config)
 
+let s:validations = {
+    \ 'timeout': {
+        \ 'description': 'a positive number',
+        \ 'func': {x -> type(x) ==? v:t_number && x > 0},
+    \ },
+    \ 'port': {
+        \ 'description': 'a positive number',
+        \ 'func': {x -> type(x) ==? v:t_number && x > 0},
+    \ },
+\ }
+
 function! ctrlb#config#set(key, value) abort
     if !has_key(s:config, a:key)
         throw a:key . ' does not exist in config options.'
     endif
+
+    let validation = s:validations[a:key]
+    if !validation['func'](a:value)
+        throw a:key . ' must be ' . validation['description'] . '.'
+    endif
+
     let s:config[a:key] = a:value
 endfunction
 
