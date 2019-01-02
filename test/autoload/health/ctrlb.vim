@@ -67,9 +67,12 @@ function! s:suite.server()
     call ctrlb#start_server()
 
     execute 'checkhealth ctrlb'
+    sleep 100ms
 
-    let line = search('The server is running.', 'n')
-    call s:assert.not_equals(line, 0)
-
-    call ctrlb#stop_server()
+    try
+        let line = search('The server is running.', 'n')
+        call s:assert.not_equals(line, 0)
+    finally
+        call ctrlb#stop_server()
+    endtry
 endfunction

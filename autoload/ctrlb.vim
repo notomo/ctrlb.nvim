@@ -55,6 +55,8 @@ function! ctrlb#stop_server() abort
         return
     endif
 
-    " TODO: check job status
-    call jobstop(s:server_job_id)
+    try
+        call jobstop(s:server_job_id)
+    catch /E900: Invalid channel id/
+    endtry
 endfunction
