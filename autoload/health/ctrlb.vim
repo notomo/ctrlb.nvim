@@ -36,7 +36,7 @@ function! s:check_server() abort
         call health#report_ok('The server is running.')
     else
         call health#report_warn('Failed to communicate with the server.', [
-            \ ':call ctlrb#start_server()',
+            \ ':call ctrlb#start_server()',
         \ ])
     endif
 endfunction
