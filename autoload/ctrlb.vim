@@ -24,3 +24,37 @@ function! ctrlb#_complete(current_arg, line, cursor_position) abort
     let candidates = _ctrlb_complete(a:current_arg, a:line, a:cursor_position)
     return join(candidates, "\n")
 endfunction
+
+function! ctrlb#ping() abort
+    let client = ctrlb#config#get('executable_client')
+    let port = ctrlb#config#get('port')
+
+    let pong = trim(system(client . ' --port ' . port  . ' ping'))
+    return pong ==? 'pong'
+endfunction
+
+let s:server_job_id = ''
+function! ctrlb#start_server() abort
+    if ctrlb#ping()
+        return
+    endif
+
+    let server = ctrlb#config#get('executable_server')
+    let port = ctrlb#config#get('port')
+    let port_option = empty(port) ? '' : '--inside=' . port
+
+    let server_port = ctrlb#config#get('server_port')
+    let server_port_option = empty(server_port) ? '' : '--outside=' . server_port
+
+    let cmd = join([server, port_option, server_port_option], ' ')
+    let s:server_job_id = jobstart(cmd)
+endfunction
+
+function! ctrlb#stop_server() abort
+    if !s:server_job_id
+        return
+    endif
+
+    " TODO: check job status
+    call jobstop(s:server_job_id)
+endfunction
