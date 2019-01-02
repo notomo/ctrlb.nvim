@@ -36,6 +36,7 @@ endfunction
 
 " NOTICE: needs to setup bin/wsxhub, bin/wsxhubd
 function! s:suite.ping()
+    call ctrlb#config#set('server_port', 8009)
     call ctrlb#config#set('port', 8010)
 
     let result = ctrlb#ping()
