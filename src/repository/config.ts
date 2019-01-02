@@ -11,6 +11,10 @@ export class ConfigRepository {
     return (await this.get("port")) as number | null;
   }
 
+  public async getExecutableClient(): Promise<string> {
+    return (await this.get("executable_client")) as string;
+  }
+
   protected async get(name: string) {
     return this.vim.call("ctrlb#config#get", name);
   }

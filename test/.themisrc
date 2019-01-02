@@ -11,5 +11,7 @@ function! CtrlbTestAfterEach() abort
     %bwipeout!
     CtrlbClearAll
     call ctrlb#config#clear()
+    call health#ctrlb#_set_test_path('')
+    call health#ctrlb#_set_test_client('')
     execute 'cd ' . s:root
 endfunction

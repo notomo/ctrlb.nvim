@@ -43,12 +43,25 @@ COMMANDS                                                *ctrlb.nvim-commands*
 ==============================================================================
 FUNCTIONS                                                *ctrlb.nvim-functions*
 
+ctrlb#start_server()                                     *ctrlb#start_server()*
+    Start the server.
+    This uses |ctrlb.nvim-config|.
+
+ctrlb#stop_server()                                       *ctrlb#stop_server()*
+    Stop the server started by |ctrlb#start_server()|.
+
 ctrlb#config#set({name}, {value})                          *ctrlb#config#set()*
     Set config settings.
 
     Arguments:
       {name}: string (|ctrlb.nvim-config| key)
       {value}: any (|ctrlb.nvim-config| value)
+
+ctrlb#config#get({name})                                   *ctrlb#config#get()*
+    Get config settings.
+
+    Arguments:
+      {name}: string (|ctrlb.nvim-config| key)
 
 ctrlb#config#clear()                                     *ctrlb#config#clear()*
     Restore default config settings.
@@ -63,6 +76,20 @@ timeout                                             *ctrlb.nvim-config-timeout*
 port                                                   *ctrlb.nvim-config-port*
     Port for wsxhub requests.
     Default: v:null (used wsxhub default port.)
+
+server_port                                     *ctrlb.nvim-config-server_port*
+    Port for wsxhubd requests.
+    This is used by |ctrlb#start_server()|.
+    Default: v:null (used wsxhubd default port.)
+
+executable_client                         *ctrlb.nvim-config-executable_client*
+    The executable file path for client.
+    Default: {ctrlb.nvim_root}/bin/wsxhub
+
+executable_server                         *ctrlb.nvim-config-executable_server*
+    The executable file path for server.
+    This is used by |ctrlb#start_server()|.
+    Default: {ctrlb.nvim_root}/bin/wsxhubd
 
 ==============================================================================
 vim:tw=78:ts=8:sw=2:ft=help:et:norl:fen:fdl=0:
