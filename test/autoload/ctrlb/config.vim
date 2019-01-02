@@ -56,6 +56,6 @@ function! s:suite.set_invalid_value()
 
     try
         call ctrlb#config#set('executable_client', '')
-    catch /executable_client must be a executable string./
+    catch /executable_client must be an executable string./
     endtry
 endfunction
