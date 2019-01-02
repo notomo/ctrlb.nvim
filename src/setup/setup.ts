@@ -44,8 +44,9 @@ export const setupServerClient = (
       writeFile(zipFilePath, body);
 
       unarchive(zipFilePath, binaryDirectory, () => {
-        chmod(binaryDirectory + "/wsxhub", "0744");
-        chmod(binaryDirectory + "/wsxhubd", "0744");
+        const exe = platform === "windows" ? ".exe" : "";
+        chmod(binaryDirectory + "/wsxhub" + exe, "0744");
+        chmod(binaryDirectory + "/wsxhubd" + exe, "0744");
       });
     }
   });
