@@ -1,7 +1,9 @@
+let s:bin_directory = expand('<sfile>:p:h:h:h') . '/bin/'
 
 let s:default_config = {
     \ 'timeout': 2,
     \ 'port': v:null,
+    \ 'executable_client': s:bin_directory . 'wsxhub',
 \ }
 let s:config = deepcopy(s:default_config)
 
@@ -13,6 +15,10 @@ let s:validations = {
     \ 'port': {
         \ 'description': 'a positive number',
         \ 'func': {x -> type(x) ==? v:t_number && x > 0},
+    \ },
+    \ 'executable_client': {
+        \ 'description': 'an executable string',
+        \ 'func': {x -> type(x) ==? v:t_string && executable(x)},
     \ },
 \ }
 

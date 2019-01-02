@@ -18,11 +18,12 @@ export class Requester {
   }
 
   public async executeAsync(info: ActionInfo): Promise<NullableError> {
+    const client = await this.configRepository.getExecutableClient();
     const timeout = await this.configRepository.getTimeout();
     const port = await this.configRepository.getPort();
     const portOption = port === null ? [] : ["--port", String(port)];
     const result = await promisifyExecFile(
-      "wsxhub",
+      client,
       portOption.concat([
         "--timeout",
         String(timeout),
@@ -62,11 +63,12 @@ export class Requester {
   }
 
   public async execute<T>(info: ActionInfo): Promise<WithError<T | null>> {
+    const client = await this.configRepository.getExecutableClient();
     const timeout = await this.configRepository.getTimeout();
     const port = await this.configRepository.getPort();
     const portOption = port === null ? [] : ["--port", String(port)];
     const result = await promisifyExecFile(
-      "wsxhub",
+      client,
       portOption.concat([
         "--timeout",
         String(timeout),
@@ -113,10 +115,11 @@ export class Requester {
     eventCallback: { (arg: T): any },
     debounceInterval: number = 0
   ): Promise<ChildProcess> {
+    const client = await this.configRepository.getExecutableClient();
     const port = await this.configRepository.getPort();
     const portOption = port === null ? [] : ["--port", String(port)];
     const p = spawn(
-      "wsxhub",
+      client,
       portOption.concat([
         "--key",
         JSON.stringify(keyFilter),

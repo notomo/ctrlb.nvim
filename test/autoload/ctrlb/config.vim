@@ -20,6 +20,11 @@ function! s:suite.config_set_and_get()
     call ctrlb#config#set('port', port)
 
     call s:assert.equals(ctrlb#config#get('port'), port)
+
+    let executable_client = 'cat'
+    call ctrlb#config#set('executable_client', executable_client)
+
+    call s:assert.equals(ctrlb#config#get('executable_client'), executable_client)
 endfunction
 
 function! s:suite.clear()
@@ -47,5 +52,10 @@ function! s:suite.set_invalid_value()
     try
         call ctrlb#config#set('port', 0)
     catch /port must be a positive number./
+    endtry
+
+    try
+        call ctrlb#config#set('executable_client', '')
+    catch /executable_client must be a executable string./
     endtry
 endfunction
