@@ -66,6 +66,7 @@ function! s:suite.server()
 
     call ctrlb#start_server()
 
+    sleep 100ms
     execute 'checkhealth ctrlb'
     sleep 100ms
 
