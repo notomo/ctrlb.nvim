@@ -43,6 +43,7 @@ function! s:suite.ping()
     call s:assert.equals(result, v:false)
 
     call ctrlb#start_server()
+    sleep 100ms
     let result = ctrlb#ping()
     try
         call s:assert.equals(result, v:true)
