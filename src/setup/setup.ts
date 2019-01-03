@@ -10,7 +10,9 @@ export const setupServerClient = (
     (filePath: string, extractTo: string, callback: Function): void;
   },
   writeFile: { (filePath: string, data: any): void },
-  getFile: { (url: string, callback: RequestCallback): void }
+  getFile: { (url: string, callback: RequestCallback): void },
+  log: { (message: string): void },
+  errorLog: { (message: string): void }
 ) => {
   let platform: string;
   switch (processPlatform) {
@@ -33,11 +35,11 @@ export const setupServerClient = (
   const url = `https://github.com/notomo/wsxhub/releases/download/${releaseTag}/${fileName}`;
   getFile(url, (error, response, body) => {
     if (error) {
-      console.error(error);
+      errorLog(error);
       return;
     }
 
-    console.log(`${url}: ${response.statusCode} ${response.statusMessage}`);
+    log(`${url}: ${response.statusCode} ${response.statusMessage}`);
     if (response.statusCode === 200) {
       const zipFilePath = binaryDirectory + "/" + fileName;
 

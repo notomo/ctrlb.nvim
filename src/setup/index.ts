@@ -31,5 +31,7 @@ setupServerClient(
   chmodSync,
   unarchive,
   writeFileSync,
-  getFile
+  getFile,
+  console.log,
+  console.error
 );
