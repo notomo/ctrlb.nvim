@@ -30,26 +30,32 @@ describe("TabList", () => {
   let tabId: number;
 
   beforeEach(() => {
-    const NeovimClass = jest.fn<Neovim>(() => ({}));
+    const NeovimClass: jest.Mock<Neovim> = jest.fn(() => ({})) as any;
     vim = new NeovimClass();
 
-    const BufferContainerClass = jest.fn<BufferContainer>(() => ({}));
+    const BufferContainerClass: jest.Mock<BufferContainer> = jest.fn(
+      () => ({})
+    ) as any;
     bufferContainer = new BufferContainerClass();
 
     tabId = 1;
 
     getCurrent = jest.fn().mockReturnValue({ id: tabId });
     getRangeModels = jest.fn().mockReturnValue([{ id: tabId }, {}]);
-    const TreeBufferClass = jest.fn<ListBuffer<Tab>>(() => ({
+    const TreeBufferClass: jest.Mock<ListBuffer<Tab>> = jest.fn(() => ({
       getCurrent: getCurrent,
       getRangeModels: getRangeModels,
-    }));
+    })) as any;
     listBuffer = new TreeBufferClass();
 
-    const EventRegistererClass = jest.fn<EventRegisterer>(() => ({}));
+    const EventRegistererClass: jest.Mock<EventRegisterer> = jest.fn(
+      () => ({})
+    ) as any;
     eventRegisterer = new EventRegistererClass();
 
-    const HighlightRepositoryClass = jest.fn<HighlightRepository>(() => ({}));
+    const HighlightRepositoryClass: jest.Mock<HighlightRepository> = jest.fn(
+      () => ({})
+    ) as any;
     highlightRepository = new HighlightRepositoryClass();
 
     open = jest.fn();
@@ -61,7 +67,7 @@ describe("TabList", () => {
     zoomDown = jest.fn();
     zoomReset = jest.fn();
     activate = jest.fn();
-    const TabRepositoryClass = jest.fn<TabRepository>(() => ({
+    const TabRepositoryClass: jest.Mock<TabRepository> = jest.fn(() => ({
       open: open,
       tabOpen: tabOpen,
       close: close,
@@ -71,7 +77,7 @@ describe("TabList", () => {
       zoomDown: zoomDown,
       zoomReset: zoomReset,
       activate: activate,
-    }));
+    })) as any;
     tabRepository = new TabRepositoryClass();
 
     tabList = new TabList(
@@ -92,9 +98,9 @@ describe("TabList", () => {
 
   it("activate does nothing when tab is null", async () => {
     getCurrent = jest.fn().mockReturnValue(null);
-    const TreeBufferClass = jest.fn<ListBuffer<Tab>>(() => ({
+    const TreeBufferClass: jest.Mock<ListBuffer<Tab>> = jest.fn(() => ({
       getCurrent: getCurrent,
-    }));
+    })) as any;
     listBuffer = new TreeBufferClass();
 
     tabList = new TabList(
@@ -113,9 +119,9 @@ describe("TabList", () => {
 
   it("activate does nothing when tab does not have id", async () => {
     getCurrent = jest.fn().mockReturnValue({ id: undefined });
-    const TreeBufferClass = jest.fn<ListBuffer<Tab>>(() => ({
+    const TreeBufferClass: jest.Mock<ListBuffer<Tab>> = jest.fn(() => ({
       getCurrent: getCurrent,
-    }));
+    })) as any;
     listBuffer = new TreeBufferClass();
 
     tabList = new TabList(
@@ -180,10 +186,10 @@ describe("TabListItem", () => {
   let Tab: Tab;
 
   beforeEach(() => {
-    const TabClass = jest.fn<Tab>(() => ({
+    const TabClass: jest.Mock<Tab> = jest.fn(() => ({
       title: "title",
       url: "url",
-    }));
+    })) as any;
     Tab = new TabClass();
 
     item = new TabListItem(Tab);
@@ -194,7 +200,7 @@ describe("TabListItem", () => {
   });
 
   it("toString with an active tab", () => {
-    const TabClass = jest.fn<Tab>(() => ({
+    const TabClass: jest.Mock<Tab> = jest.fn(() => ({
       title: "title",
       url: "url",
       active: true,

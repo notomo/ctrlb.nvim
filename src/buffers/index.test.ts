@@ -7,7 +7,7 @@ describe("Buffers", () => {
   let vim: Neovim;
 
   beforeEach(() => {
-    const NeovimClass = jest.fn<Neovim>(() => ({}));
+    const NeovimClass: jest.Mock<Neovim> = jest.fn(() => ({})) as any;
     vim = new NeovimClass();
 
     buffers = new Buffers(vim);

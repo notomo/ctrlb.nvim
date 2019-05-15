@@ -21,38 +21,44 @@ describe("CurrentTab", () => {
   let getOptionStore: jest.Mock;
 
   beforeEach(() => {
-    const NeovimClass = jest.fn<Neovim>(() => ({}));
+    const NeovimClass: jest.Mock<Neovim> = jest.fn(() => ({})) as any;
     vim = new NeovimClass();
 
     set = jest.fn();
-    const BufferOptionStoreClass = jest.fn<BufferOptionStore>(() => ({
-      set: set,
-    }));
+    const BufferOptionStoreClass: jest.Mock<BufferOptionStore> = jest.fn(
+      () => ({
+        set: set,
+      })
+    ) as any;
     bufferOptionStore = new BufferOptionStoreClass();
 
-    const BufferClass = jest.fn<Buffer>(() => ({
+    const BufferClass: jest.Mock<Buffer> = jest.fn(() => ({
       lines: [],
-    }));
+    })) as any;
     const buffer = new BufferClass();
 
     get = jest.fn().mockReturnValue(buffer);
     getOptionStore = jest.fn().mockReturnValue(bufferOptionStore);
-    const BufferContainerClass = jest.fn<BufferContainer>(() => ({
+    const BufferContainerClass: jest.Mock<BufferContainer> = jest.fn(() => ({
       get: get,
       getOptionStore: getOptionStore,
-    }));
+    })) as any;
     bufferContainer = new BufferContainerClass();
 
-    const ItemBufferClass = jest.fn<ItemBuffer<Tab>>(() => ({}));
+    const ItemBufferClass: jest.Mock<ItemBuffer<Tab>> = jest.fn(
+      () => ({})
+    ) as any;
     itemBuffer = new ItemBufferClass();
 
-    const EventRegistererClass = jest.fn<EventRegisterer>(() => ({}));
+    const EventRegistererClass: jest.Mock<EventRegisterer> = jest.fn(
+      () => ({})
+    ) as any;
     eventRegisterer = new EventRegistererClass();
 
     open = jest.fn();
-    const TabRepositoryClass = jest.fn<TabRepository>(() => ({
+    const TabRepositoryClass: jest.Mock<TabRepository> = jest.fn(() => ({
       open: open,
-    }));
+    })) as any;
     tabRepository = new TabRepositoryClass();
 
     currentTab = new CurrentTab(
@@ -71,17 +77,17 @@ describe("CurrentTab", () => {
   });
 
   it("write does nothing when the buffer is empty", async () => {
-    const BufferClass = jest.fn<Buffer>(() => ({
+    const BufferClass: jest.Mock<Buffer> = jest.fn(() => ({
       lines: ["title", "url"],
-    }));
+    })) as any;
     const buffer = new BufferClass();
 
     get = jest.fn().mockReturnValue(buffer);
     getOptionStore = jest.fn().mockReturnValue(bufferOptionStore);
-    const BufferContainerClass = jest.fn<BufferContainer>(() => ({
+    const BufferContainerClass: jest.Mock<BufferContainer> = jest.fn(() => ({
       get: get,
       getOptionStore: getOptionStore,
-    }));
+    })) as any;
     bufferContainer = new BufferContainerClass();
 
     currentTab = new CurrentTab(
@@ -103,10 +109,10 @@ describe("CurrentTabItem", () => {
   let tab: Tab;
 
   beforeEach(() => {
-    const TabClass = jest.fn<Tab>(() => ({
+    const TabClass: jest.Mock<Tab> = jest.fn(() => ({
       title: "title",
       url: "url",
-    }));
+    })) as any;
     tab = new TabClass();
 
     item = new CurrentTabItem(tab);

@@ -12,9 +12,11 @@ describe("actionArgKey", () => {
         [{ name: "tab/open", params: [{ name: "url" }] }],
         null,
       ]);
-    const ApiInfoRepositoryClass = jest.fn<ApiInfoRepository>(() => ({
-      get: get,
-    }));
+    const ApiInfoRepositoryClass: jest.Mock<ApiInfoRepository> = jest.fn(
+      () => ({
+        get: get,
+      })
+    ) as any;
     const apiInfoRepository = new ApiInfoRepositoryClass();
 
     actionArgKey = new ActionArgKey(apiInfoRepository);
@@ -34,9 +36,11 @@ describe("actionArgKey", () => {
 
   it("get error", async () => {
     get = jest.fn().mockReturnValue([[], { name: "error" }]);
-    const ApiInfoRepositoryClass = jest.fn<ApiInfoRepository>(() => ({
-      get: get,
-    }));
+    const ApiInfoRepositoryClass: jest.Mock<ApiInfoRepository> = jest.fn(
+      () => ({
+        get: get,
+      })
+    ) as any;
     const apiInfoRepository = new ApiInfoRepositoryClass();
 
     actionArgKey = new ActionArgKey(apiInfoRepository);

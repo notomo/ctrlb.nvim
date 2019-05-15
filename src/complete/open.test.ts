@@ -7,9 +7,9 @@ describe("Open", () => {
 
   beforeEach(() => {
     get = jest.fn();
-    const BufferTypeClass = jest.fn<BufferType>(() => ({
+    const BufferTypeClass: jest.Mock<BufferType> = jest.fn(() => ({
       get: get,
-    }));
+    })) as any;
     const bufferTypeSource = new BufferTypeClass();
     open = new Open(bufferTypeSource);
   });

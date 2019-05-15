@@ -28,14 +28,14 @@ describe("BufferContainer", () => {
   const bufferNumber = 1;
 
   beforeEach(() => {
-    const BufferClass = jest.fn<Buffer>(() => ({
+    const BufferClass: jest.Mock<Buffer> = jest.fn(() => ({
       id: bufferNumber,
-    }));
+    })) as any;
     const buf = new BufferClass();
 
-    const OtherBufferClass = jest.fn<Buffer>(() => ({
+    const OtherBufferClass: jest.Mock<Buffer> = jest.fn(() => ({
       id: 2,
-    }));
+    })) as any;
     const otherBuf = new OtherBufferClass();
 
     command = jest.fn();
@@ -43,11 +43,11 @@ describe("BufferContainer", () => {
     buffers = jest.fn().mockImplementation(async () => {
       return [otherBuf, buf];
     })();
-    const NeovimClass = jest.fn<Neovim>(() => ({
+    const NeovimClass: jest.Mock<Neovim> = jest.fn(() => ({
       command: command,
       call: call,
       buffers: buffers,
-    }));
+    })) as any;
     const vim = new NeovimClass();
 
     open = jest.fn();
@@ -56,28 +56,30 @@ describe("BufferContainer", () => {
     horizontalOpen = jest.fn();
     deleteBuffer = jest.fn();
     getBufferIdsOnCurrentTab = jest.fn().mockReturnValue([bufferNumber]);
-    const BufferRepositoryClass = jest.fn<BufferRepository>(() => ({
+    const BufferRepositoryClass: jest.Mock<BufferRepository> = jest.fn(() => ({
       open: open,
       tabOpen: tabOpen,
       verticalOpen: verticalOpen,
       horizontalOpen: horizontalOpen,
       delete: deleteBuffer,
       getBufferIdsOnCurrentTab: getBufferIdsOnCurrentTab,
-    }));
+    })) as any;
     bufferRepository = new BufferRepositoryClass();
 
     defineToBuffer = jest.fn();
-    const AutocmdRepositoryClass = jest.fn<AutocmdRepository>(() => ({
-      defineToBuffer: defineToBuffer,
-    }));
+    const AutocmdRepositoryClass: jest.Mock<AutocmdRepository> = jest.fn(
+      () => ({
+        defineToBuffer: defineToBuffer,
+      })
+    ) as any;
     autocmdRepository = new AutocmdRepositoryClass();
 
     create = jest.fn();
-    const BufferOptionStoreFactoryClass = jest.fn<BufferOptionStoreFactory>(
-      () => ({
-        create: create,
-      })
-    );
+    const BufferOptionStoreFactoryClass: jest.Mock<
+      BufferOptionStoreFactory
+    > = jest.fn(() => ({
+      create: create,
+    })) as any;
     bufferOptionStoreFactory = new BufferOptionStoreFactoryClass();
 
     bufferContainer = new BufferContainer(
@@ -103,11 +105,11 @@ describe("BufferContainer", () => {
     const buffers = jest.fn().mockImplementation(async () => {
       return [];
     })();
-    const NeovimClass = jest.fn<Neovim>(() => ({
+    const NeovimClass: jest.Mock<Neovim> = jest.fn(() => ({
       command: command,
       call: call,
       buffers: buffers,
-    }));
+    })) as any;
     const vim = new NeovimClass();
 
     const bufferContainer = new BufferContainer(

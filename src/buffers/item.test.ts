@@ -19,21 +19,21 @@ describe("ItemBuffer", () => {
   let replace: jest.Mock;
 
   beforeEach(() => {
-    const NeovimClass = jest.fn<Neovim>(() => ({}));
+    const NeovimClass: jest.Mock<Neovim> = jest.fn(() => ({})) as any;
     const vim = new NeovimClass();
 
     replace = jest.fn();
-    const BufferClass = jest.fn<Buffer>(() => ({
+    const BufferClass: jest.Mock<Buffer> = jest.fn(() => ({
       replace: replace,
-    }));
+    })) as any;
     const buffer = new BufferClass();
 
     get = jest.fn().mockReturnValue(buffer);
     isDisplayed = jest.fn().mockReturnValue(true);
-    const BufferContainerClass = jest.fn<BufferContainer>(() => ({
+    const BufferContainerClass: jest.Mock<BufferContainer> = jest.fn(() => ({
       get: get,
       isDisplayed: isDisplayed,
-    }));
+    })) as any;
     const bufferContainer = new BufferContainerClass();
 
     itemBuffer = new ItemBuffer(vim, bufferContainer);

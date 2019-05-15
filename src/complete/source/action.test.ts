@@ -7,9 +7,11 @@ describe("Action", () => {
 
   beforeEach(() => {
     get = jest.fn().mockReturnValue([[{ name: "tab/next" }], null]);
-    const ApiInfoRepositoryClass = jest.fn<ApiInfoRepository>(() => ({
-      get: get,
-    }));
+    const ApiInfoRepositoryClass: jest.Mock<ApiInfoRepository> = jest.fn(
+      () => ({
+        get: get,
+      })
+    ) as any;
     const apiInfoRepository = new ApiInfoRepositoryClass();
 
     action = new Action(apiInfoRepository);
@@ -22,9 +24,11 @@ describe("Action", () => {
 
   it("get error", async () => {
     get = jest.fn().mockReturnValue([[], { name: "error" }]);
-    const ApiInfoRepositoryClass = jest.fn<ApiInfoRepository>(() => ({
-      get: get,
-    }));
+    const ApiInfoRepositoryClass: jest.Mock<ApiInfoRepository> = jest.fn(
+      () => ({
+        get: get,
+      })
+    ) as any;
     const apiInfoRepository = new ApiInfoRepositoryClass();
 
     action = new Action(apiInfoRepository);

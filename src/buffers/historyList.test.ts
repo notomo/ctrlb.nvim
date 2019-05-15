@@ -21,32 +21,40 @@ describe("HistoryList", () => {
   let tabOpen: jest.Mock;
 
   beforeEach(() => {
-    const NeovimClass = jest.fn<Neovim>(() => ({}));
+    const NeovimClass: jest.Mock<Neovim> = jest.fn(() => ({})) as any;
     vim = new NeovimClass();
 
-    const BufferContainerClass = jest.fn<BufferContainer>(() => ({}));
+    const BufferContainerClass: jest.Mock<BufferContainer> = jest.fn(
+      () => ({})
+    ) as any;
     bufferContainer = new BufferContainerClass();
 
     getCurrent = jest.fn().mockReturnValue(null);
     getRangeModels = jest.fn().mockReturnValue([]);
-    const TreeBufferClass = jest.fn<ListBuffer<History>>(() => ({
+    const TreeBufferClass: jest.Mock<ListBuffer<History>> = jest.fn(() => ({
       getCurrent: getCurrent,
       getRangeModels: getRangeModels,
-    }));
+    })) as any;
     listBuffer = new TreeBufferClass();
 
-    const EventRegistererClass = jest.fn<EventRegisterer>(() => ({}));
+    const EventRegistererClass: jest.Mock<EventRegisterer> = jest.fn(
+      () => ({})
+    ) as any;
     eventRegisterer = new EventRegistererClass();
 
     open = jest.fn();
     tabOpen = jest.fn();
-    const HistoryRepositoryClass = jest.fn<HistoryRepository>(() => ({
-      open: open,
-      tabOpen: tabOpen,
-    }));
+    const HistoryRepositoryClass: jest.Mock<HistoryRepository> = jest.fn(
+      () => ({
+        open: open,
+        tabOpen: tabOpen,
+      })
+    ) as any;
     historyRepository = new HistoryRepositoryClass();
 
-    const HighlightRepositoryClass = jest.fn<HighlightRepository>(() => ({}));
+    const HighlightRepositoryClass: jest.Mock<HighlightRepository> = jest.fn(
+      () => ({})
+    ) as any;
     highlightRepository = new HighlightRepositoryClass();
 
     historyList = new HistoryList(
@@ -70,9 +78,9 @@ describe("HistoryList", () => {
       title: "title",
     };
     getCurrent = jest.fn().mockReturnValue(history);
-    const TreeBufferClass = jest.fn<ListBuffer<History>>(() => ({
+    const TreeBufferClass: jest.Mock<ListBuffer<History>> = jest.fn(() => ({
       getCurrent: getCurrent,
-    }));
+    })) as any;
     listBuffer = new TreeBufferClass();
 
     historyList = new HistoryList(
@@ -96,9 +104,9 @@ describe("HistoryList", () => {
       url: url,
     };
     getCurrent = jest.fn().mockReturnValue(history);
-    const TreeBufferClass = jest.fn<ListBuffer<History>>(() => ({
+    const TreeBufferClass: jest.Mock<ListBuffer<History>> = jest.fn(() => ({
       getCurrent: getCurrent,
-    }));
+    })) as any;
     listBuffer = new TreeBufferClass();
 
     historyList = new HistoryList(
@@ -126,9 +134,9 @@ describe("HistoryList", () => {
       title: "title",
     };
     getRangeModels = jest.fn().mockReturnValue([history]);
-    const TreeBufferClass = jest.fn<ListBuffer<History>>(() => ({
+    const TreeBufferClass: jest.Mock<ListBuffer<History>> = jest.fn(() => ({
       getRangeModels: getRangeModels,
-    }));
+    })) as any;
     listBuffer = new TreeBufferClass();
 
     historyList = new HistoryList(
@@ -152,9 +160,9 @@ describe("HistoryList", () => {
       url: url,
     };
     getRangeModels = jest.fn().mockReturnValue([history]);
-    const TreeBufferClass = jest.fn<ListBuffer<History>>(() => ({
+    const TreeBufferClass: jest.Mock<ListBuffer<History>> = jest.fn(() => ({
       getRangeModels: getRangeModels,
-    }));
+    })) as any;
     listBuffer = new TreeBufferClass();
 
     historyList = new HistoryList(
@@ -177,7 +185,7 @@ describe("HistoryListItem", () => {
   let history: History;
 
   beforeEach(() => {
-    const HistoryClass = jest.fn<History>(() => ({
+    const HistoryClass: jest.Mock<History> = jest.fn(() => ({
       title: "title",
       url: "url",
     }));

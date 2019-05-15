@@ -27,57 +27,57 @@ describe("Ctrlb", () => {
 
   beforeEach(() => {
     executeAsync = jest.fn();
-    const RequesterClass = jest.fn<Requester>(() => ({
+    const RequesterClass: jest.Mock<Requester> = jest.fn(() => ({
       executeAsync: executeAsync,
-    }));
+    })) as any;
     requester = new RequesterClass();
 
     complete = jest.fn();
-    const CompleterClass = jest.fn<Completer>(() => ({
+    const CompleterClass: jest.Mock<Completer> = jest.fn(() => ({
       complete: complete,
-    }));
+    })) as any;
     completer = new CompleterClass(requester);
 
     parse = jest.fn();
     parseJsonFile = jest.fn();
     isBufferType = jest.fn().mockReturnValue(true);
-    const ArgParserClass = jest.fn<ArgParser>(() => ({
+    const ArgParserClass: jest.Mock<ArgParser> = jest.fn(() => ({
       parse: parse,
       parseJsonFile: parseJsonFile,
       isBufferType: isBufferType,
-    }));
+    })) as any;
     const argParser = new ArgParserClass();
 
     openLayout = jest.fn();
-    const LayoutItemClass = jest.fn<LayoutItem>(() => ({
+    const LayoutItemClass: jest.Mock<LayoutItem> = jest.fn(() => ({
       openLayout: openLayout,
-    }));
+    })) as any;
     const layoutItem = new LayoutItemClass();
 
     layoutParse = jest.fn();
     layoutParse.mockReturnValue(layoutItem);
-    const LayoutParserClass = jest.fn<LayoutParser>(() => ({
+    const LayoutParserClass: jest.Mock<LayoutParser> = jest.fn(() => ({
       parse: layoutParse,
-    }));
+    })) as any;
     layoutParser = new LayoutParserClass();
 
-    const NeovimClass = jest.fn<Neovim>(() => ({}));
+    const NeovimClass: jest.Mock<Neovim> = jest.fn(() => ({})) as any;
     const vim = new NeovimClass();
 
     doAction = jest.fn();
     open = jest.fn();
-    const BaseBufferClass = jest.fn<BaseBuffer>(() => ({
+    const BaseBufferClass: jest.Mock<BaseBuffer> = jest.fn(() => ({
       doAction: doAction,
       open: open,
-    }));
+    })) as any;
     const buffer = new BaseBufferClass();
 
     get = jest.fn().mockReturnValue(buffer);
     clearAll = jest.fn().mockReturnValue(buffer);
-    const BuffersClass = jest.fn<Buffers>(() => ({
+    const BuffersClass: jest.Mock<Buffers> = jest.fn(() => ({
       get: get,
       clearAll: clearAll,
-    }));
+    })) as any;
     buffers = new BuffersClass(vim, requester);
 
     ctrlb = new Ctrlb(requester, argParser, layoutParser, buffers, completer);
@@ -104,9 +104,9 @@ describe("Ctrlb", () => {
   it("open throws error if bufferType is invalid", () => {
     const bufferType = "invalidBufferType";
     isBufferType = jest.fn().mockReturnValue(false);
-    const ArgParserClass = jest.fn<ArgParser>(() => ({
+    const ArgParserClass: jest.Mock<ArgParser> = jest.fn(() => ({
       isBufferType: isBufferType,
-    }));
+    })) as any;
     const argParser = new ArgParserClass();
     ctrlb = new Ctrlb(requester, argParser, layoutParser, buffers, completer);
 
@@ -135,9 +135,9 @@ describe("Ctrlb", () => {
   it("doAction throws error if bufferType is invalid", () => {
     const bufferType = "invalidBufferType";
     isBufferType = jest.fn().mockReturnValue(false);
-    const ArgParserClass = jest.fn<ArgParser>(() => ({
+    const ArgParserClass: jest.Mock<ArgParser> = jest.fn(() => ({
       isBufferType: isBufferType,
-    }));
+    })) as any;
     const argParser = new ArgParserClass();
     ctrlb = new Ctrlb(requester, argParser, layoutParser, buffers, completer);
 

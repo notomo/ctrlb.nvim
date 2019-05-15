@@ -29,32 +29,34 @@ describe("ListBuffer", () => {
   beforeEach(() => {
     call = jest.fn().mockReturnValue(1);
     command = jest.fn();
-    const NeovimClass = jest.fn<Neovim>(() => ({
+    const NeovimClass: jest.Mock<Neovim> = jest.fn(() => ({
       call: call,
       command: command,
-    }));
+    })) as any;
     const vim = new NeovimClass();
 
     insert = jest.fn();
-    const BufferClass = jest.fn<Buffer>(() => ({
+    const BufferClass: jest.Mock<Buffer> = jest.fn(() => ({
       insert: insert,
-    }));
+    })) as any;
     const buffer = new BufferClass();
 
     set = jest.fn();
-    const BufferOptionStoreClass = jest.fn<BufferOptionStore>(() => ({
-      set: set,
-    }));
+    const BufferOptionStoreClass: jest.Mock<BufferOptionStore> = jest.fn(
+      () => ({
+        set: set,
+      })
+    ) as any;
     bufferOptionStore = new BufferOptionStoreClass();
 
     get = jest.fn().mockReturnValue(buffer);
     getOptionStore = jest.fn().mockReturnValue(bufferOptionStore);
     isDisplayed = jest.fn().mockReturnValue(true);
-    const BufferContainerClass = jest.fn<BufferContainer>(() => ({
+    const BufferContainerClass: jest.Mock<BufferContainer> = jest.fn(() => ({
       get: get,
       getOptionStore: getOptionStore,
       isDisplayed: isDisplayed,
-    }));
+    })) as any;
     const bufferContainer = new BufferContainerClass();
 
     listBuffer = new ListBuffer(vim, bufferContainer);

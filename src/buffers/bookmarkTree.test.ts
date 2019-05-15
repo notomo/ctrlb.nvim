@@ -30,10 +30,12 @@ describe("BookmarkTree", () => {
   let bookmarkDirectory: Bookmark;
 
   beforeEach(() => {
-    const NeovimClass = jest.fn<Neovim>(() => ({}));
+    const NeovimClass: jest.Mock<Neovim> = jest.fn(() => ({})) as any;
     vim = new NeovimClass();
 
-    const BufferContainerClass = jest.fn<BufferContainer>(() => ({}));
+    const BufferContainerClass: jest.Mock<BufferContainer> = jest.fn(
+      () => ({})
+    ) as any;
     bufferContainer = new BufferContainerClass();
 
     getCurrent = jest.fn().mockReturnValue(null);
@@ -41,16 +43,18 @@ describe("BookmarkTree", () => {
     getParent = jest.fn().mockReturnValue(null);
     set = jest.fn();
     getCurrentNodeId = jest.fn().mockReturnValue(null);
-    const TreeBufferClass = jest.fn<TreeBuffer<Bookmark>>(() => ({
+    const TreeBufferClass: jest.Mock<TreeBuffer<Bookmark>> = jest.fn(() => ({
       getCurrent: getCurrent,
       getRangeModels: getRangeModels,
       getParent: getParent,
       set: set,
       getCurrentNodeId: getCurrentNodeId,
-    }));
+    })) as any;
     treeBuffer = new TreeBufferClass();
 
-    const EventRegistererClass = jest.fn<EventRegisterer>(() => ({}));
+    const EventRegistererClass: jest.Mock<EventRegisterer> = jest.fn(
+      () => ({})
+    ) as any;
     eventRegisterer = new EventRegistererClass();
 
     tabOpen = jest.fn();
@@ -59,15 +63,19 @@ describe("BookmarkTree", () => {
       return [bookmark];
     });
     remove = jest.fn();
-    const BookmarkRepositoryClass = jest.fn<BookmarkRepository>(() => ({
-      tabOpen: tabOpen,
-      open: open,
-      getTree: getTree,
-      remove: remove,
-    }));
+    const BookmarkRepositoryClass: jest.Mock<BookmarkRepository> = jest.fn(
+      () => ({
+        tabOpen: tabOpen,
+        open: open,
+        getTree: getTree,
+        remove: remove,
+      })
+    ) as any;
     bookmarkRepository = new BookmarkRepositoryClass();
 
-    const HighlightRepositoryClass = jest.fn<HighlightRepository>(() => ({}));
+    const HighlightRepositoryClass: jest.Mock<HighlightRepository> = jest.fn(
+      () => ({})
+    ) as any;
     highlightRepository = new HighlightRepositoryClass();
 
     bookmarkTree = new BookmarkTree(
@@ -80,15 +88,15 @@ describe("BookmarkTree", () => {
     );
 
     id = "id";
-    const BookmarkClass = jest.fn<Bookmark>(() => ({
+    const BookmarkClass: jest.Mock<Bookmark> = jest.fn(() => ({
       id: id,
       url: "url",
-    }));
+    })) as any;
     bookmark = new BookmarkClass();
 
-    const BookmarkDirectoryClass = jest.fn<Bookmark>(() => ({
+    const BookmarkDirectoryClass: jest.Mock<Bookmark> = jest.fn(() => ({
       id: id,
-    }));
+    })) as any;
     bookmarkDirectory = new BookmarkDirectoryClass();
   });
 
@@ -101,9 +109,9 @@ describe("BookmarkTree", () => {
   it("tabOpenBookmark", async () => {
     getRangeModels = jest.fn().mockReturnValue([bookmark]);
 
-    const TreeBufferClass = jest.fn<TreeBuffer<Bookmark>>(() => ({
+    const TreeBufferClass: jest.Mock<TreeBuffer<Bookmark>> = jest.fn(() => ({
       getRangeModels: getRangeModels,
-    }));
+    })) as any;
     treeBuffer = new TreeBufferClass();
 
     bookmarkTree = new BookmarkTree(
@@ -123,10 +131,10 @@ describe("BookmarkTree", () => {
   it("remove", async () => {
     getRangeModels = jest.fn().mockReturnValue([bookmark]);
 
-    const TreeBufferClass = jest.fn<TreeBuffer<Bookmark>>(() => ({
+    const TreeBufferClass: jest.Mock<TreeBuffer<Bookmark>> = jest.fn(() => ({
       getRangeModels: getRangeModels,
       getCurrentNodeId: getCurrentNodeId,
-    }));
+    })) as any;
     treeBuffer = new TreeBufferClass();
 
     bookmarkTree = new BookmarkTree(
@@ -152,9 +160,9 @@ describe("BookmarkTree", () => {
   it("openBookmark opens a url", async () => {
     getCurrent = jest.fn().mockReturnValue(bookmark);
 
-    const TreeBufferClass = jest.fn<TreeBuffer<Bookmark>>(() => ({
+    const TreeBufferClass: jest.Mock<TreeBuffer<Bookmark>> = jest.fn(() => ({
       getCurrent: getCurrent,
-    }));
+    })) as any;
     treeBuffer = new TreeBufferClass();
 
     bookmarkTree = new BookmarkTree(
@@ -174,10 +182,10 @@ describe("BookmarkTree", () => {
   it("openBookmark opens a directory", async () => {
     getCurrent = jest.fn().mockReturnValue(bookmarkDirectory);
 
-    const TreeBufferClass = jest.fn<TreeBuffer<Bookmark>>(() => ({
+    const TreeBufferClass: jest.Mock<TreeBuffer<Bookmark>> = jest.fn(() => ({
       getCurrent: getCurrent,
       set: set,
-    }));
+    })) as any;
     treeBuffer = new TreeBufferClass();
 
     bookmarkTree = new BookmarkTree(
@@ -204,10 +212,10 @@ describe("BookmarkTree", () => {
   it("openParent", async () => {
     getParent = jest.fn().mockReturnValue(bookmark);
 
-    const TreeBufferClass = jest.fn<TreeBuffer<Bookmark>>(() => ({
+    const TreeBufferClass: jest.Mock<TreeBuffer<Bookmark>> = jest.fn(() => ({
       getParent: getParent,
       set: set,
-    }));
+    })) as any;
     treeBuffer = new TreeBufferClass();
 
     bookmarkTree = new BookmarkTree(
@@ -234,14 +242,14 @@ describe("BookmarkTreeItem", () => {
 
   beforeEach(() => {
     id = "id";
-    const BookmarkClass = jest.fn<Bookmark>(() => ({
+    const BookmarkClass: jest.Mock<Bookmark> = jest.fn(() => ({
       id: id,
       title: "title",
       url: "url",
     }));
     bookmark = new BookmarkClass();
 
-    const BookmarkDirectoryClass = jest.fn<Bookmark>(() => ({
+    const BookmarkDirectoryClass: jest.Mock<Bookmark> = jest.fn(() => ({
       title: "title",
       id: id,
     }));
