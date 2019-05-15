@@ -19,16 +19,16 @@ describe("CtrlbPlugin", () => {
   let plugin: NvimPlugin;
 
   beforeEach(() => {
-    const NeovimClass = jest.fn<Neovim>(() => ({}));
+    const NeovimClass: jest.Mock<Neovim> = jest.fn(() => ({})) as any;
     const nvim = new NeovimClass();
 
     setOptions = jest.fn();
     registerFunction = jest.fn();
-    const NvimPluginClass = jest.fn<NvimPlugin>(() => ({
+    const NvimPluginClass: jest.Mock<NvimPlugin> = jest.fn(() => ({
       nvim: nvim,
       setOptions: setOptions,
       registerFunction: registerFunction,
-    }));
+    })) as any;
     plugin = new NvimPluginClass();
 
     requestAsync = jest.fn().mockImplementation(async () => {
@@ -49,21 +49,21 @@ describe("CtrlbPlugin", () => {
     complete = jest.fn().mockImplementation(async () => {
       return;
     });
-    const CtrlbClass = jest.fn<Ctrlb>(() => ({
+    const CtrlbClass: jest.Mock<Ctrlb> = jest.fn(() => ({
       requestAsync: requestAsync,
       open: open,
       openLayout: openLayout,
       doAction: doAction,
       clearAll: clearAll,
       complete: complete,
-    }));
+    })) as any;
     const ctrlb = new CtrlbClass();
     Di.set("Ctrlb", ctrlb);
 
     error = jest.fn();
-    const ReporterClass = jest.fn<Reporter>(() => ({
+    const ReporterClass: jest.Mock<Reporter> = jest.fn(() => ({
       error: error,
-    }));
+    })) as any;
     const reporter = new ReporterClass();
     Di.set("Reporter", reporter);
 
@@ -81,9 +81,9 @@ describe("CtrlbPlugin", () => {
       throw new Error("");
     });
 
-    const CtrlbClass = jest.fn<Ctrlb>(() => ({
+    const CtrlbClass: jest.Mock<Ctrlb> = jest.fn(() => ({
       requestAsync: requestAsync,
-    }));
+    })) as any;
     const ctrlb = new CtrlbClass();
     Di.set("Ctrlb", ctrlb);
 
@@ -105,9 +105,9 @@ describe("CtrlbPlugin", () => {
       throw new Error("");
     });
 
-    const CtrlbClass = jest.fn<Ctrlb>(() => ({
+    const CtrlbClass: jest.Mock<Ctrlb> = jest.fn(() => ({
       open: open,
-    }));
+    })) as any;
     const ctrlb = new CtrlbClass();
     Di.set("Ctrlb", ctrlb);
 
@@ -129,10 +129,10 @@ describe("CtrlbPlugin", () => {
       throw new Error("");
     });
 
-    const CtrlbClass = jest.fn<Ctrlb>(() => ({
+    const CtrlbClass: jest.Mock<Ctrlb> = jest.fn(() => ({
       openLayout: openLayout,
       clearAll: clearAll,
-    }));
+    })) as any;
     const ctrlb = new CtrlbClass();
     Di.set("Ctrlb", ctrlb);
 
@@ -158,9 +158,9 @@ describe("CtrlbPlugin", () => {
       throw new Error("");
     });
 
-    const CtrlbClass = jest.fn<Ctrlb>(() => ({
+    const CtrlbClass: jest.Mock<Ctrlb> = jest.fn(() => ({
       doAction: doAction,
-    }));
+    })) as any;
     const ctrlb = new CtrlbClass();
     Di.set("Ctrlb", ctrlb);
 
@@ -184,9 +184,9 @@ describe("CtrlbPlugin", () => {
       throw new Error("");
     });
 
-    const CtrlbClass = jest.fn<Ctrlb>(() => ({
+    const CtrlbClass: jest.Mock<Ctrlb> = jest.fn(() => ({
       clearAll: clearAll,
-    }));
+    })) as any;
     const ctrlb = new CtrlbClass();
     Di.set("Ctrlb", ctrlb);
 
@@ -209,9 +209,9 @@ describe("CtrlbPlugin", () => {
       throw new Error("");
     });
 
-    const CtrlbClass = jest.fn<Ctrlb>(() => ({
+    const CtrlbClass: jest.Mock<Ctrlb> = jest.fn(() => ({
       complete: complete,
-    }));
+    })) as any;
     const ctrlb = new CtrlbClass();
     Di.set("Ctrlb", ctrlb);
 

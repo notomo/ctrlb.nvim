@@ -8,15 +8,15 @@ describe("HistoryRepository", () => {
   let tabOpen: jest.Mock;
 
   beforeEach(() => {
-    const RequesterClass = jest.fn<Requester>(() => ({}));
+    const RequesterClass: jest.Mock<Requester> = jest.fn(() => ({})) as any;
     const requester = new RequesterClass();
 
     open = jest.fn();
     tabOpen = jest.fn();
-    const TabRepositoryClass = jest.fn<TabRepository>(() => ({
+    const TabRepositoryClass: jest.Mock<TabRepository> = jest.fn(() => ({
       open: open,
       tabOpen: tabOpen,
-    }));
+    })) as any;
     const tabRepository = new TabRepositoryClass();
 
     historyRepository = new HistoryRepository(requester, tabRepository);

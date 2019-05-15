@@ -9,15 +9,15 @@ describe("Execute", () => {
 
   beforeEach(() => {
     getActions = jest.fn().mockReturnValue(["name"]);
-    const ActionClass = jest.fn<Action>(() => ({
+    const ActionClass: jest.Mock<Action> = jest.fn(() => ({
       get: getActions,
-    }));
+    })) as any;
     const action = new ActionClass();
 
     getActionArgKeys = jest.fn().mockReturnValue(["-zoomFactor=", "-id="]);
-    const ActionArgKeyClass = jest.fn<ActionArgKey>(() => ({
+    const ActionArgKeyClass: jest.Mock<ActionArgKey> = jest.fn(() => ({
       get: getActionArgKeys,
-    }));
+    })) as any;
     const actionArgKey = new ActionArgKeyClass();
 
     execute = new Execute(action, actionArgKey);

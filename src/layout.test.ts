@@ -14,9 +14,9 @@ describe("BufferItem", () => {
 
   beforeEach(() => {
     open = jest.fn();
-    const CtrlClass = jest.fn<Ctrl>(() => ({
+    const CtrlClass: jest.Mock<Ctrl> = jest.fn(() => ({
       open: open,
-    }));
+    })) as any;
     ctrl = new CtrlClass();
 
     bufferItem = new BufferItem(ctrl, null, false);
@@ -43,32 +43,32 @@ describe("LayoutItem", () => {
       return 2;
     })();
 
-    const WindowClass = jest.fn<Window>(() => ({
+    const WindowClass: jest.Mock<Window> = jest.fn(() => ({
       width: width,
       height: height,
-    }));
+    })) as any;
     const window = new WindowClass();
 
     const gotWindow = jest.fn().mockImplementation(async () => {
       return window;
     })();
     const setWindow = jest.fn();
-    const NeovimClass = jest.fn<Neovim>(() => ({
+    const NeovimClass: jest.Mock<Neovim> = jest.fn(() => ({
       window: gotWindow,
       setWindow: setWindow,
-    }));
+    })) as any;
     vim = new NeovimClass();
 
     open = jest.fn();
-    const EmptyClass = jest.fn<Empty>(() => ({
+    const EmptyClass: jest.Mock<Empty> = jest.fn(() => ({
       open: open,
-    }));
+    })) as any;
     empty = new EmptyClass();
 
-    const BufferItemClass = jest.fn<BufferItem>(() => ({
+    const BufferItemClass: jest.Mock<BufferItem> = jest.fn(() => ({
       open: open,
       isActive: true,
-    }));
+    })) as any;
     const bufferItem = new BufferItemClass();
 
     const insideLayoutItem = new LayoutItem(
@@ -112,22 +112,22 @@ describe("LayoutParser", () => {
   let layoutParser: LayoutParser;
 
   beforeEach(() => {
-    const NeovimClass = jest.fn<Neovim>(() => ({}));
+    const NeovimClass: jest.Mock<Neovim> = jest.fn(() => ({})) as any;
     const vim = new NeovimClass();
 
-    const RequesterClass = jest.fn<Requester>(() => ({}));
+    const RequesterClass: jest.Mock<Requester> = jest.fn(() => ({})) as any;
     requester = new RequesterClass();
 
     open = jest.fn();
-    const BaseBufferClass = jest.fn<BaseBuffer>(() => ({
+    const BaseBufferClass: jest.Mock<BaseBuffer> = jest.fn(() => ({
       open: open,
-    }));
+    })) as any;
     const buffer = new BaseBufferClass();
 
     get = jest.fn().mockReturnValue(buffer);
-    const BuffersClass = jest.fn<Buffers>(() => ({
+    const BuffersClass: jest.Mock<Buffers> = jest.fn(() => ({
       get: get,
-    }));
+    })) as any;
     buffers = new BuffersClass(vim, requester);
 
     layoutParser = new LayoutParser(vim, buffers);

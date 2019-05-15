@@ -6,9 +6,9 @@ describe("ApiInfoRepository", () => {
 
   it("get", async () => {
     execute = jest.fn().mockReturnValue([[], null]);
-    const RequesterClass = jest.fn<Requester>(() => ({
+    const RequesterClass: jest.Mock<Requester> = jest.fn(() => ({
       execute: execute,
-    }));
+    })) as any;
     const requester = new RequesterClass();
 
     const apiInfoRepository = new ApiInfoRepository(requester);

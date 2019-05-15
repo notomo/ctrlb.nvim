@@ -8,9 +8,9 @@ describe("AutocmdRepository", () => {
 
   beforeEach(() => {
     command = jest.fn();
-    const NeovimClass = jest.fn<Neovim>(() => ({
+    const NeovimClass: jest.Mock<Neovim> = jest.fn(() => ({
       command: command,
-    }));
+    })) as any;
     const neovim = new NeovimClass();
 
     autocmdRepository = new AutocmdRepository(neovim);

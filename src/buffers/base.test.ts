@@ -22,28 +22,30 @@ describe("BaseBuffer", () => {
 
   beforeEach(() => {
     command = jest.fn();
-    const NeovimClass = jest.fn<Neovim>(() => ({
+    const NeovimClass: jest.Mock<Neovim> = jest.fn(() => ({
       command: command,
-    }));
+    })) as any;
     const vim = new NeovimClass();
 
     unsubscribe = jest.fn();
-    const EventRegistererClass = jest.fn<EventRegisterer>(() => ({
+    const EventRegistererClass: jest.Mock<EventRegisterer> = jest.fn(() => ({
       unsubscribe: unsubscribe,
-    }));
+    })) as any;
     const eventRegisterer = new EventRegistererClass();
 
-    const BufferClass = jest.fn<Buffer>(() => ({}));
+    const BufferClass: jest.Mock<Buffer> = jest.fn(() => ({})) as any;
     const vimBuffer = new BufferClass();
 
     set = jest.fn();
     setFileType = jest.fn();
     adjust = jest.fn();
-    const BufferOptionStoreClass = jest.fn<BufferOptionStore>(() => ({
-      set: set,
-      setFileType: setFileType,
-      adjust: adjust,
-    }));
+    const BufferOptionStoreClass: jest.Mock<BufferOptionStore> = jest.fn(
+      () => ({
+        set: set,
+        setFileType: setFileType,
+        adjust: adjust,
+      })
+    ) as any;
     const bufferOptionStore = new BufferOptionStoreClass();
 
     isInitialized = jest
@@ -54,13 +56,13 @@ describe("BaseBuffer", () => {
     get = jest.fn().mockReturnValue(vimBuffer);
     unload = jest.fn().mockReturnValue(vimBuffer);
     getOptionStore = jest.fn().mockReturnValue(bufferOptionStore);
-    const BufferContainerClass = jest.fn<BufferContainer>(() => ({
+    const BufferContainerClass: jest.Mock<BufferContainer> = jest.fn(() => ({
       isInitialized: isInitialized,
       openByDirection: openByDirection,
       get: get,
       unload: unload,
       getOptionStore: getOptionStore,
-    }));
+    })) as any;
     const bufferContainer = new BufferContainerClass(vim);
 
     buffer = new Example(vim, bufferContainer, eventRegisterer);

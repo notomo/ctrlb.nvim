@@ -8,15 +8,15 @@ describe("BufferOptionStore", () => {
 
   beforeEach(() => {
     command = jest.fn();
-    const NeovimClass = jest.fn<Neovim>(() => ({
+    const NeovimClass: jest.Mock<Neovim> = jest.fn(() => ({
       command: command,
-    }));
+    })) as any;
     const vim = new NeovimClass();
 
     setOption = jest.fn();
-    const BufferClass = jest.fn<Buffer>(() => ({
+    const BufferClass: jest.Mock<Buffer> = jest.fn(() => ({
       setOption: setOption,
-    }));
+    })) as any;
     const buffer = new BufferClass();
 
     bufferOptionStore = new BufferOptionStore(vim, buffer);
@@ -70,10 +70,10 @@ describe("BufferOptionStore", () => {
 
 describe("BufferOptionStoreFactory", () => {
   it("create", () => {
-    const NeovimClass = jest.fn<Neovim>(() => ({}));
+    const NeovimClass: jest.Mock<Neovim> = jest.fn(() => ({})) as any;
     const vim = new NeovimClass();
 
-    const BufferClass = jest.fn<Buffer>(() => ({}));
+    const BufferClass: jest.Mock<Buffer> = jest.fn(() => ({})) as any;
     const buffer = new BufferClass();
 
     const bufferOptionStoreFactory = new BufferOptionStoreFactory(vim);

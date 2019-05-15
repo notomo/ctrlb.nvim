@@ -12,17 +12,17 @@ describe("Completer", () => {
 
   beforeEach(() => {
     matchFalse = jest.fn().mockReturnValue(false);
-    const OpenClass = jest.fn<Open>(() => ({
+    const OpenClass: jest.Mock<Open> = jest.fn(() => ({
       match: matchFalse,
-    }));
+    })) as any;
     open = new OpenClass();
 
     matchTrue = jest.fn().mockReturnValue(true);
     findCandidates = jest.fn();
-    const ExecuteClass = jest.fn<Execute>(() => ({
+    const ExecuteClass: jest.Mock<Execute> = jest.fn(() => ({
       match: matchTrue,
       findCandidates: findCandidates,
-    }));
+    })) as any;
     execute = new ExecuteClass();
 
     completer = new Completer(open, execute);
@@ -36,9 +36,9 @@ describe("Completer", () => {
   });
 
   it("complete returns empty array", async () => {
-    const ExecuteClass = jest.fn<Execute>(() => ({
+    const ExecuteClass: jest.Mock<Execute> = jest.fn(() => ({
       match: matchFalse,
-    }));
+    })) as any;
     execute = new ExecuteClass();
     const completer = new Completer(open, execute);
 

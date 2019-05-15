@@ -7,19 +7,19 @@
     "dependencies": {
         "log4js": "^3.0.6",
         "mkdirp": "^0.5.1",
-        "neovim": "^4.2.1",
+        "neovim": "^4.5.0",
         "tslib": "^1.9.3",
         "unzip": "^0.1.11"
     },
     "devDependencies": {
-        "@types/jest": "^23.3.9",
+        "@types/jest": "^23.3.14",
         "@types/mkdirp": "^0.5.2",
-        "@types/node": "^10.12.2",
+        "@types/node": "^10.14.6",
         "@types/request": "^2.48.1",
         "@types/unzip": "^0.1.1",
         "jest": "^23.6.0",
-        "ts-jest": "^23.10.4",
-        "typescript": "^3.1.6"
+        "ts-jest": "^23.10.5",
+        "typescript": "^3.4.5"
     },
     "scripts": {
         "test": "jest --coverage",
