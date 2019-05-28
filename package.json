@@ -23,9 +23,9 @@
     },
     "scripts": {
         "test": "jest --coverage",
-        "build": "tsc -p tsconfig.json && node ./version.js",
+        "build": "tsc -p tsconfig.json && node ./version.js > ./lib/version.json",
         "watch": "tsc -p tsconfig.json --watch true",
-        "setup": "npm ci && npm run build && node lib/setup"
+        "setup": "node ./setup.js"
     },
     "jest": {
         "moduleFileExtensions": [
