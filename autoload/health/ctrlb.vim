@@ -43,7 +43,7 @@ endfunction
 
 function! s:check_ts_build() abort
     let project_root = empty(s:test_project_root) ? s:project_root : s:test_project_root
-    let version_file = project_root . '/lib/version'
+    let version_file = project_root . '/lib/version.json'
 
     let s:advice = [
         \ 'cd ' . fnamemodify(project_root, ':~'),
@@ -56,12 +56,13 @@ function! s:check_ts_build() abort
         return
     endif
 
-    let built_version = join(readfile(version_file), '')
+    let built_version_json = join(readfile(version_file), '')
+    let built_versions = json_decode(built_version_json)
 
-    let package_json = join(readfile(project_root . '/package.json'), '')
-    let package_version = json_decode(package_json)['version']
-    if built_version ==? package_version
-        call health#report_ok('The compiled files are up to date. Version: ' . package_version)
+    let package_json = join(readfile(project_root . '/version.json'), '')
+    let package_versions = json_decode(package_json)
+    if built_versions == package_versions
+        call health#report_ok('The compiled files are up to date.')
     else
         call health#report_warn('The compiled files are outdated. Please execute the following commands.', s:advice)
     endif

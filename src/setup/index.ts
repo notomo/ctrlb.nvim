@@ -2,7 +2,7 @@ import { setupServerClient } from "./setup";
 import { sync as mkdir } from "mkdirp";
 import { chmodSync } from "fs";
 import { createReadStream, writeFileSync } from "fs";
-import { Extract } from "unzip";
+import { Extract } from "unzipper";
 import { get } from "request";
 import { RequestCallback } from "request";
 
