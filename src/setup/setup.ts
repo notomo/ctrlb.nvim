@@ -6,6 +6,7 @@ export const setupServerClient = (
   binaryDirectory: string,
   mkdir: { (dir: string): void },
   chmod: { (path: string, mode: string): void },
+  stat: { (path: string): void },
   unarchive: {
     (filePath: string, extractTo: string, callback: Function): void;
   },
@@ -32,6 +33,12 @@ export const setupServerClient = (
   mkdir(binaryDirectory);
 
   const fileName = `wsxhub-${platform}-amd64-${releaseTag}.zip`;
+  const zipFilePath = binaryDirectory + "/" + fileName;
+  try {
+    stat(zipFilePath);
+    return;
+  } catch (e) {}
+
   const url = `https://github.com/notomo/wsxhub/releases/download/${releaseTag}/${fileName}`;
   getFile(url, (error, response, body) => {
     if (error) {
@@ -41,8 +48,6 @@ export const setupServerClient = (
 
     log(`${url}: ${response.statusCode} ${response.statusMessage}`);
     if (response.statusCode === 200) {
-      const zipFilePath = binaryDirectory + "/" + fileName;
-
       writeFile(zipFilePath, body);
 
       unarchive(zipFilePath, binaryDirectory, () => {

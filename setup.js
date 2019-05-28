@@ -8,7 +8,6 @@ const npm = cmd => {
 };
 const node = cmd => {
   const command = "node " + cmd;
-  console.log(command);
   const result = execSync(command, { encoding: "utf8" });
   console.log(result);
 };
