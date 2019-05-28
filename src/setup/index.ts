@@ -1,7 +1,7 @@
 import { setupServerClient } from "./setup";
 import { sync as mkdir } from "mkdirp";
 import { chmodSync } from "fs";
-import { createReadStream, writeFileSync } from "fs";
+import { createReadStream, writeFileSync, statSync } from "fs";
 import { Extract } from "unzipper";
 import { get } from "request";
 import { RequestCallback } from "request";
@@ -29,6 +29,7 @@ setupServerClient(
   binaryDirectory,
   mkdir,
   chmodSync,
+  statSync,
   unarchive,
   writeFileSync,
   getFile,

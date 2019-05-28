@@ -3,6 +3,7 @@ import { setupServerClient } from "./setup";
 describe("setupServerClient", () => {
   let mkdir: jest.Mock;
   let chmod: jest.Mock;
+  let stat: jest.Mock;
   let unarchive: jest.Mock;
   let writeFile: jest.Mock;
   let getFile: jest.Mock;
@@ -21,6 +22,9 @@ describe("setupServerClient", () => {
   beforeEach(() => {
     mkdir = jest.fn();
     chmod = jest.fn();
+    stat = jest.fn().mockImplementation(() => {
+      throw new Error("ENOENT: no such file or directory");
+    });
     writeFile = jest.fn();
 
     getFile = jest.fn().mockImplementation((url, callback) => {
@@ -44,6 +48,7 @@ describe("setupServerClient", () => {
       binaryDirectory,
       mkdir,
       chmod,
+      stat,
       unarchive,
       writeFile,
       getFile,
@@ -70,6 +75,7 @@ describe("setupServerClient", () => {
       binaryDirectory,
       mkdir,
       chmod,
+      stat,
       unarchive,
       writeFile,
       getFile,
@@ -93,6 +99,7 @@ describe("setupServerClient", () => {
       binaryDirectory,
       mkdir,
       chmod,
+      stat,
       unarchive,
       writeFile,
       getFile,
@@ -118,6 +125,7 @@ describe("setupServerClient", () => {
         binaryDirectory,
         mkdir,
         chmod,
+        stat,
         unarchive,
         writeFile,
         getFile,
@@ -138,6 +146,7 @@ describe("setupServerClient", () => {
       binaryDirectory,
       mkdir,
       chmod,
+      stat,
       unarchive,
       writeFile,
       getFileWith404,
@@ -160,6 +169,7 @@ describe("setupServerClient", () => {
       binaryDirectory,
       mkdir,
       chmod,
+      stat,
       unarchive,
       writeFile,
       getFileWithError,
@@ -169,5 +179,25 @@ describe("setupServerClient", () => {
 
     expect(writeFile).not.toHaveBeenCalled();
     expect(errorLog).toHaveBeenCalledWith(error);
+  });
+
+  it("do nothing if the zip file already exists", () => {
+    stat = jest.fn();
+
+    setupServerClient(
+      "win32",
+      releaseTag,
+      binaryDirectory,
+      mkdir,
+      chmod,
+      stat,
+      unarchive,
+      writeFile,
+      getFile,
+      log,
+      errorLog
+    );
+
+    expect(getFile).not.toHaveBeenCalled();
   });
 });
