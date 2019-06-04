@@ -36,8 +36,49 @@ import { TabList } from "./buffers/tabList";
 import { DownloadList } from "./buffers/downloadList";
 import { EventRegisterer } from "./buffers/event";
 
+type Deps = {
+  Ctrlb: Ctrlb;
+  Requester: Requester;
+  Reporter: Reporter;
+  Open: Open;
+  Execute: Execute;
+  Completer: Completer;
+  ApiInfoRepository: ApiInfoRepository;
+  BookmarkRepository: BookmarkRepository;
+  TabRepository: TabRepository;
+  EventRepository: EventRepository;
+  HistoryRepository: HistoryRepository;
+  DownloadRepository: DownloadRepository;
+  BufferRepository: BufferRepository;
+  AutocmdRepository: AutocmdRepository;
+  HighlightRepository: HighlightRepository;
+  ConfigRepository: ConfigRepository;
+  EventRegisterer: EventRegisterer;
+  Ctrl: Ctrl;
+  BookmarkTree: BookmarkTree;
+  CurrentTab: CurrentTab;
+  Empty: Empty;
+  HistoryList: HistoryList;
+  TabList: TabList;
+  DownloadList: DownloadList;
+  BufferContainer: BufferContainer;
+};
+
+type DepsFuncs = {
+  [P in keyof Deps]: { (vim: Neovim, ...args: any[]): Deps[P] }
+};
+type DepsCache = { [P in keyof Deps]: Deps[P] | null };
+const initDepsCache = (depsFuncs: DepsFuncs): DepsCache => {
+  const caches = {} as DepsCache;
+  Object.keys(depsFuncs).map(key => {
+    // FIXME: Expression produces a union type that is too complex to represent.
+    caches[key as "Ctrlb"] = null;
+  });
+  return caches;
+};
+
 export class Di {
-  protected static readonly deps: Deps = {
+  protected static readonly deps: DepsFuncs = {
     Ctrlb: (vim: Neovim) => {
       const argParser = new ArgParser();
       const requester = Di.get("Requester", vim);
@@ -231,149 +272,39 @@ export class Di {
     },
   };
 
-  protected static readonly cache: DepsCache = {
-    Ctrlb: null,
-    Requester: null,
-    Reporter: null,
-    Open: null,
-    Execute: null,
-    Completer: null,
-    ApiInfoRepository: null,
-    BookmarkRepository: null,
-    TabRepository: null,
-    EventRepository: null,
-    HistoryRepository: null,
-    DownloadRepository: null,
-    BufferRepository: null,
-    AutocmdRepository: null,
-    HighlightRepository: null,
-    ConfigRepository: null,
-    EventRegisterer: null,
-    Ctrl: null,
-    BookmarkTree: null,
-    CurrentTab: null,
-    Empty: null,
-    HistoryList: null,
-    TabList: null,
-    DownloadList: null,
-    BufferContainer: null,
-  };
+  protected static readonly cache: DepsCache = initDepsCache(Di.deps);
 
-  public static get(cls: "Ctrl", vim: Neovim, cacheable: false): Ctrl;
-  public static get(
-    cls: "BookmarkTree",
-    vim: Neovim,
-    cacheable: false
-  ): BookmarkTree;
-  public static get(
-    cls: "CurrentTab",
-    vim: Neovim,
-    cacheable: false
-  ): CurrentTab;
-  public static get(cls: "Empty", vim: Neovim, cacheable: false): Empty;
-  public static get(
-    cls: "HistoryList",
-    vim: Neovim,
-    cacheable: false
-  ): HistoryList;
-  public static get(cls: "TabList", vim: Neovim, cacheable: false): TabList;
-  public static get(
-    cls: "DownloadList",
-    vim: Neovim,
-    cacheable: false
-  ): DownloadList;
-  public static get(
-    cls: "EventRegisterer",
-    vim: Neovim,
-    cacheable: false
-  ): EventRegisterer;
-  public static get(cls: "BufferRepository", vim: Neovim): BufferRepository;
-  public static get(cls: "AutocmdRepository", vim: Neovim): AutocmdRepository;
-  public static get(
-    cls: "HighlightRepository",
-    vim: Neovim
-  ): HighlightRepository;
-  public static get(cls: "ConfigRepository", vim: Neovim): ConfigRepository;
-  public static get(cls: "HistoryRepository", vim: Neovim): HistoryRepository;
-  public static get(cls: "DownloadRepository", vim: Neovim): DownloadRepository;
-  public static get(cls: "EventRepository", vim: Neovim): EventRepository;
-  public static get(cls: "TabRepository", vim: Neovim): TabRepository;
-  public static get(cls: "BookmarkRepository", vim: Neovim): BookmarkRepository;
-  public static get(cls: "ApiInfoRepository", vim: Neovim): ApiInfoRepository;
-  public static get(
-    cls: "BufferContainer",
-    vim: Neovim,
-    cacheable: false,
-    type: string
-  ): BufferContainer;
-  public static get(cls: "Execute", vim: Neovim): Execute;
-  public static get(cls: "Open", vim: Neovim): Open;
-  public static get(cls: "Completer", vim: Neovim): Completer;
-  public static get(
-    cls: "Reporter",
-    vim: Neovim,
-    cacheable: false,
-    name: string
-  ): Reporter;
-  public static get(cls: "Requester", vim: Neovim): Requester;
-  public static get(cls: "Ctrlb", vim: Neovim): Ctrlb;
-  public static get(
-    cls: keyof Deps,
+  public static get<ClassName extends keyof Deps>(
+    cls: ClassName,
     vim: Neovim,
     cacheable: boolean = true,
     ...args: any[]
-  ): ReturnType<Deps[keyof Deps]> {
+  ): Deps[ClassName] {
     const cache = this.cache[cls];
     if (cache !== null) {
-      return cache;
+      // FIXME: Expression produces a union type that is too complex to represent.
+      return cache as any;
     }
-    const resolved = this.deps[cls](vim, ...args);
+    const resolved = this.deps[cls](vim, ...args) as Deps[ClassName];
     if (cacheable) {
-      this.cache[cls] = resolved;
+      // FIXME: Expression produces a union type that is too complex to represent.
+      this.cache[cls] = resolved as any;
     }
     return resolved;
   }
 
-  public static set(
-    cls: keyof Deps,
-    value: ReturnType<Deps[keyof Deps]>
+  public static set<ClassName extends keyof Deps>(
+    cls: ClassName,
+    value: Deps[ClassName]
   ): void {
-    this.cache[cls] = value;
+    // FIXME: Expression produces a union type that is too complex to represent.
+    this.cache[cls] = value as any;
   }
 
   public static clear(): void {
     for (const key of Object.keys(this.deps)) {
-      this.cache[key as keyof DepsCache] = null;
+      // FIXME: Expression produces a union type that is too complex to represent.
+      this.cache[key as "Ctrlb"] = null;
     }
   }
 }
-
-interface Deps {
-  Ctrlb: { (vim: Neovim, ...args: any[]): Ctrlb };
-  Requester: { (vim: Neovim, ...args: any[]): Requester };
-  Reporter: { (vim: Neovim, ...args: any[]): Reporter };
-  Open: { (vim: Neovim, ...args: any[]): Open };
-  Execute: { (vim: Neovim, ...args: any[]): Execute };
-  Completer: { (vim: Neovim, ...args: any[]): Completer };
-  ApiInfoRepository: { (vim: Neovim, ...args: any[]): ApiInfoRepository };
-  BookmarkRepository: { (vim: Neovim, ...args: any[]): BookmarkRepository };
-  TabRepository: { (vim: Neovim, ...args: any[]): TabRepository };
-  EventRepository: { (vim: Neovim, ...args: any[]): EventRepository };
-  HistoryRepository: { (vim: Neovim, ...args: any[]): HistoryRepository };
-  DownloadRepository: { (vim: Neovim, ...args: any[]): DownloadRepository };
-  BufferRepository: { (vim: Neovim, ...args: any[]): BufferRepository };
-  AutocmdRepository: { (vim: Neovim, ...args: any[]): AutocmdRepository };
-  HighlightRepository: { (vim: Neovim, ...args: any[]): HighlightRepository };
-  ConfigRepository: { (vim: Neovim, ...args: any[]): ConfigRepository };
-  EventRegisterer: { (vim: Neovim, ...args: any[]): EventRegisterer };
-  Ctrl: { (vim: Neovim, ...args: any[]): Ctrl };
-  BookmarkTree: { (vim: Neovim, ...args: any[]): BookmarkTree };
-  CurrentTab: { (vim: Neovim, ...args: any[]): CurrentTab };
-  Empty: { (vim: Neovim, ...args: any[]): Empty };
-  HistoryList: { (vim: Neovim, ...args: any[]): HistoryList };
-  TabList: { (vim: Neovim, ...args: any[]): TabList };
-  DownloadList: { (vim: Neovim, ...args: any[]): DownloadList };
-  BufferContainer: { (vim: Neovim, ...args: any[]): BufferContainer };
-}
-
-type DepsCache = { [P in keyof Deps]: ReturnType<Deps[P]> | null };
