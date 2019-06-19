@@ -5,7 +5,7 @@ let s:default_config = {
     \ 'port': v:null,
     \ 'server_port': v:null,
     \ 'executable_client': s:bin_directory . 'wsxhub',
-    \ 'executable_server': s:bin_directory . 'wsxhubd',
+    \ 'executable_server': s:bin_directory . 'wsxhub',
 \ }
 let s:config = deepcopy(s:default_config)
 

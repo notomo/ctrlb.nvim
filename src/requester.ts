@@ -1,14 +1,20 @@
 import { spawn, ChildProcess, execFile } from "child_process";
 import { ActionInfo } from "./info";
-import { promisify } from "util";
 import { Logger, getLogger } from "./logger";
 import { Reporter } from "./reporter";
 import { ConfigRepository } from "./repository/config";
 import { WithError, NullableError } from "./error";
-const promisifyExecFile = promisify(execFile);
+
+const promisifyProcess = (proc: ChildProcess) => {
+  return new Promise((resolve, reject) => {
+    proc.addListener("error", reject);
+    proc.addListener("exit", resolve);
+  });
+};
 
 export class Requester {
   protected readonly logger: Logger;
+  protected id = 0;
 
   constructor(
     protected readonly reporter: Reporter,
@@ -22,33 +28,34 @@ export class Requester {
     const timeout = await this.configRepository.getTimeout();
     const port = await this.configRepository.getPort();
     const portOption = port === null ? [] : ["--port", String(port)];
-    const result = await promisifyExecFile(
+
+    const proc = execFile(
       client,
-      portOption.concat([
-        "--timeout",
-        String(timeout),
-        "send",
-        "--json",
-        JSON.stringify(info),
-      ]),
+      portOption.concat(["send", "--timeout", String(timeout)]),
       { timeout: (timeout + 1) * 1000 }
-    ).catch(e => {
-      return e;
+    );
+    if (proc.stdin === null || proc.stdout === null) {
+      return new Error("stdin or stdout not found");
+    }
+
+    let result = "";
+    proc.stdout.on("data", data => {
+      result += data;
     });
 
-    if (result.name !== undefined) {
-      const error = {
-        name: result.name,
-        message: result.message,
-        stack: result.stack,
-      };
-      await this.reporter.error(error);
-      return error;
+    info.id = String(this.id + 1);
+    proc.stdin.write(JSON.stringify(info));
+    proc.stdin.end();
+
+    try {
+      await promisifyProcess(proc);
+    } catch (e) {
+      return e;
     }
 
     const stdout: {
       error?: { data: { name: string }; message: string };
-    } = JSON.parse(result.stdout.trim().split("\n")[0]);
+    } = JSON.parse(result.trim().split("\n")[0]);
 
     if (stdout.error !== undefined) {
       const error = {
@@ -67,34 +74,36 @@ export class Requester {
     const timeout = await this.configRepository.getTimeout();
     const port = await this.configRepository.getPort();
     const portOption = port === null ? [] : ["--port", String(port)];
-    const result = await promisifyExecFile(
+
+    const proc = execFile(
       client,
-      portOption.concat([
-        "--timeout",
-        String(timeout),
-        "send",
-        "--json",
-        JSON.stringify(info),
-      ]),
+      portOption.concat(["send", "--timeout", String(timeout)]),
       { timeout: (timeout + 1) * 1000 }
-    ).catch(e => {
-      return e;
+    );
+    if (proc.stdin === null || proc.stdout === null) {
+      const e = new Error("stdin or stdout not found");
+      return [null, e];
+    }
+
+    let result = "";
+    proc.stdout.on("data", data => {
+      result += data;
     });
 
-    if (result.name !== undefined) {
-      const error = {
-        name: result.name,
-        message: result.message,
-        stack: result.stack,
-      };
-      await this.reporter.error(error);
-      return [null, error];
+    info.id = String(this.id + 1);
+    proc.stdin.write(JSON.stringify(info));
+    proc.stdin.end();
+
+    try {
+      await promisifyProcess(proc);
+    } catch (e) {
+      return e;
     }
 
     const stdout: {
       body: { data: T };
       error?: { data: { name: string }; message: string };
-    } = JSON.parse(result.stdout.trim().split("\n")[0]);
+    } = JSON.parse(result.trim().split("\n")[0]);
 
     if (stdout.error !== undefined) {
       const error = {
@@ -121,13 +130,16 @@ export class Requester {
     const p = spawn(
       client,
       portOption.concat([
-        "--key",
-        JSON.stringify(keyFilter),
-        "--filter",
-        JSON.stringify(filter),
-        "--regex",
-        JSON.stringify(regexFilter),
         "receive",
+        "--filter",
+        JSON.stringify({
+          operator: "and",
+          filters: [
+            { type: "exactKey", map: keyFilter },
+            { type: "exact", map: filter },
+            { type: "regexp", map: regexFilter },
+          ],
+        }),
         "--debounce",
         debounceInterval.toString(),
       ])

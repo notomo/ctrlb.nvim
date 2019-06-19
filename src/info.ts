@@ -2,6 +2,7 @@ import { readFileSync } from "fs";
 import { CtrlbBufferType } from "./buffers/type";
 
 export interface ActionInfo {
+  id?: string;
   method: string;
   params?: ActionArgs;
 }
