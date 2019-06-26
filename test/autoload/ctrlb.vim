@@ -34,7 +34,7 @@ function! s:suite._complete()
     call s:assert.is_string(result)
 endfunction
 
-" NOTICE: needs to setup bin/wsxhub, bin/wsxhubd
+" NOTICE: needs to setup bin/wsxhub
 function! s:suite.ping()
     call ctrlb#config#set('server_port', 8009)
     call ctrlb#config#set('port', 8010)
