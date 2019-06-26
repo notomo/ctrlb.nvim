@@ -6,7 +6,7 @@ import { Extract } from "unzipper";
 import { get } from "request";
 import { RequestCallback } from "request";
 
-const releaseTag = "v0.0.4";
+const releaseTag = "v0.0.6";
 const binaryDirectory = "bin";
 
 const unarchive = (
