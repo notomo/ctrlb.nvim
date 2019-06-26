@@ -78,9 +78,9 @@ port                                                   *ctrlb.nvim-config-port*
     Default: v:null (used wsxhub default port.)
 
 server_port                                     *ctrlb.nvim-config-server_port*
-    Port for wsxhubd requests.
+    Port for wsxhub outside requests.
     This is used by |ctrlb#start_server()|.
-    Default: v:null (used wsxhubd default port.)
+    Default: v:null (used wsxhub default port.)
 
 executable_client                         *ctrlb.nvim-config-executable_client*
     The executable file path for client.
@@ -89,7 +89,12 @@ executable_client                         *ctrlb.nvim-config-executable_client*
 executable_server                         *ctrlb.nvim-config-executable_server*
     The executable file path for server.
     This is used by |ctrlb#start_server()|.
-    Default: {ctrlb.nvim_root}/bin/wsxhubd
+    Default: {ctrlb.nvim_root}/bin/wsxhub
+
+server_allow                                   *ctrlb.nvim-config-server_allow*
+    The allowed ip pattern for server.
+    This is used by |ctrlb#start_server()|.
+    Default: v:null (used wsxhub default.)
 
 ==============================================================================
 vim:tw=78:ts=8:sw=2:ft=help:et:norl:fen:fdl=0:

@@ -38,6 +38,7 @@ endfunction
 function! s:suite.ping()
     call ctrlb#config#set('server_port', 8009)
     call ctrlb#config#set('port', 8010)
+    call ctrlb#config#set('server_allow', 'localhost:8009')
 
     let result = ctrlb#ping()
     call s:assert.equals(result, v:false)
