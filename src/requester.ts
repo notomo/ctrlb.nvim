@@ -8,7 +8,13 @@ import { WithError, NullableError } from "./error";
 const promisifyProcess = (proc: ChildProcess) => {
   return new Promise((resolve, reject) => {
     proc.addListener("error", reject);
-    proc.addListener("exit", resolve);
+    proc.addListener("exit", (code: number) => {
+      if (code === 0) {
+        resolve();
+        return;
+      }
+      reject();
+    });
   });
 };
 
@@ -29,13 +35,24 @@ export class Requester {
     const port = await this.configRepository.getPort();
     const portOption = port === null ? [] : ["--port", String(port)];
 
+    this.id += 1;
+    const id = String(this.id);
     const proc = execFile(
       client,
-      portOption.concat(["send", "--timeout", String(timeout)]),
+      portOption.concat([
+        "send",
+        "--timeout",
+        String(timeout),
+        "--filter",
+        JSON.stringify({
+          operator: "and",
+          filters: [{ type: "contained", map: { id: id } }],
+        }),
+      ]),
       { timeout: (timeout + 1) * 1000 }
     );
-    if (proc.stdin === null || proc.stdout === null) {
-      return new Error("stdin or stdout not found");
+    if (proc.stdin === null || proc.stdout === null || proc.stderr === null) {
+      return new Error("stdin or stdout or stderr not found");
     }
 
     let result = "";
@@ -43,14 +60,21 @@ export class Requester {
       result += data;
     });
 
-    info.id = String(this.id + 1);
+    let errorResult = "";
+    proc.stderr.on("data", data => {
+      errorResult += data;
+    });
+
+    info.id = id;
     proc.stdin.write(JSON.stringify(info));
     proc.stdin.end();
 
     try {
       await promisifyProcess(proc);
     } catch (e) {
-      return e;
+      const error = { name: "request error", message: errorResult.trim() };
+      await this.reporter.error(error);
+      return error;
     }
 
     const stdout: {
@@ -75,12 +99,23 @@ export class Requester {
     const port = await this.configRepository.getPort();
     const portOption = port === null ? [] : ["--port", String(port)];
 
+    this.id += 1;
+    const id = String(this.id);
     const proc = execFile(
       client,
-      portOption.concat(["send", "--timeout", String(timeout)]),
+      portOption.concat([
+        "send",
+        "--timeout",
+        String(timeout),
+        "--filter",
+        JSON.stringify({
+          operator: "and",
+          filters: [{ type: "contained", map: { id: id } }],
+        }),
+      ]),
       { timeout: (timeout + 1) * 1000 }
     );
-    if (proc.stdin === null || proc.stdout === null) {
+    if (proc.stdin === null || proc.stdout === null || proc.stderr === null) {
       const e = new Error("stdin or stdout not found");
       return [null, e];
     }
@@ -90,13 +125,20 @@ export class Requester {
       result += data;
     });
 
-    info.id = String(this.id + 1);
+    let errorResult = "";
+    proc.stderr.on("data", data => {
+      errorResult += data;
+    });
+
+    info.id = String(this.id);
     proc.stdin.write(JSON.stringify(info));
     proc.stdin.end();
 
     try {
       await promisifyProcess(proc);
     } catch (e) {
+      const error = { name: "request error", message: errorResult.trim() };
+      await this.reporter.error(error);
       return e;
     }
 
@@ -135,8 +177,8 @@ export class Requester {
         JSON.stringify({
           operator: "and",
           filters: [
-            { type: "exactKey", map: keyFilter },
-            { type: "exact", map: filter },
+            { type: "containedKey", map: keyFilter },
+            { type: "contained", map: filter },
             { type: "regexp", map: regexFilter },
           ],
         }),
