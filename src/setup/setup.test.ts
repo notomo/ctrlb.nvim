@@ -62,10 +62,6 @@ describe("setupServerClient", () => {
       body
     );
     expect(chmod).toHaveBeenCalledWith(binaryDirectory + "/wsxhub.exe", "0744");
-    expect(chmod).toHaveBeenCalledWith(
-      binaryDirectory + "/wsxhubd.exe",
-      "0744"
-    );
   });
 
   it("linux", () => {
@@ -89,7 +85,6 @@ describe("setupServerClient", () => {
       body
     );
     expect(chmod).toHaveBeenCalledWith(binaryDirectory + "/wsxhub", "0744");
-    expect(chmod).toHaveBeenCalledWith(binaryDirectory + "/wsxhubd", "0744");
   });
 
   it("darwin", () => {
@@ -113,7 +108,6 @@ describe("setupServerClient", () => {
       body
     );
     expect(chmod).toHaveBeenCalledWith(binaryDirectory + "/wsxhub", "0744");
-    expect(chmod).toHaveBeenCalledWith(binaryDirectory + "/wsxhubd", "0744");
   });
 
   it("the other platform", () => {

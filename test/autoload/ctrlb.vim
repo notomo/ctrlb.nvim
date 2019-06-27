@@ -34,10 +34,11 @@ function! s:suite._complete()
     call s:assert.is_string(result)
 endfunction
 
-" NOTICE: needs to setup bin/wsxhub, bin/wsxhubd
+" NOTICE: needs to setup bin/wsxhub
 function! s:suite.ping()
     call ctrlb#config#set('server_port', 8009)
     call ctrlb#config#set('port', 8010)
+    call ctrlb#config#set('server_allow', 'localhost:8009')
 
     let result = ctrlb#ping()
     call s:assert.equals(result, v:false)

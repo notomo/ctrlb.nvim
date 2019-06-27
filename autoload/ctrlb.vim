@@ -41,12 +41,15 @@ function! ctrlb#start_server() abort
 
     let server = ctrlb#config#get('executable_server')
     let port = ctrlb#config#get('port')
-    let port_option = empty(port) ? '' : '--inside=' . port
+    let port_option = empty(port) ? '' : '--port=' . port
 
     let server_port = ctrlb#config#get('server_port')
     let server_port_option = empty(server_port) ? '' : '--outside=' . server_port
 
-    let cmd = join([server, port_option, server_port_option], ' ')
+    let server_allow = ctrlb#config#get('server_allow')
+    let server_allow_option = empty(server_allow) ? '' : '--outside-allow=' . server_allow
+
+    let cmd = join([server, port_option, 'server', server_port_option, server_allow_option], ' ')
     let s:server_job_id = jobstart(cmd)
 endfunction
 

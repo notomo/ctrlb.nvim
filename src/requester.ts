@@ -1,14 +1,26 @@
 import { spawn, ChildProcess, execFile } from "child_process";
 import { ActionInfo } from "./info";
-import { promisify } from "util";
 import { Logger, getLogger } from "./logger";
 import { Reporter } from "./reporter";
 import { ConfigRepository } from "./repository/config";
 import { WithError, NullableError } from "./error";
-const promisifyExecFile = promisify(execFile);
+
+const promisifyProcess = (proc: ChildProcess) => {
+  return new Promise((resolve, reject) => {
+    proc.addListener("error", reject);
+    proc.addListener("exit", (code: number) => {
+      if (code === 0) {
+        resolve();
+        return;
+      }
+      reject();
+    });
+  });
+};
 
 export class Requester {
   protected readonly logger: Logger;
+  protected id = 0;
 
   constructor(
     protected readonly reporter: Reporter,
@@ -22,33 +34,52 @@ export class Requester {
     const timeout = await this.configRepository.getTimeout();
     const port = await this.configRepository.getPort();
     const portOption = port === null ? [] : ["--port", String(port)];
-    const result = await promisifyExecFile(
+
+    this.id += 1;
+    const id = String(this.id);
+    const proc = execFile(
       client,
       portOption.concat([
+        "send",
         "--timeout",
         String(timeout),
-        "send",
-        "--json",
-        JSON.stringify(info),
+        "--filter",
+        JSON.stringify({
+          operator: "and",
+          filters: [{ type: "contained", map: { id: id } }],
+        }),
       ]),
       { timeout: (timeout + 1) * 1000 }
-    ).catch(e => {
-      return e;
+    );
+    if (proc.stdin === null || proc.stdout === null || proc.stderr === null) {
+      return new Error("stdin or stdout or stderr not found");
+    }
+
+    let result = "";
+    proc.stdout.on("data", data => {
+      result += data;
     });
 
-    if (result.name !== undefined) {
-      const error = {
-        name: result.name,
-        message: result.message,
-        stack: result.stack,
-      };
+    let errorResult = "";
+    proc.stderr.on("data", data => {
+      errorResult += data;
+    });
+
+    info.id = id;
+    proc.stdin.write(JSON.stringify(info));
+    proc.stdin.end();
+
+    try {
+      await promisifyProcess(proc);
+    } catch (e) {
+      const error = { name: "request error", message: errorResult.trim() };
       await this.reporter.error(error);
       return error;
     }
 
     const stdout: {
       error?: { data: { name: string }; message: string };
-    } = JSON.parse(result.stdout.trim().split("\n")[0]);
+    } = JSON.parse(result.trim().split("\n")[0]);
 
     if (stdout.error !== undefined) {
       const error = {
@@ -67,34 +98,54 @@ export class Requester {
     const timeout = await this.configRepository.getTimeout();
     const port = await this.configRepository.getPort();
     const portOption = port === null ? [] : ["--port", String(port)];
-    const result = await promisifyExecFile(
+
+    this.id += 1;
+    const id = String(this.id);
+    const proc = execFile(
       client,
       portOption.concat([
+        "send",
         "--timeout",
         String(timeout),
-        "send",
-        "--json",
-        JSON.stringify(info),
+        "--filter",
+        JSON.stringify({
+          operator: "and",
+          filters: [{ type: "contained", map: { id: id } }],
+        }),
       ]),
       { timeout: (timeout + 1) * 1000 }
-    ).catch(e => {
-      return e;
+    );
+    if (proc.stdin === null || proc.stdout === null || proc.stderr === null) {
+      const e = new Error("stdin or stdout not found");
+      return [null, e];
+    }
+
+    let result = "";
+    proc.stdout.on("data", data => {
+      result += data;
     });
 
-    if (result.name !== undefined) {
-      const error = {
-        name: result.name,
-        message: result.message,
-        stack: result.stack,
-      };
+    let errorResult = "";
+    proc.stderr.on("data", data => {
+      errorResult += data;
+    });
+
+    info.id = String(this.id);
+    proc.stdin.write(JSON.stringify(info));
+    proc.stdin.end();
+
+    try {
+      await promisifyProcess(proc);
+    } catch (e) {
+      const error = { name: "request error", message: errorResult.trim() };
       await this.reporter.error(error);
-      return [null, error];
+      return e;
     }
 
     const stdout: {
       body: { data: T };
       error?: { data: { name: string }; message: string };
-    } = JSON.parse(result.stdout.trim().split("\n")[0]);
+    } = JSON.parse(result.trim().split("\n")[0]);
 
     if (stdout.error !== undefined) {
       const error = {
@@ -121,13 +172,16 @@ export class Requester {
     const p = spawn(
       client,
       portOption.concat([
-        "--key",
-        JSON.stringify(keyFilter),
-        "--filter",
-        JSON.stringify(filter),
-        "--regex",
-        JSON.stringify(regexFilter),
         "receive",
+        "--filter",
+        JSON.stringify({
+          operator: "and",
+          filters: [
+            { type: "containedKey", map: keyFilter },
+            { type: "contained", map: filter },
+            { type: "regexp", map: regexFilter },
+          ],
+        }),
         "--debounce",
         debounceInterval.toString(),
       ])

@@ -5,7 +5,8 @@ let s:default_config = {
     \ 'port': v:null,
     \ 'server_port': v:null,
     \ 'executable_client': s:bin_directory . 'wsxhub',
-    \ 'executable_server': s:bin_directory . 'wsxhubd',
+    \ 'executable_server': s:bin_directory . 'wsxhub',
+    \ 'server_allow': v:null,
 \ }
 let s:config = deepcopy(s:default_config)
 
@@ -29,6 +30,10 @@ let s:validations = {
     \ 'executable_server': {
         \ 'description': 'an executable string',
         \ 'func': {x -> type(x) ==? v:t_string && executable(x)},
+    \ },
+    \ 'server_allow': {
+        \ 'description': 'an server allow pattern',
+        \ 'func': {x -> type(x) ==? v:t_string},
     \ },
 \ }
 
