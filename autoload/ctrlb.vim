@@ -47,7 +47,13 @@ function! ctrlb#start_server() abort
     let server_port_option = empty(server_port) ? '' : '--outside=' . server_port
 
     let server_allow = ctrlb#config#get('server_allow')
-    let server_allow_option = empty(server_allow) ? '' : '--outside-allow=' . server_allow
+    if empty(server_allow) && !empty(server_port)
+        let server_allow_option = '--outside-allow=127.0.0.1:' . server_port
+    elseif !empty(server_allow)
+        let server_allow_option = '--outside-allow=' . server_allow
+    else
+        let server_allow_option = ''
+    endif
 
     let cmd = join([server, port_option, 'server', server_port_option, server_allow_option], ' ')
     let s:server_job_id = jobstart(cmd)
