@@ -34,17 +34,23 @@ export class BookmarkRepository {
     });
   }
 
-  public async tabOpen(id: string | null): Promise<NullableError> {
-    return this.requester.executeAsync({
-      method: "bookmark/tabOpen",
-      params: { id: id },
-    });
+  public async tabOpen(
+    ids: ReadonlyArray<string | null>
+  ): Promise<NullableError> {
+    return this.requester.batchNotify(
+      ids.map(id => {
+        return { method: "bookmark/tabOpen", params: { id: id } };
+      })
+    );
   }
 
-  public async remove(id: string): Promise<NullableError> {
-    return this.requester.executeAsync({
-      method: "bookmark/remove",
-      params: { id: id },
-    });
+  public async remove(
+    ids: ReadonlyArray<string | null>
+  ): Promise<NullableError> {
+    return this.requester.batchNotify(
+      ids.map(id => {
+        return { method: "bookmark/remove", params: { id: id } };
+      })
+    );
   }
 }

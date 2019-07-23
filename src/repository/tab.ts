@@ -30,25 +30,28 @@ export class TabRepository {
     return [tabs, null];
   }
 
-  public async close(id: number): Promise<NullableError> {
-    return this.requester.executeAsync({
-      method: "tab/close",
-      params: { id: id },
-    });
+  public async close(ids: ReadonlyArray<number>): Promise<NullableError> {
+    return this.requester.batchNotify(
+      ids.map(id => {
+        return { method: "tab/close", params: { id: id } };
+      })
+    );
   }
 
-  public async duplicate(id: number): Promise<NullableError> {
-    return this.requester.executeAsync({
-      method: "tab/duplicate",
-      params: { id: id },
-    });
+  public async duplicate(ids: ReadonlyArray<number>): Promise<NullableError> {
+    return this.requester.batchNotify(
+      ids.map(id => {
+        return { method: "tab/duplicate", params: { id: id } };
+      })
+    );
   }
 
-  public async reload(id: number): Promise<NullableError> {
-    return this.requester.executeAsync({
-      method: "tab/reload",
-      params: { id: id },
-    });
+  public async reload(ids: ReadonlyArray<number>): Promise<NullableError> {
+    return this.requester.batchNotify(
+      ids.map(id => {
+        return { method: "tab/reload", params: { id: id } };
+      })
+    );
   }
 
   public async activate(id: number): Promise<NullableError> {
@@ -65,32 +68,36 @@ export class TabRepository {
     });
   }
 
-  public async tabOpen(url: string): Promise<NullableError> {
-    return this.requester.executeAsync({
-      method: "tab/tabOpen",
-      params: { url: url },
-    });
+  public async tabOpen(urls: ReadonlyArray<string>): Promise<NullableError> {
+    return this.requester.batchNotify(
+      urls.map(url => {
+        return { method: "tab/tabOpen", params: { url: url } };
+      })
+    );
   }
 
-  public async zoomUp(id: number): Promise<NullableError> {
-    return this.requester.executeAsync({
-      method: "tab/zoom/up",
-      params: { id: id },
-    });
+  public async zoomUp(ids: ReadonlyArray<number>): Promise<NullableError> {
+    return this.requester.batchNotify(
+      ids.map(id => {
+        return { method: "tab/zoom/up", params: { id: id } };
+      })
+    );
   }
 
-  public async zoomDown(id: number): Promise<NullableError> {
-    return this.requester.executeAsync({
-      method: "tab/zoom/down",
-      params: { id: id },
-    });
+  public async zoomDown(ids: ReadonlyArray<number>): Promise<NullableError> {
+    return this.requester.batchNotify(
+      ids.map(id => {
+        return { method: "tab/zoom/down", params: { id: id } };
+      })
+    );
   }
 
-  public async zoomReset(id: number): Promise<NullableError> {
-    return this.requester.executeAsync({
-      method: "tab/zoom/reset",
-      params: { id: id },
-    });
+  public async zoomReset(ids: ReadonlyArray<number>): Promise<NullableError> {
+    return this.requester.batchNotify(
+      ids.map(id => {
+        return { method: "tab/zoom/reset", params: { id: id } };
+      })
+    );
   }
 
   public async onChanged(callback: {

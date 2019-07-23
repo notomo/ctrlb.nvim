@@ -29,6 +29,42 @@ export class Requester {
     this.logger = getLogger("requester");
   }
 
+  public async batchNotify(infos: ActionInfo[]): Promise<NullableError> {
+    if (infos.length === 0) {
+      return null
+    }
+
+    const client = await this.configRepository.getExecutableClient();
+    const timeout = await this.configRepository.getTimeout();
+    const port = await this.configRepository.getPort();
+    const portOption = port === null ? [] : ["--port", String(port)];
+
+    const proc = execFile(client, portOption.concat(["notify"]), {
+      timeout: (timeout + 1) * 1000,
+    });
+    if (proc.stdin === null || proc.stderr === null) {
+      return new Error("stdin or stderr not found");
+    }
+
+    let errorResult = "";
+    proc.stderr.on("data", data => {
+      errorResult += data;
+    });
+
+    proc.stdin.write(JSON.stringify(infos));
+    proc.stdin.end();
+
+    try {
+      await promisifyProcess(proc);
+    } catch (e) {
+      const error = { name: "notify error", message: errorResult.trim() };
+      await this.reporter.error(error);
+      return error;
+    }
+
+    return null;
+  }
+
   public async executeAsync(info: ActionInfo): Promise<NullableError> {
     const client = await this.configRepository.getExecutableClient();
     const timeout = await this.configRepository.getTimeout();

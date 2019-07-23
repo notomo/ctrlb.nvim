@@ -119,18 +119,19 @@ export class BookmarkTree extends BaseBuffer {
   }
 
   public async tabOpenBookmark(firstLine: number, lastLine: number) {
-    (await this.treeBuffer.getRangeModels(firstLine, lastLine))
+    const ids = (await this.treeBuffer.getRangeModels(firstLine, lastLine))
       .map(bookmark => bookmark.id)
-      .filter((id): id is string => id !== undefined)
-      .map(id => this.bookmarkRepository.tabOpen(id));
+      .filter((id): id is string => id !== undefined);
+
+    await this.bookmarkRepository.tabOpen(ids);
   }
 
   public async remove(firstLine: number, lastLine: number) {
-    await (await this.treeBuffer.getRangeModels(firstLine, lastLine))
+    const ids = (await this.treeBuffer.getRangeModels(firstLine, lastLine))
       .map(bookmark => bookmark.id)
-      .filter((id): id is string => id !== undefined)
-      .map(id => this.bookmarkRepository.remove(id));
+      .filter((id): id is string => id !== undefined);
 
+    await this.bookmarkRepository.remove(ids);
     await this.read();
   }
 

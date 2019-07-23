@@ -103,7 +103,7 @@ describe("BookmarkTree", () => {
   it("tabOpenBookmark does nothing", async () => {
     await bookmarkTree.doAction("tabOpen", 1, 1);
 
-    expect(tabOpen).not.toHaveBeenCalled();
+    expect(tabOpen).toHaveBeenCalledWith([]);
   });
 
   it("tabOpenBookmark", async () => {
@@ -125,7 +125,7 @@ describe("BookmarkTree", () => {
 
     await bookmarkTree.doAction("tabOpen", 1, 1);
 
-    expect(tabOpen).toHaveBeenCalledWith(id);
+    expect(tabOpen).toHaveBeenCalledWith([id]);
   });
 
   it("remove", async () => {
@@ -148,7 +148,7 @@ describe("BookmarkTree", () => {
 
     await bookmarkTree.doAction("remove", 1, 1);
 
-    expect(remove).toHaveBeenCalledWith(id);
+    expect(remove).toHaveBeenCalledWith([id]);
   });
 
   it("openParent does nothing", async () => {

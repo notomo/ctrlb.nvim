@@ -126,7 +126,7 @@ describe("HistoryList", () => {
   it("tabOpenHistory does nothing when the current item is null", async () => {
     await historyList.tabOpenHistory(1, 1);
 
-    expect(tabOpen).not.toHaveBeenCalled();
+    expect(tabOpen).toHaveBeenCalledWith([]);
   });
 
   it("tabOpenHistory does nothing when the current item does not have url", async () => {
@@ -150,7 +150,7 @@ describe("HistoryList", () => {
 
     await historyList.tabOpenHistory(1, 1);
 
-    expect(tabOpen).not.toHaveBeenCalled();
+    expect(tabOpen).toHaveBeenCalledWith([]);
   });
 
   it("tabOpenHistory", async () => {
@@ -176,7 +176,7 @@ describe("HistoryList", () => {
 
     await historyList.tabOpenHistory(1, 1);
 
-    expect(tabOpen).toHaveBeenCalledWith(url);
+    expect(tabOpen).toHaveBeenCalledWith([url]);
   });
 });
 

@@ -141,43 +141,43 @@ describe("TabList", () => {
   it("close", async () => {
     await tabList.doAction("close", 0, 0);
 
-    expect(close).toHaveBeenCalledWith(tabId);
+    expect(close).toHaveBeenCalledWith([tabId]);
   });
 
   it("reload", async () => {
     await tabList.doAction("reload", 0, 0);
 
-    expect(reload).toHaveBeenCalledWith(tabId);
+    expect(reload).toHaveBeenCalledWith([tabId]);
   });
 
   it("duplicate", async () => {
     await tabList.doAction("duplicate", 0, 0);
 
-    expect(duplicate).toHaveBeenCalledWith(tabId);
+    expect(duplicate).toHaveBeenCalledWith([tabId]);
   });
 
   it("zoomUp", async () => {
     await tabList.doAction("zoomUp", 0, 0);
 
-    expect(zoomUp).toHaveBeenCalledWith(tabId);
+    expect(zoomUp).toHaveBeenCalledWith([tabId]);
   });
 
   it("zoomDown", async () => {
     await tabList.doAction("zoomDown", 0, 0);
 
-    expect(zoomDown).toHaveBeenCalledWith(tabId);
+    expect(zoomDown).toHaveBeenCalledWith([tabId]);
   });
 
   it("zoomReset", async () => {
     await tabList.doAction("zoomReset", 0, 0);
 
-    expect(zoomReset).toHaveBeenCalledWith(tabId);
+    expect(zoomReset).toHaveBeenCalledWith([tabId]);
   });
 
   it("close", async () => {
     await tabList.doAction("close", 0, 0);
 
-    expect(close).toHaveBeenCalledWith(tabId);
+    expect(close).toHaveBeenCalledWith([tabId]);
   });
 });
 

@@ -29,8 +29,8 @@ describe("HistoryRepository", () => {
   });
 
   it("tabOpen", async () => {
-    await historyRepository.tabOpen("url");
+    await historyRepository.tabOpen(["url"]);
 
-    expect(tabOpen).toHaveBeenCalledWith("url");
+    expect(tabOpen).toHaveBeenCalledWith(["url"]);
   });
 });
