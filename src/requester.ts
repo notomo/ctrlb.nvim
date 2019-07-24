@@ -31,7 +31,7 @@ export class Requester {
 
   public async batchNotify(infos: ActionInfo[]): Promise<NullableError> {
     if (infos.length === 0) {
-      return null
+      return null;
     }
 
     const client = await this.configRepository.getExecutableClient();
