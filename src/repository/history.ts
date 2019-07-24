@@ -27,11 +27,12 @@ export class HistoryRepository {
     return [histories, error];
   }
 
-  public async remove(url: string): Promise<NullableError> {
-    return this.requester.executeAsync({
-      method: "history/remove",
-      params: { url: url },
-    });
+  public async remove(urls: ReadonlyArray<string>): Promise<NullableError> {
+    return this.requester.batchNotify(
+      urls.map(url => {
+        return { method: "history/remove", params: { url: url } };
+      })
+    );
   }
 
   public async onCreated(callback: {
@@ -49,7 +50,7 @@ export class HistoryRepository {
     return this.tabRepository.open(url);
   }
 
-  public async tabOpen(url: string): Promise<NullableError> {
-    return this.tabRepository.tabOpen(url);
+  public async tabOpen(urls: ReadonlyArray<string>): Promise<NullableError> {
+    return this.tabRepository.tabOpen(urls);
   }
 }

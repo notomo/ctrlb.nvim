@@ -110,39 +110,33 @@ export class TabList extends BaseBuffer {
   }
 
   public async close(firstLine: number, lastLine: number) {
-    (await this.getIds(firstLine, lastLine)).map(id =>
-      this.tabRepository.close(id)
-    );
+    const ids = await this.getIds(firstLine, lastLine);
+    await this.tabRepository.close(ids);
   }
 
   public async duplicate(firstLine: number, lastLine: number) {
-    (await this.getIds(firstLine, lastLine)).map(id =>
-      this.tabRepository.duplicate(id)
-    );
+    const ids = await this.getIds(firstLine, lastLine);
+    await this.tabRepository.duplicate(ids);
   }
 
   public async reload(firstLine: number, lastLine: number) {
-    (await this.getIds(firstLine, lastLine)).map(id =>
-      this.tabRepository.reload(id)
-    );
+    const ids = await this.getIds(firstLine, lastLine);
+    await this.tabRepository.reload(ids);
   }
 
   public async zoomUp(firstLine: number, lastLine: number) {
-    (await this.getIds(firstLine, lastLine)).map(id =>
-      this.tabRepository.zoomUp(id)
-    );
+    const ids = await this.getIds(firstLine, lastLine);
+    await this.tabRepository.zoomUp(ids);
   }
 
   public async zoomDown(firstLine: number, lastLine: number) {
-    (await this.getIds(firstLine, lastLine)).map(id =>
-      this.tabRepository.zoomDown(id)
-    );
+    const ids = await this.getIds(firstLine, lastLine);
+    await this.tabRepository.zoomDown(ids);
   }
 
   public async zoomReset(firstLine: number, lastLine: number) {
-    (await this.getIds(firstLine, lastLine)).map(id =>
-      this.tabRepository.zoomReset(id)
-    );
+    const ids = await this.getIds(firstLine, lastLine);
+    await this.tabRepository.zoomReset(ids);
   }
 
   protected async getIds(
