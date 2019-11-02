@@ -75,3 +75,5 @@ endfunction
 function! health#ctrlb#_set_test_client(path) abort
     let s:test_client = a:path
 endfunction
+
+doautocmd User CtrlbSourceLoad

@@ -69,3 +69,5 @@ function! ctrlb#stop_server() abort
     catch /E900: Invalid channel id/
     endtry
 endfunction
+
+doautocmd User CtrlbSourceLoad
